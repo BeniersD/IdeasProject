@@ -14,11 +14,13 @@ main = do
     mapM_ print commutativityTestSet
     putStrLn "\n"
     --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet
-    mapM_ print $ map (apply ruleCommutativity) commutativityTestSet 
+    --mapM_ print $ map (apply ruleCommutativity) commutativityTestSet 
     putStrLn "\n"    
-    mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet 
+    --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet 
     --mapM_ print $ [apply (checkStrategy) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
-
+    mapM_ print $ [apply (layerFirst  lift ruleCommutativity) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet]     
+    --mapM_ print $ map (apply layerFirst) commutativityTestSet 
+     
 
 
     --putStrLn "\nruleCommutativity:"

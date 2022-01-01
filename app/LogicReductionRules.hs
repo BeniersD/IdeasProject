@@ -32,12 +32,12 @@ convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y 
 ------------------------------------------------------------------------------------------------------------
 -- Set of rules
 ------------------------------------------------------------------------------------------------------------
-ruleAbsorption, ruleCommutativeAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, 
+ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, 
    ruleIdempotency, ruleImplicationElimination, ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT,
    ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: Ord a => Eq a => LgcRule a
 
 ruleAbsorption = createRule "Absorption" "single.absorption" absorption
-ruleCommutativeAbsorption = createRule "Absorption" "single.commutative.and.absorption" f
+{--ruleCommutativeAbsorption = createRule "Absorption" "single.commutative.and.absorption" f
    where
       f :: Ord a => LgcRed a
       f ((p :&&: q) :||: r) | p == r = Just r  -- check (((p :&&: q) :||: r) | p == r) .*. commutativity (lk) .*. absorption r -- absorption ((q :&&: p) :||: r) | otherwise = Nothing
@@ -45,18 +45,9 @@ ruleCommutativeAbsorption = createRule "Absorption" "single.commutative.and.abso
       f (p :||: (q :&&: r)) | p == q = Just p -- absorption ((r :&&: q) :||: p) | otherwise = Nothing 
       f ((p :||: q) :&&: r) | q == r = Just r -- absorption (r :&&: (q :||: p)) | otherwise = Nothing
       f _                            = Nothing
+--}
 ruleAssociativity = createRule "Associativity" "single.associativity" associativity
 ruleCommutativity = createRule "Commutativity" "single.commutativity" commutativity
-{--
-ruleCommutativity = createRule "Commutativity" "single.commutativity" f
-   where
-      f :: Ord a => LgcRed a
-      f (p :||: q) | p > q     = commutativity (p :||: q)
-                  -- | otherwise  = Nothing
-      f (p :&&: q) | p > q     = commutativity (p :&&: q)
-                  -- | otherwise  = Nothing
-      f _                       = Nothing
-   --}
 ruleDeMorganAnd = createRule "De Morgan And" "single.demorgan.and" deMorganAnd
 ruleDeMorganOr = createRule "De Morgan Or" "single.demorgan.or" deMorganOr
 ruleDistributivity = createRule "Distributivity" "single.distributivity" distributivity
@@ -81,8 +72,8 @@ absorption, associativity, commutativity, deMorganAnd, deMorganOr, doubleNot, di
    fRuleConjunction, fRuleComplement, fRuleNotT, fRuleDisjunction, idempotency, implicationElimination,
    tRuleConjunction, tRuleComplement, tRuleNotF, tRuleDisjunction :: Ord a => Eq a => LgcRed a
 
-absorption ((p :&&: q) :||: r) | q == r = Just r | otherwise = Nothing                               
-absorption (p :&&: (q :||: r)) | p == q = Just p | otherwise = Nothing
+absorption ((p :&&: q) :||: r) | q == r = Just r 
+absorption (p :&&: (q :||: r)) | p == q = Just p
 absorption _                            = Nothing
 
 associativity ((p :||: q) :||: r) = Just (p :||: (q:||: r))
@@ -114,7 +105,7 @@ equivalenceElimination _           = Nothing
 fRuleConjunction (p :&&: F) = Just F
 fRuleConjunction _          = Nothing
 
-fRuleComplement (p :&&: Not q) | p == q = Just F | otherwise = Nothing
+fRuleComplement (p :&&: Not q) | p == q = Just F
 fRuleComplement _                       = Nothing 
 
 fRuleNotT (Not T) = Just F
@@ -124,9 +115,7 @@ fRuleDisjunction (p :||: F) = Just p
 fRuleDisjunction _          = Nothing
 
 idempotency (p :||: q) | p == q    = Just p 
-                       -- | otherwise = Nothing 
 idempotency (p :&&: q) | p == q    = Just p 
-                       -- | otherwise = Nothing 
 idempotency _                      = Nothing
 
 implicationElimination (p :->: q) = Just (Not p :||: q)
@@ -135,7 +124,7 @@ implicationElimination _          = Nothing
 tRuleConjunction (p :&&: T) = Just p
 tRuleConjunction _          = Nothing
 
-tRuleComplement (p :||: Not q) | p == q = Just T | otherwise = Nothing
+tRuleComplement (p :||: Not q) | p == q = Just T
 tRuleComplement _                       = Nothing 
 
 tRuleNotF (Not F) = Just T

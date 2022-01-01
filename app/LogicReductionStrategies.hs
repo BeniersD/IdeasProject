@@ -49,16 +49,22 @@ isOrdered _                  = False
 
 isCommutativeAbsorption :: Ord a => Logic a -> Bool 
 isCommutativeAbsorption ((p :&&: q) :||: r) | p == r = True
-isCommutativeAbsorption (p :&&: (q :||: r)) | p == r = Just p -- .|. absorption (p :&&: (r :||: q)) | otherwise = Nothing
-isCommutativeAbsorption (p :||: (q :&&: r)) | p == q = Just p -- absorption ((r :&&: q) :||: p) | otherwise = Nothing 
+isCommutativeAbsorption (p :&&: (q :||: r)) | p == r = True
+isCommutativeAbsorption (p :||: (q :&&: r)) | p == q = True
 isCommutativeAbsorption ((p :||: q) :&&: r) | q == r = True
-isCommutativeAbsorption _ = False
+isCommutativeAbsorption _                            = False
 
-sCommutativityOrd :: Ord a => LSLgc a
-sCommutativityOrd = label "Commutativity-Ordered" $ check isOrdered .*. ruleCommutativity
+stratCommutativityOrd :: Ord a => LSLgc a
+stratCommutativityOrd = label "Commutativity-Ordered" $ check isOrdered .*. ruleCommutativity
 
 ruleCommutativityOrdered :: Ord a => Eq a => LgcRule a
-ruleCommutativityOrdered = convertToRule "Ordered Commutativity" "single.commutativity.ordered" sCommutativityOrd
+ruleCommutativityOrdered = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
+
+stratCommutativeAbsorption :: Ord a => LSLgc a
+stratCommutativeAbsorption = label "Commutativity-Ordered" $ check isCommutativeAbsorption .*. somewhere (ruleCommutativity)
+
+ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
+ruleCommutativeAbsorption = convertToRule "Commutative Absorption" "single.commutativity.absorption" stratCommutativeAbsorption
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Simple logic Strategies
