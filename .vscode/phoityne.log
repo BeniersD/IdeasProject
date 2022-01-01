@@ -1,0 +1,13 @@
+2021-11-05 12:09:29.941789800000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-05 12:10:30.962468600000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-11-05 12:10:47.441473300000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-07 14:32:53.806556400000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-07 14:38:34.746413100000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-07 14:40:43.064701400000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-07 14:40:51.791702900000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-07 14:46:16.764123800000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-07 14:46:25.907481100000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-07 14:46:32.889988900000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-07 14:51:03.070943000000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-17 15:33:54.028004600000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-11-17 15:33:54.030004500000 [$pid(ThreadId 5)] WARNING APP - InitState InternalLoadRequest (HdaInternalLoadRequest {pathHdaInternalLoadRequest = "C:\\Users\\DIAG_LP\\OneDrive\\Bureaublad\\IDEAS\\IdeasProject\\app\\Main.hs"}) not supported. nop.
