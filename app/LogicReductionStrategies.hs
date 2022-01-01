@@ -61,7 +61,7 @@ ruleCommutativityOrdered :: Ord a => Eq a => LgcRule a
 ruleCommutativityOrdered = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
 
 stratCommutativeAbsorption :: Ord a => LSLgc a
-stratCommutativeAbsorption = label "Commutativity-Ordered" $ check isCommutativeAbsorption .*. somewhere (ruleCommutativity)
+stratCommutativeAbsorption = label "Commutativity-Ordered" $ check isCommutativeAbsorption .*. ruleCommutativity
 
 ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
 ruleCommutativeAbsorption = convertToRule "Commutative Absorption" "single.commutativity.absorption" stratCommutativeAbsorption
