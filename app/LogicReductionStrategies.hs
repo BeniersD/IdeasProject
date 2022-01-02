@@ -29,7 +29,7 @@ multiRuleChoiceStrategy x = label description strategy
 multiRuleOrElseStrategy :: Eq a => [LgcRule a] -> LSCtxLgc a
 multiRuleOrElseStrategy x = label description strategy
     where
-        description = intercalate "-or-" (map (show . getId) x)
+        description = intercalate "-orelse-" (map (show . getId) x)
         strategy = orelse (map liftToContext x)
 
 ------------------------------
@@ -59,14 +59,35 @@ isOrdered (p :||: q) | p > q = True
 isOrdered _                  = False
 
 isCommutativeAbsorption :: Ord a => Logic a -> Bool 
-isCommutativeAbsorption ((p :&&: q) :||: r) | p == r = True
-isCommutativeAbsorption (p :&&: (q :||: r)) | p == r = True
-isCommutativeAbsorption (p :||: (q :&&: r)) | p == q = True
-isCommutativeAbsorption ((p :||: q) :&&: r) | q == r = True
-isCommutativeAbsorption _                            = False
+isCommutativeAbsorption ((p :&&: q) :||: r) | p == r           = True
+isCommutativeAbsorption (p :||: (q :&&: r)) | p == q || p == r = True
+isCommutativeAbsorption (p :&&: (q :||: r)) | p == r           = True
+isCommutativeAbsorption ((p :||: q) :&&: r) | p == r || q == r = True
+isCommutativeAbsorption _                                      = False
+
+isOr :: Ord a => Logic a -> Bool
+isOr (p :||: q) = True
+isOr _          = False
+
+isAnd :: Ord a => Logic a -> Bool
+isAnd (p :&&: q) = True
+isAnd _          = False
 
 stratCommutativityOrd :: Ord a => LSLgc a
 stratCommutativityOrd = label "Commutativity-Ordered" $ check isOrdered .*. ruleCommutativity
+{--
+stratCommutativeAbsorption :: Ord a => LSCtxLgc a
+stratCommutativeAbsorption = label "Commutativity-Absortion" $ f
+    where
+        f :: Ord a => Logic a -> Strategy (CtxLgc a)
+        f ((p :&&: q) :||: r) | p == r = layerFirst (liftToContext ruleCommutativity) .*. liftToContext ruleAbsorption
+        --f (p :||: (q :&&: r)) | p == q = Just ruleCommutativity .*. ruleAbsorption
+        --f (p :||: (q :&&: r)) | p == r = Just ruleCommutativity .*. layerFirst( ruleCommutativity ) .*. ruleAbsorption    
+        --f (p :&&: (q :||: r)) | p == r = Just layerFirst( choice( isOr ) .*. ruleCommutativity ) .*. ruleAbsorption
+        --f ((p :||: q) :&&: r) | p == r = Just ruleCommutativity .*. ruleAbsorption
+        --f ((p :||: q) :&&: r) | q == r = Just layerFirst( ruleCommutativity ) .*. commutativity .*. ruleAbsorption
+        --f _                            = Nothing
+--}
 
 ruleCommutativityOrd :: Ord a => Eq a => LgcRule a
 ruleCommutativityOrd = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd

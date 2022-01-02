@@ -1,5 +1,5 @@
 module LogicReductionRules 
-   ( LgcRule, LgcRed, LSLgc, LSCtxLgc, hasRule,  createRule, convertToRule,
+   ( LgcRule, LgcRed, LSLgc, LSCtxLgc, CtxLgc, hasRule,  createRule, convertToRule,
      ruleDoubleNot, ruleDeMorganAnd, ruleDeMorganOr, ruleImplicationElimination, ruleEquivalenceElimination, ruleAbsorption, 
      ruleIdempotency, ruleFRuleConjunction, ruleTRuleConjunction, ruleFRuleDisjunction, ruleTRuleDisjunction, 
      ruleFRuleComplement, ruleTRuleComplement, ruleFRuleNotT, ruleTRuleNotF, ruleCommutativity, commutativity
@@ -15,7 +15,8 @@ import Data.List
 type LgcRule a = Rule (Logic a)
 type LgcRed a = Logic a -> Maybe (Logic a) 
 type LSLgc a = LabeledStrategy (Logic a)
-type LSCtxLgc a = LabeledStrategy (Context (Logic a))
+type CtxLgc a = Context (Logic a)
+type LSCtxLgc a = LabeledStrategy (CtxLgc a)
 
 ------------------------------------------------------------------------------------------------------------
 -- Generic rewrite/reduction functions
