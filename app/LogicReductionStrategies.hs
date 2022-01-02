@@ -17,12 +17,20 @@ import Ideas.Common.Traversal.Navigator
 multiRuleStrategy :: Eq a => LgcRule a -> LSCtxLgc a
 multiRuleStrategy x = label ("rewrite.multi." ++ show (getId x)) (repeatS (somewhere (liftToContext x)))
 
+
 -- Apply of a given list of rules (choice)
 multiRuleChoiceStrategy :: Eq a => [LgcRule a] -> LSCtxLgc a
 multiRuleChoiceStrategy x = label description strategy
     where
         description = intercalate "-or-" (map (show . getId) x)
         strategy = choice (map liftToContext x)
+
+-- Apply of a given list of rules (orelse)
+multiRuleOrElseStrategy :: Eq a => [LgcRule a] -> LSCtxLgc a
+multiRuleOrElseStrategy x = label description strategy
+    where
+        description = intercalate "-or-" (map (show . getId) x)
+        strategy = orelse (map liftToContext x)
 
 ------------------------------
 -- Usage: repeat (layerOne (ruleDoubleNot .*. ruleDeMorganOr .*. ruleDeMorganAnd))
@@ -118,7 +126,19 @@ testlf :: LgcRule a -> LSCtxLgc a
 testlf x = label description strategy
     where
         description = "Layered First " ++ ( show . getId ) x
+        strategy = layerFirst (liftToContext x)
+
+testlf2 :: LgcRule a -> LSCtxLgc a
+testlf2 x = label description strategy
+    where
+        description = "Layered First " ++ ( show . getId ) x
         strategy = layerFirst2 (liftToContext x)
+
+testlf3 :: LSCtxLgc a -> LSCtxLgc a
+testlf3 x = label description strategy
+    where
+        description = "Layered First " ++ ( show . getId ) x
+        strategy = layerFirst2 x
 
 --deMorgan (Not (p :&&: T)) = Just (Not p :||: Not T) = Just (Not p :||: F) = Just Not p
 --deMorgan (Not (T :&&: p)) = Just (Not T :||: Not p) = Just (F :||: Not p) = Just Not p

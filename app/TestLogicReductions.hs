@@ -15,13 +15,33 @@ main = do
     putStrLn "\n"
     --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet
     --mapM_ print $ map (apply ruleCommutativity) commutativityTestSet 
-    --putStrLn "\n"    
+    putStrLn "\n"    
     --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet 
     --mapM_ print $ [apply (checkStrategy) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
     --mapM_ print $ [apply (layerFirst  lift ruleCommutativity) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet]     
     mapM_ print $ [apply (testlf ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    putStrLn "\n"    
+    mapM_ print $ [apply (testlf2 ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
     --mapM_ print $ map (apply layerFirst) commutativityTestSet 
-     
+
+    putStrLn "\n"         
+    mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ map (apply layerFirst) commutativityTestSet 
+
+    putStrLn "\n"         
+    mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ map (apply layerFirst) commutativityTestSet 
+
+    putStrLn "\n"         
+    mapM_ print $ [apply (testlf3 (multiRuleOrElseStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ map (apply layerFirst) commutativityTestSet 
+
+    putStrLn "\n"         
+    mapM_ print $ [apply (testlf3 (multiRuleOrElseStrategy [ruleDeMorganAnd, ruleDeMorganOr, ruleFRuleNotT, ruleTRuleNotF])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ map (apply layerFirst) commutativityTestSet 
+
+    putStrLn "\n"         
+    mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr, ruleFRuleNotT, ruleTRuleNotF])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
 
 
     --putStrLn "\nruleCommutativity:"

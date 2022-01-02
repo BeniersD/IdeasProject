@@ -30,7 +30,7 @@ convertToRule :: Eq a => String -> String -> LSLgc a -> LgcRule a
 convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) (apply f)
 
 --convertLscToRule :: Eq a => String -> String -> LSCtxLgc a -> LgcRule a
---convertLscToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) (apply (f) $ newContext $ termNavigator)
+--convertLscToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) (apply (fromContext f))
 
 ------------------------------------------------------------------------------------------------------------
 -- Set of rules
