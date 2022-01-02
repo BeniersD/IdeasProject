@@ -2,7 +2,7 @@ module LogicReductionRules
    ( LgcRule, LgcRed, LSLgc, LSCtxLgc, hasRule,  createRule, convertToRule,
      ruleDoubleNot, ruleDeMorganAnd, ruleDeMorganOr, ruleImplicationElimination, ruleEquivalenceElimination, ruleAbsorption, 
      ruleIdempotency, ruleFRuleConjunction, ruleTRuleConjunction, ruleFRuleDisjunction, ruleTRuleDisjunction, 
-     ruleFRuleComplement, ruleTRuleComplement, ruleFRuleNotT, ruleTRuleNotF, ruleCommutativity
+     ruleFRuleComplement, ruleTRuleComplement, ruleFRuleNotT, ruleTRuleNotF, ruleCommutativity, commutativity
    ) where
 
 import Ideas.Common.Library hiding (description)
@@ -29,15 +29,18 @@ createRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) f
 convertToRule :: Eq a => String -> String -> LSLgc a -> LgcRule a
 convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) (apply f)
 
+--convertLscToRule :: Eq a => String -> String -> LSCtxLgc a -> LgcRule a
+--convertLscToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) (apply (f) $ newContext $ termNavigator)
+
 ------------------------------------------------------------------------------------------------------------
 -- Set of rules
 ------------------------------------------------------------------------------------------------------------
 ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, 
    ruleIdempotency, ruleImplicationElimination, ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT,
-   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: Ord a => Eq a => LgcRule a
+   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF, ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
 
 ruleAbsorption = createRule "Absorption" "single.absorption" absorption
-{--ruleCommutativeAbsorption = createRule "Absorption" "single.commutative.and.absorption" f
+ruleCommutativeAbsorption = createRule "Absorption" "single.commutative.and.absorption" f
    where
       f :: Ord a => LgcRed a
       f ((p :&&: q) :||: r) | p == r = Just r  -- check (((p :&&: q) :||: r) | p == r) .*. commutativity (lk) .*. absorption r -- absorption ((q :&&: p) :||: r) | otherwise = Nothing
@@ -45,7 +48,6 @@ ruleAbsorption = createRule "Absorption" "single.absorption" absorption
       f (p :||: (q :&&: r)) | p == q = Just p -- absorption ((r :&&: q) :||: p) | otherwise = Nothing 
       f ((p :||: q) :&&: r) | q == r = Just r -- absorption (r :&&: (q :||: p)) | otherwise = Nothing
       f _                            = Nothing
---}
 ruleAssociativity = createRule "Associativity" "single.associativity" associativity
 ruleCommutativity = createRule "Commutativity" "single.commutativity" commutativity
 ruleDeMorganAnd = createRule "De Morgan And" "single.demorgan.and" deMorganAnd

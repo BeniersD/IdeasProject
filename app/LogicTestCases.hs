@@ -76,7 +76,11 @@ equivalenceEliminationDerivTestSet =
 
 
 deMorganDerivTestSet =
-                [ Not (Not (Not (Var 'p')) :&&: T),                             -- ¬(¬¬p ˄ T) 
+                [ 
+                  Not (Var 'p' :&&: Var 'q'),                                   -- ¬(p ˄ q)  
+                  Not (Var 'q' :&&: Var 'p'),                                   -- ¬(q ˄ p)  
+                  Not (Not (Var 'q' :&&: Var 'p')),                             -- ¬¬(q ˄ p)  
+                  Not (Not (Not (Var 'p')) :&&: T),                             -- ¬(¬¬p ˄ T) 
                   Not (Not (Not (Var 'p')) :&&: T :&&: T),                      -- ¬(¬¬p ˄ T ˄ T)
                   Not (Not (Not (Var 'p')) :&&: T :&&: F),                      -- ¬(¬¬p ˄ T ˄ F)                
                   Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'p'))),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    

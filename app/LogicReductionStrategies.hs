@@ -42,6 +42,9 @@ layer s = ruleDown .*. s .*. ruleUp
 layerFirst :: (IsStrategy f, Navigator a) => f a -> Strategy a
 layerFirst s = layer (visitFirst s) 
 
+layerFirst2 :: (IsStrategy f, Navigator a) => f a -> Strategy a
+layerFirst2 s = s |> layer (visitFirst s)
+
 isOrdered :: Ord a => Logic a -> Bool
 isOrdered (p :&&: q) | p > q = True
 isOrdered (p :||: q) | p > q = True
@@ -57,14 +60,8 @@ isCommutativeAbsorption _                            = False
 stratCommutativityOrd :: Ord a => LSLgc a
 stratCommutativityOrd = label "Commutativity-Ordered" $ check isOrdered .*. ruleCommutativity
 
-ruleCommutativityOrdered :: Ord a => Eq a => LgcRule a
-ruleCommutativityOrdered = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
-
-stratCommutativeAbsorption :: Ord a => LSLgc a
-stratCommutativeAbsorption = label "Commutativity-Ordered" $ check isCommutativeAbsorption .*. ruleCommutativity
-
-ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
-ruleCommutativeAbsorption = convertToRule "Commutative Absorption" "single.commutativity.absorption" stratCommutativeAbsorption
+ruleCommutativityOrd :: Ord a => Eq a => LgcRule a
+ruleCommutativityOrd = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Simple logic Strategies
@@ -101,6 +98,10 @@ deMorgan = label "DeMorgan" $ multiRuleChoiceStrategy [ruleDeMorganOr, ruleDeMor
 negation = label "Negate" $ multiRuleChoiceStrategy [ruleTRuleNotF, ruleFRuleNotT]
 
 multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere deMorgan)
+
+--ruleDeMorgan :: Ord a => Eq a => LgcRule a
+--ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" deMorgan
+
 multiNegation = label "Multi Negate" $ repeatS (somewhere negation)
 multiDoubleNot = multiRuleStrategy ruleDoubleNot
 
@@ -111,6 +112,13 @@ deMorganComplete = label "Complete DeMorgan" $ deMorganDeriv |> multiDeMorganDer
 
 -- create new rule (draft)
 -- ruleDeMorganComplete = convertToRule "DeMorgan Complete" "demorgan.complete" deMorganComplete
+
+testlf :: LgcRule a -> LSCtxLgc a
+--testlf = label "layered first" $  layerFirst (liftToContext ruleDoubleNot)
+testlf x = label description strategy
+    where
+        description = "Layered First " ++ ( show . getId ) x
+        strategy = layerFirst2 (liftToContext x)
 
 --deMorgan (Not (p :&&: T)) = Just (Not p :||: Not T) = Just (Not p :||: F) = Just Not p
 --deMorgan (Not (T :&&: p)) = Just (Not T :||: Not p) = Just (F :||: Not p) = Just Not p
