@@ -1,17 +1,18 @@
-module LogicTestFunctions (testReduction, testEquivalence) where
+module LogicTestFunctions where
 
 import Data.Foldable as Foldable
 import Data.Function
 import LogicReductionRules_Old
 import LogicTestCases
+import LogicReductionRules
 
-tupleToStr :: (Int, ChrLogic) -> [Char]
+tupleToStr :: (Show a) => (Int, a) -> String
 tupleToStr x = numbers ++ ". " ++ formula ++ "\n"
     where
         numbers = show $ fst x
         formula = show $ snd x
 
-resultToStr :: [(Int, ChrLogic)] -> String
+resultToStr :: (Show a) => [(Int, a)] -> String
 resultToStr = foldl' (++) "" . map tupleToStr
 
 zipResults :: [a] -> [(Int, a)]
@@ -25,6 +26,13 @@ reduceFormula x =
         Just x  -> uncurry map x
         Nothing -> []
 
+pptest :: (Show a) => String -> [a] -> IO ()
+pptest desc y = putStr $ desc ++ ":\n" ++ result ++ "\n"
+    where 
+        resultset  = zipResults y
+        result     = resultToStr resultset
+
+{--
 testReduction :: [Char] -> [Char] -> IO ()
 testReduction x y = putStr $ "Test reduction " ++ x ++ ":\n" ++ result ++ "\n"
     where 
@@ -82,6 +90,7 @@ defineFunction x =
         "multiDeMorganAndMultiLogEq"             -> multiDeMorganAndMultiLogEq
         "multiDeMorganAndMultiLogEqAndDoubleNot" -> multiDeMorganAndMultiLogEqAndDoubleNot
 
+
 defineTest :: [Char] -> Maybe (Reduction, LChrLogic)
 defineTest x = 
     case x of
@@ -116,3 +125,4 @@ defineTestSet x =
     case x of
         "(==)" -> Just equivalenceTestSet
         _      -> Nothing
+        --}

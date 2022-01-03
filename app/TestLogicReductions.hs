@@ -7,31 +7,34 @@ import LogicReductionRules
 import LogicReductionStrategies
 import LogicExercices
 import LogicTestCases
+import LogicTestFunctions
 
 main :: IO ()
 main = do
-    putStrLn "\nCommutativity testSet:"
-    mapM_ print deMorganDerivTestSet
-    putStrLn "\n"
+    pptest "deMorganDerivTestSet" deMorganDerivTestSet
+    --pptest "DeMorgan Strategy" [applyD (deMorgan) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    pptest "Test Layer Top All" [applyD (testlta ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+
     --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet
     --mapM_ print $ map (apply ruleCommutativity) commutativityTestSet 
     putStrLn "\n"    
     --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet 
     --mapM_ print $ [apply (checkStrategy) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
     --mapM_ print $ [apply (layerFirst  lift ruleCommutativity) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet]     
-    mapM_ print $ [apply (testlf ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ [apply (testlf ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+
 
     putStrLn "\n"    
-    mapM_ print $ [apply (testlf2 ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ [apply (testlf2 ruleDeMorganOr) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
 
     putStrLn "\n"         
-    mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
 
     putStrLn "\n"         
-    mapM_ print $ [apply (testlf3 (multiRuleOrElseStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ [apply (testlf3 (multiRuleOrElseStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
 
     putStrLn "\n"         
-    mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr, ruleTRuleNotF])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr, ruleTRuleNotF])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
 
 
     --putStrLn "\n"         
@@ -54,8 +57,7 @@ main = do
     putStrLn "\nDeMorgan Deriv TestSet:"
     mapM_ print deMorganDerivTestSet
 
-    putStrLn "\nDeMorgan Strategy:"
-    mapM_ print $ [apply (deMorgan) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    
 
     putStrLn "\nMulti DeMorgan Strategy:"
     mapM_ print $ [apply (multiDeMorgan) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 

@@ -37,21 +37,19 @@ multiRuleOrElseStrategy x = label description strategy
 --- oncetd s = fix $ \x -> s |> layerOne x
 ------------------------------
 -- left-biasedchoice
-visitFirst :: (IsStrategy f, Navigator a) => f a -> Strategy a
---visitFirst :: (IsStrategy f, IsStrategy g, Navigator a) => f a -> g a -> Strategy a
---visitFirst next s = s |> next .*. (visitFirst next s) 
--- next (next layer?) vs right? 
-visitFirst s = fix $ \x -> s |> (ruleRight .*. x)
---visitFirst next s = fix $ \x -> try (s |> next .*. x)
+visitFirst, visitAll, visitId :: (IsStrategy f, Navigator a) => f a -> Strategy a
+visitFirst s = fix $ \x -> (s |> (ruleRight .*. x))
+visitAll s = fix $ \x -> s .*. ( check (not.hasRight) |> (ruleRight .*. x))
+visitId s = ruleUp .*. ruleDown .*. s
 
 layer :: (Navigator a) => Strategy a -> Strategy a
 layer s = ruleDown .*. s .*. ruleUp
 
-layerFirst :: (IsStrategy f, Navigator a) => f a -> Strategy a
+layerLeftMostOnly, layerFirst, layerAll, layerTopAll :: (IsStrategy f, Navigator a) => f a -> Strategy a
+layerLeftMostOnly s = layer (visitId s)
 layerFirst s = layer (visitFirst s) 
-
-layerFirst2 :: (IsStrategy f, Navigator a) => f a -> Strategy a
-layerFirst2 s = s |> layer (visitFirst s)
+layerAll s = layer (visitAll s)
+layerTopAll s = s |> layerAll s
 
 isOrdered :: Ord a => Logic a -> Bool
 isOrdered (p :&&: q) | p > q = True
@@ -149,17 +147,23 @@ testlf x = label description strategy
         description = "Layered First " ++ ( show . getId ) x
         strategy = layerFirst (liftToContext x)
 
-testlf2 :: LgcRule a -> LSCtxLgc a
-testlf2 x = label description strategy
+testlta :: LgcRule a -> LSCtxLgc a
+testlta x = label description strategy
     where
-        description = "Layered First " ++ ( show . getId ) x
-        strategy = layerFirst2 (liftToContext x)
+        description = "Layered All " ++ ( show . getId ) x
+        strategy = layerTopAll (liftToContext x)
 
-testlf3 :: LSCtxLgc a -> LSCtxLgc a
-testlf3 x = label description strategy
+testlta2 :: LSCtxLgc a -> LSCtxLgc a
+testlta2 x = label description strategy
     where
-        description = "Layered First " ++ ( show . getId ) x
-        strategy = layerFirst2 x
+        description = "Layered All " ++ ( show . getId ) x
+        strategy = layerTopAll x
+
+testlmo :: LSCtxLgc a -> LSCtxLgc a
+testlmo x = label description strategy
+    where
+        description = "Layered Left Most Only " ++ ( show . getId ) x
+        strategy = layerLeftMostOnly x
 
 --deMorgan (Not (p :&&: T)) = Just (Not p :||: Not T) = Just (Not p :||: F) = Just Not p
 --deMorgan (Not (T :&&: p)) = Just (Not T :||: Not p) = Just (F :||: Not p) = Just Not p
