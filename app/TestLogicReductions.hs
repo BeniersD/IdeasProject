@@ -2,18 +2,37 @@ module TestLogicReductions (main) where
 
 import Ideas.Common.Library
 import Ideas.Main.Default
-import Domain.Logic.Formula
+import Domain.Logic.Formula 
 import LogicReductionRules
 import LogicReductionStrategies
 import LogicExercices
 import LogicTestCases
 import LogicTestFunctions
 
+quickTestSet :: LsLgcChar
+quickTestSet = [
+                Not (Not (Var 'p' :&&: Var 'q')), 
+                Not (Var 'q' :&&: Var 'p' :&&: Var 'r'),
+                Not (Not (Var 'q' :&&: Var 'p' :&&: Var 'r')),
+                Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's'), 
+                Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's' :&&: Var 't')
+                --Not (Not (Var 'q' :&&: Var 'p')),                             -- ¬¬(q ˄ p)  
+                --Not (Not (Not (Var 'p')) :&&: T),                             -- ¬(¬¬p ˄ T) 
+                --Not (Not (Not (Var 'p')) :&&: T :&&: T),                      -- ¬(¬¬p ˄ T ˄ T)
+                --Not (Not (Not (Var 'p')) :&&: T :&&: F),                      -- ¬(¬¬p ˄ T ˄ F)                
+                --Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'p'))),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
+                --Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'q'))),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
+                --Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: T)          -- ¬(¬¬p ˄ ¬p ˄ T)
+               ]
+
 main :: IO ()
 main = do
-    pptest "deMorganDerivTestSet" deMorganDerivTestSet
+    --pptest "deMorganDerivTestSet" deMorganDerivTestSet
     --pptest "DeMorgan Strategy" [applyD (deMorgan) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
-    pptest "Test Layer Top All" [applyD (testlta ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    --pptest "Test Layer Top All" [applyD (testlta ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+    pptest "test" quickTestSet
+    pptest "Test" [applyD (testl ruleDeMorganAnd) $ newContext $ termNavigator x | x <- quickTestSet ]
+
 
     --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet
     --mapM_ print $ map (apply ruleCommutativity) commutativityTestSet 

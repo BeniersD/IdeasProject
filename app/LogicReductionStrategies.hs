@@ -10,46 +10,62 @@ import LogicReductionRules
 import Ideas.Common.Strategy.Traversal hiding (layer)
 import Ideas.Common.Traversal.Navigator
 
+testl :: Ord a => Eq a => LgcRule a -> LSCtxLgc a
+testl s = label description strategy
+    where
+        description = "Layered First " ++ ( show . getId ) s
+        rule = liftToContext ruleDeMorganOr .|. liftToContext ruleDeMorganAnd
+        --strategy =  fix $ \x -> somewhere ( try(rule) .*. ruleDown .*. (check (not.hasRight) |> (ruleRight .*. x)
+        strat = rule .*. layer (visitTryAll (rule))
+        strategy = repeatS( strat )
+
+
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Apply a rule multiple times somewhere
-multiRuleStrategy :: Eq a => LgcRule a -> LSCtxLgc a
-multiRuleStrategy x = label ("rewrite.multi." ++ show (getId x)) (repeatS (somewhere (liftToContext x)))
-
+stratMultiRule :: Eq a => LgcRule a -> LSCtxLgc a
+stratMultiRule x = label ("rewrite.multi." ++ show (getId x)) (repeatS (somewhere (liftToContext x)))
 
 -- Apply of a given list of rules (choice)
-multiRuleChoiceStrategy :: Eq a => [LgcRule a] -> LSCtxLgc a
-multiRuleChoiceStrategy x = label description strategy
+stratMultiRuleChoice, stratMultiRuleOrElse :: Eq a => [LgcRule a] -> LSCtxLgc a
+stratMultiRuleChoice x = label description strategy
     where
         description = intercalate "-or-" (map (show . getId) x)
         strategy = choice (map liftToContext x)
 
 -- Apply of a given list of rules (orelse)
-multiRuleOrElseStrategy :: Eq a => [LgcRule a] -> LSCtxLgc a
-multiRuleOrElseStrategy x = label description strategy
+stratMultiRuleOrElse x = label description strategy
     where
         description = intercalate "-orelse-" (map (show . getId) x)
         strategy = orelse (map liftToContext x)
+
 
 ------------------------------
 -- Usage: repeat (layerOne (ruleDoubleNot .*. ruleDeMorganOr .*. ruleDeMorganAnd))
 --- oncetd s = fix $ \x -> s |> layerOne x
 ------------------------------
 -- left-biasedchoice
-visitFirst, visitAll, visitId :: (IsStrategy f, Navigator a) => f a -> Strategy a
-visitFirst s = fix $ \x -> (s |> (ruleRight .*. x))
-visitAll s = fix $ \x -> s .*. ( check (not.hasRight) |> (ruleRight .*. x))
-visitId s = ruleUp .*. ruleDown .*. s
+visitFirst, visitAll, visitTryAll, visitId, visitLeftMostOnly :: (IsStrategy f, Navigator a) => f a -> Strategy a
+visitFirst s = fix $ \x -> s |> (ruleRight .*. x)
+visitAll s = fix $ \x -> s .*. (check (not.hasRight) |> (ruleRight .*. x))
+visitTryAll s = fix $ \x -> try (s) .*. (check (not.hasRight) |> (ruleRight .*. x))
+visitId s = check (isTop) |> ruleUp .*. ruleDown .*. s
+visitLeftMostOnly s = check (not.hasDown) |> (ruleDown .*.  s)
+visitRightMostOnly s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*. x)
 
 layer :: (Navigator a) => Strategy a -> Strategy a
 layer s = ruleDown .*. s .*. ruleUp
 
-layerLeftMostOnly, layerFirst, layerAll, layerTopAll :: (IsStrategy f, Navigator a) => f a -> Strategy a
-layerLeftMostOnly s = layer (visitId s)
+layerLeftMostOnly, layerFirst, layerAll, layerZeroFirst, layerZeroFirstRepeat :: (IsStrategy f, Navigator a) => f a -> Strategy a
 layerFirst s = layer (visitFirst s) 
 layerAll s = layer (visitAll s)
-layerTopAll s = s |> layerAll s
+layerTryAll s = layer (visitTryAll s)
+layerLeftMostOnly s = layer (visitLeftMostOnly s)
+layerRightMostOnly s = layer (visitRightMostOnly s)
+layerZeroFirst s = s |> layerAll s
+layerZeroFirstRepeat s = s |> layerAll s
+
 
 isOrdered :: Ord a => Logic a -> Bool
 isOrdered (p :&&: q) | p > q = True
@@ -73,19 +89,23 @@ isAnd _          = False
 
 stratCommutativityOrd :: Ord a => LSLgc a
 stratCommutativityOrd = label "Commutativity-Ordered" $ check isOrdered .*. ruleCommutativity
-{--
-stratCommutativeAbsorption :: Ord a => LSCtxLgc a
-stratCommutativeAbsorption = label "Commutativity-Absortion" $ f
+
+stratCommutativeAbsorption :: Logic a -> LSCtxLgc a
+{-- stratCommutativeAbsorption = label "Commutativity-Absortion" f
     where
-        f :: Ord a => Logic a -> Strategy (CtxLgc a)
-        f ((p :&&: q) :||: r) | p == r = layerFirst (liftToContext ruleCommutativity) .*. liftToContext ruleAbsorption
-        --f (p :||: (q :&&: r)) | p == q = Just ruleCommutativity .*. ruleAbsorption
-        --f (p :||: (q :&&: r)) | p == r = Just ruleCommutativity .*. layerFirst( ruleCommutativity ) .*. ruleAbsorption    
+        f :: (Ord a, Eq a) => Logic a -> Strategy (Logic a)
+        f ((p :&&: q) :||: r) | p == r = layerFirst (ruleCommutativity) -- .*. ruleAbsorption
+        --f (p :||: (q :&&: r)) | p == q = stratMultiRuleSequence (ruleCommutativity, ruleAbsorption)
+        --f (p :||: (q :&&: r)) | p == r = (liftToContext ruleCommutativity) .*. layerFirst( ruleCommutativity ) .*. (liftToContext ruleAbsorption)
         --f (p :&&: (q :||: r)) | p == r = Just layerFirst( choice( isOr ) .*. ruleCommutativity ) .*. ruleAbsorption
         --f ((p :||: q) :&&: r) | p == r = Just ruleCommutativity .*. ruleAbsorption
         --f ((p :||: q) :&&: r) | q == r = Just layerFirst( ruleCommutativity ) .*. commutativity .*. ruleAbsorption
-        --f _                            = Nothing
+        --f _                            = _
 --}
+stratCommutativeAbsorption x = label "Commutativity-Absortion" f
+    where
+        f :: (Ord a, Eq a) => Logic a -> LSCtxLgc a
+        f ((p :&&: q) :||: r) | p == r = (layerFirst (ruleCommutativity) .*. ruleAbsorption) $ newContext $ termNavigator x 
 
 ruleCommutativityOrd :: Ord a => Eq a => LgcRule a
 ruleCommutativityOrd = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
@@ -121,8 +141,8 @@ deMorganComplete, deMorgan, multiDeMorgan, deMorganDeriv, deMorganDeriv1, deMorg
     implicationEliminationDeriv4, multiImplicationElimination, implicationEliminationDeriv, implicationEliminationComplete,
     mulitImplicationEliminationDeriv, multiDeMorganDeriv :: Ord a => Eq a => LSCtxLgc a
 
-deMorgan = label "DeMorgan" $ multiRuleChoiceStrategy [ruleDeMorganOr, ruleDeMorganAnd]
-negation = label "Negate" $ multiRuleChoiceStrategy [ruleTRuleNotF, ruleFRuleNotT]
+deMorgan = label "DeMorgan" $ stratMultiRuleChoice [ruleDeMorganOr, ruleDeMorganAnd]
+negation = label "Negate" $ stratMultiRuleChoice [ruleTRuleNotF, ruleFRuleNotT]
 
 multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere deMorgan)
 
@@ -130,7 +150,7 @@ multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere deMorgan)
 --ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" deMorgan
 
 multiNegation = label "Multi Negate" $ repeatS (somewhere negation)
-multiDoubleNot = multiRuleStrategy ruleDoubleNot
+multiDoubleNot = stratMultiRule ruleDoubleNot
 
 deMorganDeriv = label "DeMorgan Derivative" $ deMorganDeriv1 .|. deMorganDeriv2 .|. deMorganDeriv3 .|. deMorganDeriv4
 multiDeMorganDeriv = label "Multi DeMorgan Derivative" $ repeatS (somewhere deMorganDeriv)
@@ -140,26 +160,29 @@ deMorganComplete = label "Complete DeMorgan" $ deMorganDeriv |> multiDeMorganDer
 -- create new rule (draft)
 -- ruleDeMorganComplete = convertToRule "DeMorgan Complete" "demorgan.complete" deMorganComplete
 
-testlf :: LgcRule a -> LSCtxLgc a
+testlf, testlta, testlta3 :: LgcRule a -> LSCtxLgc a
 --testlf = label "layered first" $  layerFirst (liftToContext ruleDoubleNot)
 testlf x = label description strategy
     where
         description = "Layered First " ++ ( show . getId ) x
         strategy = layerFirst (liftToContext x)
 
-testlta :: LgcRule a -> LSCtxLgc a
 testlta x = label description strategy
     where
         description = "Layered All " ++ ( show . getId ) x
-        strategy = layerTopAll (liftToContext x)
+        strategy = layerZeroFirst (liftToContext x)
 
-testlta2 :: LSCtxLgc a -> LSCtxLgc a
+testlta3 x = label description strategy
+    where
+        description = "Layered All " ++ ( show . getId ) x
+        strategy = layerZeroFirstRepeat (liftToContext x)
+
+testlta2, testlmo :: LSCtxLgc a -> LSCtxLgc a
 testlta2 x = label description strategy
     where
         description = "Layered All " ++ ( show . getId ) x
-        strategy = layerTopAll x
+        strategy = layerZeroFirst x
 
-testlmo :: LSCtxLgc a -> LSCtxLgc a
 testlmo x = label description strategy
     where
         description = "Layered Left Most Only " ++ ( show . getId ) x
