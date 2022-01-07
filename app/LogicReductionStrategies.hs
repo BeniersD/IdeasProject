@@ -28,7 +28,7 @@ stratMultiRule :: Eq a => LgcRule a -> LSCtxLgc a
 stratMultiRule x = label ("rewrite.multi." ++ show (getId x)) (repeatS (somewhere (liftToContext x)))
 
 -- Apply of a given list of rules (choice)
-stratMultiRuleChoice, stratMultiRuleOrElse :: Eq a => [LgcRule a] -> LSCtxLgc a
+stratMultiRuleChoice, stratMultiRuleOrElse, stratMultiRuleSeq :: Eq a => [LgcRule a] -> LSCtxLgc a
 stratMultiRuleChoice x = label description strategy
     where
         description = intercalate "-or-" (map (show . getId) x)
@@ -40,6 +40,11 @@ stratMultiRuleOrElse x = label description strategy
         description = intercalate "-orelse-" (map (show . getId) x)
         strategy = orelse (map liftToContext x)
 
+-- Apply of a given list of rules (orelse)
+stratMultiRuleSeq x = label description strategy
+    where
+        description = intercalate "-orelse-" (map (show . getId) x)
+        strategy = sequence (map liftToContext x)
 
 ------------------------------
 -- Usage: repeat (layerOne (ruleDoubleNot .*. ruleDeMorganOr .*. ruleDeMorganAnd))
@@ -47,7 +52,7 @@ stratMultiRuleOrElse x = label description strategy
 ------------------------------
 -- left-biasedchoice
 visitFirst, visitAll, visitTryAll, visitId, visitLeftMostOnly :: (IsStrategy f, Navigator a) => f a -> Strategy a
-visitFirst s = fix $ \x -> s |> (ruleRight .*. x)
+visitFirst s = fix $ \x -> s |> (check (not.hasRight) |> (ruleRight .*. x))
 visitAll s = fix $ \x -> s .*. (check (not.hasRight) |> (ruleRight .*. x))
 visitTryAll s = fix $ \x -> try (s) .*. (check (not.hasRight) |> (ruleRight .*. x))
 visitId s = check (isTop) |> ruleUp .*. ruleDown .*. s
@@ -57,27 +62,35 @@ visitRightMostOnly s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*
 layer :: (Navigator a) => Strategy a -> Strategy a
 layer s = ruleDown .*. s .*. ruleUp
 
-layerLeftMostOnly, layerFirst, layerAll, layerZeroFirst, layerZeroFirstRepeat :: (IsStrategy f, Navigator a) => f a -> Strategy a
-layerFirst s = layer (visitFirst s) 
-layerAll s = layer (visitAll s)
-layerTryAll s = layer (visitTryAll s)
-layerLeftMostOnly s = layer (visitLeftMostOnly s)
-layerRightMostOnly s = layer (visitRightMostOnly s)
-layerZeroFirst s = s |> layerAll s
-layerZeroFirstRepeat s = s |> layerAll s
-
-
 isOrdered :: Ord a => Logic a -> Bool
 isOrdered (p :&&: q) | p > q = True
 isOrdered (p :||: q) | p > q = True
 isOrdered _                  = False
 
-isCommutativeAbsorption :: Ord a => Logic a -> Bool 
-isCommutativeAbsorption ((p :&&: q) :||: r) | p == r           = True
-isCommutativeAbsorption (p :||: (q :&&: r)) | p == q || p == r = True
-isCommutativeAbsorption (p :&&: (q :||: r)) | p == r           = True
-isCommutativeAbsorption ((p :||: q) :&&: r) | p == r || q == r = True
-isCommutativeAbsorption _                                      = False
+stratCommutativityOrd :: Ord a => LSLgc a
+stratCommutativityOrd = label "Commutativity-Ordered" $ check isOrdered |> ruleCommutativity
+
+ruleCommutativityOrd :: Ord a => Eq a => LgcRule a
+ruleCommutativityOrd = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
+
+isCommutativeAbsorption1, isCommutativeAbsorption2, isCommutativeAbsorption3, isCommutativeAbsorption4 :: Eq a => Logic a -> Bool 
+isCommutativeAbsorption1 ((p :&&: q) :||: r) | p == r = True
+isCommutativeAbsorption1 _                            = False
+
+isCommutativeAbsorption2 (p :||: (q :&&: r)) | p == q = True
+isCommutativeAbsorption2 _                            = False
+
+isCommutativeAbsorption3 (p :||: (q :&&: r)) | p == r = True
+isCommutativeAbsorption3 _                            = False
+
+isCommutativeAbsorption4 (p :&&: (q :||: r)) | p == r = True
+isCommutativeAbsorption4 _                            = False
+
+isCommutativeAbsorption5 ((p :||: q) :&&: r) | p == r = True
+isCommutativeAbsorption5 _                            = False
+
+isCommutativeAbsorption6 ((p :||: q) :&&: r) | q == r = True
+isCommutativeAbsorption6 _                            = False
 
 isOr :: Ord a => Logic a -> Bool
 isOr (p :||: q) = True
@@ -87,34 +100,35 @@ isAnd :: Ord a => Logic a -> Bool
 isAnd (p :&&: q) = True
 isAnd _          = False
 
-stratCommutativityOrd :: Ord a => LSLgc a
-stratCommutativityOrd = label "Commutativity-Ordered" $ check isOrdered .*. ruleCommutativity
-
-stratCommutativeAbsorption :: Logic a -> LSCtxLgc a
+stratCommutativeAbsorption :: (Ord a, Eq a) => LSLgc a
 {-- stratCommutativeAbsorption = label "Commutativity-Absortion" f
     where
         f :: (Ord a, Eq a) => Logic a -> Strategy (Logic a)
-        f ((p :&&: q) :||: r) | p == r = layerFirst (ruleCommutativity) -- .*. ruleAbsorption
+        f ((p :&&: q) :||: r) | p == r = layerLeftMostOnly (ruleCommutativity) -- .*. ruleAbsorption
         --f (p :||: (q :&&: r)) | p == q = stratMultiRuleSequence (ruleCommutativity, ruleAbsorption)
-        --f (p :||: (q :&&: r)) | p == r = (liftToContext ruleCommutativity) .*. layerFirst( ruleCommutativity ) .*. (liftToContext ruleAbsorption)
-        --f (p :&&: (q :||: r)) | p == r = Just layerFirst( choice( isOr ) .*. ruleCommutativity ) .*. ruleAbsorption
+        --f (p :||: (q :&&: r)) | p == r = (liftToContext ruleCommutativity) .*. layerRightMostOnly( ruleCommutativity ) .*. (liftToContext ruleAbsorption)
+        --f (p :&&: (q :||: r)) | p == r = Just (liftToContext ruleCommutativity) .*. layerFirst( ruleCommutativity ) .*. (liftToContext ruleAbsorption)
         --f ((p :||: q) :&&: r) | p == r = Just ruleCommutativity .*. ruleAbsorption
-        --f ((p :||: q) :&&: r) | q == r = Just layerFirst( ruleCommutativity ) .*. commutativity .*. ruleAbsorption
+        --f ((p :||: q) :&&: r) | q == r = Just Just ruleCommutativity .*. ruleAbsorption
         --f _                            = _
 --}
-stratCommutativeAbsorption x = label "Commutativity-Absortion" f
+stratCommutativeAbsorption = label "Commutativity-Absortion" strategy
     where
-        f :: (Ord a, Eq a) => Logic a -> LSCtxLgc a
-        f ((p :&&: q) :||: r) | p == r = (layerFirst (ruleCommutativity) .*. ruleAbsorption) $ newContext $ termNavigator x 
+        strategy = (check (not.isCommutativeAbsorption1) |> (layer (visitLeftMostOnly (ruleCommutativity)) .*. ruleAbsorption)) |>
+                   (check (not.isCommutativeAbsorption2) |> (ruleCommutativity .*. ruleAbsorption)) |>
+                   (check (not.isCommutativeAbsorption3) |> ruleCommutativity .*. layer( visitFirst (ruleCommutativity)) .*. ruleAbsorption) |>
+                   (check (not.isCommutativeAbsorption4) |> ruleCommutativity .*. layer( visitFirst (ruleCommutativity)) .*. ruleAbsorption) |>
+                   (check (not.isCommutativeAbsorption5) |> (ruleCommutativity .*. ruleAbsorption)) |>
+                   (check (not.isCommutativeAbsorption6) |> (ruleCommutativity .*. ruleAbsorption))
 
-ruleCommutativityOrd :: Ord a => Eq a => LgcRule a
-ruleCommutativityOrd = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
+ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
+ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Simple logic Strategies
 --------------------------------------------------------------------------------------------------------------------------------------
 commutativeFRuleComplement, commutativeFRuleConjunction, commutativeFRuleDisjunction, commutativeTRuleComplement,
-    commutativeTRuleConjunction, commutativeTRuleDisjunction :: Ord a => Eq a => LSLgc a
+    commutativeTRuleConjunction, commutativeTRuleDisjunction :: (Ord a, Eq a) => LSLgc a
 
 commutativeFRuleComplement  = label "Commutative-and-F-Rule Complement"  $ ruleCommutativity .*. ruleFRuleComplement
 commutativeFRuleConjunction = label "Commutative-and-T-Rule Complement"  $ ruleCommutativity .*. ruleFRuleConjunction
@@ -160,33 +174,33 @@ deMorganComplete = label "Complete DeMorgan" $ deMorganDeriv |> multiDeMorganDer
 -- create new rule (draft)
 -- ruleDeMorganComplete = convertToRule "DeMorgan Complete" "demorgan.complete" deMorganComplete
 
-testlf, testlta, testlta3 :: LgcRule a -> LSCtxLgc a
+testlf, testlta, testlta2 :: LgcRule a -> LSCtxLgc a
 --testlf = label "layered first" $  layerFirst (liftToContext ruleDoubleNot)
 testlf x = label description strategy
     where
         description = "Layered First " ++ ( show . getId ) x
-        strategy = layerFirst (liftToContext x)
+        strategy = layer (visitFirst (liftToContext x))
 
 testlta x = label description strategy
     where
         description = "Layered All " ++ ( show . getId ) x
-        strategy = layerZeroFirst (liftToContext x)
+        strategy = (liftToContext x) .*. layer (visitFirst (liftToContext x))
 
-testlta3 x = label description strategy
-    where
-        description = "Layered All " ++ ( show . getId ) x
-        strategy = layerZeroFirstRepeat (liftToContext x)
-
-testlta2, testlmo :: LSCtxLgc a -> LSCtxLgc a
 testlta2 x = label description strategy
     where
         description = "Layered All " ++ ( show . getId ) x
-        strategy = layerZeroFirst x
+        strategy = repeatS ((liftToContext x) .*. layer (visitFirst (liftToContext x)))
+
+testlta3, testlmo :: LSCtxLgc a -> LSCtxLgc a
+testlta3 x = label description strategy
+    where
+        description = "Layered All " ++ ( show . getId ) x
+        strategy = x .*. layer (visitAll (x))
 
 testlmo x = label description strategy
     where
         description = "Layered Left Most Only " ++ ( show . getId ) x
-        strategy = layerLeftMostOnly x
+        strategy = x .*. layer (visitLeftMostOnly (x))
 
 --deMorgan (Not (p :&&: T)) = Just (Not p :||: Not T) = Just (Not p :||: F) = Just Not p
 --deMorgan (Not (T :&&: p)) = Just (Not T :||: Not p) = Just (F :||: Not p) = Just Not p
