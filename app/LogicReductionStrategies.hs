@@ -9,6 +9,7 @@ import Ideas.Utils.Prelude
 import LogicReductionRules
 import Ideas.Common.Strategy.Traversal hiding (layer)
 import Ideas.Common.Traversal.Navigator
+import qualified Ideas.Common.Strategy.Combinators as Combinators
 
 testl :: Ord a => Eq a => LgcRule a -> LSCtxLgc a
 testl s = label description strategy
@@ -16,8 +17,8 @@ testl s = label description strategy
         description = "Layered First " ++ ( show . getId ) s
         rule = liftToContext ruleDeMorganOr .|. liftToContext ruleDeMorganAnd
         --strategy =  fix $ \x -> somewhere ( try(rule) .*. ruleDown .*. (check (not.hasRight) |> (ruleRight .*. x)
-        strat = rule .*. layer (visitTryAll (rule))
-        strategy = repeatS( strat )
+        strat = rule |> layer(visitFirst (rule)) 
+        strategy = somewhere (strat .*. try(strat) .*. try(strat) .*. try(strat) .*. try(strat))
 
 
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -29,22 +30,22 @@ stratMultiRule x = label ("rewrite.multi." ++ show (getId x)) (repeatS (somewher
 
 -- Apply of a given list of rules (choice)
 stratMultiRuleChoice, stratMultiRuleOrElse, stratMultiRuleSeq :: Eq a => [LgcRule a] -> LSCtxLgc a
-stratMultiRuleChoice x = label description strategy
+stratMultiRuleChoice xs = label description strategy
     where
-        description = intercalate "-or-" (map (show . getId) x)
-        strategy = choice (map liftToContext x)
+        description = intercalate "-or-" (map (show . getId) xs)
+        strategy = choice (map liftToContext xs)
 
 -- Apply of a given list of rules (orelse)
-stratMultiRuleOrElse x = label description strategy
+stratMultiRuleOrElse xs = label description strategy
     where
-        description = intercalate "-orelse-" (map (show . getId) x)
-        strategy = orelse (map liftToContext x)
+        description = intercalate "-orelse-" (map (show . getId) xs)
+        strategy = orelse (map liftToContext xs)
 
 -- Apply of a given list of rules (orelse)
-stratMultiRuleSeq x = label description strategy
+stratMultiRuleSeq xs = label description strategy
     where
-        description = intercalate "-orelse-" (map (show . getId) x)
-        strategy = sequence (map liftToContext x)
+        description = intercalate "-and-" (map (show . getId) xs)
+        strategy = Combinators.sequence (map liftToContext xs)
 
 ------------------------------
 -- Usage: repeat (layerOne (ruleDoubleNot .*. ruleDeMorganOr .*. ruleDeMorganAnd))
@@ -100,7 +101,7 @@ isAnd :: Ord a => Logic a -> Bool
 isAnd (p :&&: q) = True
 isAnd _          = False
 
-stratCommutativeAbsorption :: (Ord a, Eq a) => LSLgc a
+stratCommutativeAbsorption :: (Ord a, Eq a) => LSCtxLgc a
 {-- stratCommutativeAbsorption = label "Commutativity-Absortion" f
     where
         f :: (Ord a, Eq a) => Logic a -> Strategy (Logic a)
@@ -112,17 +113,17 @@ stratCommutativeAbsorption :: (Ord a, Eq a) => LSLgc a
         --f ((p :||: q) :&&: r) | q == r = Just Just ruleCommutativity .*. ruleAbsorption
         --f _                            = _
 --}
-stratCommutativeAbsorption = label "Commutativity-Absortion" strategy
+stratCommutativeAbsorption = label "Commutativity-Absortion" s --strategy
     where
-        strategy = (check (not.isCommutativeAbsorption1) |> (layer (visitLeftMostOnly (ruleCommutativity)) .*. ruleAbsorption)) |>
-                   (check (not.isCommutativeAbsorption2) |> (ruleCommutativity .*. ruleAbsorption)) |>
-                   (check (not.isCommutativeAbsorption3) |> ruleCommutativity .*. layer( visitFirst (ruleCommutativity)) .*. ruleAbsorption) |>
-                   (check (not.isCommutativeAbsorption4) |> ruleCommutativity .*. layer( visitFirst (ruleCommutativity)) .*. ruleAbsorption) |>
-                   (check (not.isCommutativeAbsorption5) |> (ruleCommutativity .*. ruleAbsorption)) |>
-                   (check (not.isCommutativeAbsorption6) |> (ruleCommutativity .*. ruleAbsorption))
+        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitLeftMostOnly ( liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
+            (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
+            (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer( visitFirst (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
+            (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer( visitFirst (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
+            (check (maybe False (not . isCommutativeAbsorption5) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
+            (check (maybe False (not . isCommutativeAbsorption6) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) 
 
-ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
-ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
+--ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
+--ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Simple logic Strategies
