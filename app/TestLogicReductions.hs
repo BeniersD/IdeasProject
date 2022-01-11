@@ -8,58 +8,17 @@ import LogicReductionStrategies
 import LogicExercices
 import LogicTestCases
 import LogicTestFunctions
-
-quickTestSet :: LsLgcChar
-quickTestSet = [
-                Not (Var 'p' :&&: Var 'q'),
-                Not (Var 'q' :&&: Var 'p' :&&: Var 'r'),
-                Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's'), 
-                Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's' :&&: Var 't'),
-                Not (Not (Var 'p' :&&: Var 'q')), 
-                Not (Not (Var 'q' :&&: Var 'p' :&&: Var 'r')),
-                Not (Not (Var 'q' :&&: Var 'p')),                             -- ¬¬(q ˄ p)  
-                Not (Not (Not (Var 'p')) :&&: T),                             -- ¬(¬¬p ˄ T) 
-                Not (Not (Not (Var 'p')) :&&: T :&&: T),                      -- ¬(¬¬p ˄ T ˄ T)
-                Not (Not (Not (Var 'p')) :&&: T :&&: F),                      -- ¬(¬¬p ˄ T ˄ F)                
-                Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'p'))),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
-                Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'q'))),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
-                Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: T)          -- ¬(¬¬p ˄ ¬p ˄ T)
-               ]
+import LogicTests
 
 main :: IO ()
 main = do
     --testRuleDeMorganOrSimple
     --testRuleDeMorganOrComplex
     --testRuleDeMorganAndSimple
-    testRuleDeMorganAndComplex
+    --testRuleDeMorganAndComplex
+    --tstStratDeMorganSimple
+    tstStratDeMorganComplex
 
-testRuleDeMorganOrSimple :: IO ()
-testRuleDeMorganOrSimple = do
-    putStrLn "DeMorgan-Or Rule"
-    let testset = deMorganOrTestSetSimple
-    pptest "Input  (Simple testset): " testset
-    pptest "Output (Simple testset): " [applyD (liftToContext ruleDeMorganOr) $ newContext $ termNavigator x | x <- testset ]
-
-testRuleDeMorganOrComplex :: IO ()
-testRuleDeMorganOrComplex = do
-    putStrLn "DeMorgan-Or Rule"
-    let testset = deMorganTestSetComplex
-    pptest "Input  (Simple testset): " testset
-    pptest "Output (Simple testset): " [applyD (liftToContext ruleDeMorganOr) $ newContext $ termNavigator x | x <- testset ]
-
-testRuleDeMorganAndSimple :: IO ()
-testRuleDeMorganAndSimple = do
-    putStrLn "DeMorgan-And Rule"
-    let testset = deMorganAndTestSetSimple
-    pptest "Input  (Simple testset): " testset
-    pptest "Output (Simple testset): " [applyD (liftToContext ruleDeMorganAnd) $ newContext $ termNavigator x | x <- testset ]
-
-testRuleDeMorganAndComplex :: IO ()
-testRuleDeMorganAndComplex = do
-    putStrLn "DeMorgan-And Rule"
-    let testset = deMorganTestSetComplex
-    pptest "Input  (Complex testset): " testset
-    pptest "Output (Complex testset): " [applyD (liftToContext ruleDeMorganAnd) $ newContext $ termNavigator x | x <- testset ]
 
     --pptest "deMorganDerivTestSet" deMorganDerivTestSet
     --pptest "DeMorgan Strategy" [applyD (deMorgan) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 

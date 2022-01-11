@@ -7,10 +7,10 @@ import Domain.Logic.Formula  hiding (not)
 type LgcChar  = Logic Char
 type LsLgcChar = [LgcChar]
 
-doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTestSetSimple, deMorganTestSetComplex, deMorganAndDoubleNotTestSet,implicationEliminationTestSet 
-  , implicationEliminationDerivTestSet , absorptionTestSet, idempotencyTestSet, boolRuleConjunctionTestSet, boolRuleDisjunctionTestSet
-  , boolRuleComplementTestSet, boolRuleNotTestSet, deMorganAndImplicationEliminationTestSet, deMorganAndEquivalenceEliminationTestSet
-  , equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet, commutativityTestSet :: LsLgcChar
+doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTestSetSimple, deMorganOrTestSetComplex, deMorganAndTestSetComplex, deMorganAndDoubleNotTestSet,
+  implicationEliminationTestSet, implicationEliminationDerivTestSet , absorptionTestSet, idempotencyTestSet, boolRuleConjunctionTestSet, boolRuleDisjunctionTestSet,
+  boolRuleComplementTestSet, boolRuleNotTestSet, deMorganAndImplicationEliminationTestSet, deMorganAndEquivalenceEliminationTestSet,
+  equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet, commutativityTestSet :: LsLgcChar
 commutativityTestSet =
                 [ Var 'p' :&&: Var 'q',
                   Var 'q' :&&: Var 'p',
@@ -166,6 +166,29 @@ deMorganAndTestSetComplex =
                   Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'p'))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬p)    
                   Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'q'))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬q)        
                   Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: T),                                                       -- ¬(¬¬p ˄ ¬p ˄ T)
+                  (Var 'p' :->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: Not (Var 'p'))                               -- ¬(¬¬p ˄ ¬p ˄ T)
+                ]
+
+deMorganOrTestSetComplex = 
+                [ 
+                  Not (Not (Var 'p' :||: Var 'q')),                                                                          -- ¬¬(p ˄ q)  
+                  Not (Not (Var 'q' :||: Var 'p')),                                                                          -- ¬¬(q ˄ p)  
+                  Not (Not (Var 'q' :||: Var 'p' :||: Var 'r')),                                                             -- ¬¬(q ˄ p ˄ r)  
+                  Not (Var 'q' :||: Var 'p' :&&: Var 'r'),                                                                   -- ¬¬(q ˄ p ˄ r)  
+                  Not (Var 'q' :||: Var 'p' :&&: Var 'r' :||: Var 's'),                                                      -- ¬¬(q ˄ p ˄ r ˄ s)  
+                  Not (Var 'q' :||: Var 'p' :||: Var 's' :&&: Var 'r'),                                                      -- ¬¬(q ˄ p ˄ s ˄ r)  
+                  (Var 'p' :->: Not (Not (Var 'p') :<->: Not (Not (Var 'p')))) :<->: Not (Not (Var 'p') :||: Not (Var 'p')), -- (p → ¬(¬p ↔ ¬¬p)) ↔ ¬(¬p ˄ p))                  
+                  Not (Var 'p' :||: Var 'q') :||: Not (Var 'p' :||: Var 'q'),                                                -- ¬(p ˄ q) ˅ ¬(p ˄ q)
+                  Not (Not (Var 'p' :||: Var 'q') :||: Not( Var 'p' :||: Var 'q')),                                          -- ¬(¬(p ˄ q) ˅ ¬(p ˄ q))                
+                  Not (Not (Var 'p' :||: Var 'q')) :||: Not (Not (Var 'p' :||: Var 'q')),                                    -- ¬¬(p ˄ q) ˅ ¬¬(p ˄ q))
+                  Not (Not (Var 'p' :||: Var 'q') :||: Not (Var 'p' :||: Var 'q')),                                          -- ¬¬(p ˄ q) ˅ ¬(p ˄ q))
+                  Not (Not (Not (Var 'p' :||: Var 'q') :||: Not (Var 'p' :||: Var 'q')) :||: Var 'p'),                       -- ¬(¬(¬(p ˄ q) ˅ ¬(p ˄ q))) ˅ p)
+                  Not (Not (Not (Var 'p')) :||: T),                                                                          -- ¬(¬¬p ˄ T) 
+                  Not (Not (Not (Var 'p')) :||: T :||: T),                                                                   -- ¬(¬¬p ˄ T ˄ T)
+                  Not (Not (Not (Var 'p')) :||: T :||: F),                                                                   -- ¬(¬¬p ˄ T ˄ F)                
+                  Not (Not (Not (Var 'p')) :||: T :||: Not (Not (Var 'p'))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬p)    
+                  Not (Not (Not (Var 'p')) :||: T :||: Not (Not (Var 'q'))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬q)        
+                  Not (Not (Not (Var 'p')) :||: Not (Var 'p') :&&: T),                                                       -- ¬(¬¬p ˄ ¬p ˄ T)
                   (Var 'p' :->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: Not (Var 'p'))                               -- ¬(¬¬p ˄ ¬p ˄ T)
                 ]
 

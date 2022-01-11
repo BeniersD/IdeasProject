@@ -1,6 +1,6 @@
 module LogicReductionStrategies where
 
-import Ideas.Common.Library hiding (right, layer)
+import Ideas.Common.Library hiding (layer)
 import Ideas.Main.Default
 import Ideas.Utils.Uniplate
 import Data.List
@@ -86,6 +86,8 @@ isCommutativeAbsorption1 ((p :&&: q) :||: r) | p == r = True
 isCommutativeAbsorption1 _                            = False
 
 isCommutativeAbsorption2 (p :||: (q :&&: r)) | p == q = True
+isCommutativeAbsorption2 ((p :||: q) :&&: r) | p == r = True
+isCommutativeAbsorption2 ((p :||: q) :&&: r) | q == r = True
 isCommutativeAbsorption2 _                            = False
 
 isCommutativeAbsorption3 (p :||: (q :&&: r)) | p == r = True
@@ -94,11 +96,7 @@ isCommutativeAbsorption3 _                            = False
 isCommutativeAbsorption4 (p :&&: (q :||: r)) | p == r = True
 isCommutativeAbsorption4 _                            = False
 
-isCommutativeAbsorption5 ((p :||: q) :&&: r) | p == r = True
-isCommutativeAbsorption5 _                            = False
 
-isCommutativeAbsorption6 ((p :||: q) :&&: r) | q == r = True
-isCommutativeAbsorption6 _                            = False
 
 isOr :: Ord a => Logic a -> Bool
 isOr (p :||: q) = True
@@ -108,29 +106,10 @@ isAnd :: Ord a => Logic a -> Bool
 isAnd (p :&&: q) = True
 isAnd _          = False
 
-stratCommutativeAbsorption :: (Ord a, Eq a) => LSCtxLgc a
-{-- stratCommutativeAbsorption = label "Commutativity-Absortion" f
-    where
-        f :: (Ord a, Eq a) => Logic a -> Strategy (Logic a)
-        f ((p :&&: q) :||: r) | p == r = layerLeftMostOnly (ruleCommutativity) -- .*. ruleAbsorption
-        --f (p :||: (q :&&: r)) | p == q = stratMultiRuleSequence (ruleCommutativity, ruleAbsorption)
-        --f (p :||: (q :&&: r)) | p == r = (liftToContext ruleCommutativity) .*. layerRightMostOnly( ruleCommutativity ) .*. (liftToContext ruleAbsorption)
-        --f (p :&&: (q :||: r)) | p == r = Just (liftToContext ruleCommutativity) .*. layerFirst( ruleCommutativity ) .*. (liftToContext ruleAbsorption)
-        --f ((p :||: q) :&&: r) | p == r = Just ruleCommutativity .*. ruleAbsorption
-        --f ((p :||: q) :&&: r) | q == r = Just Just ruleCommutativity .*. ruleAbsorption
-        --f _                            = _
---}
-stratCommutativeAbsorption = label "Commutativity-Absortion" s --strategy
-    where
-        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitLeftMost ( liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
-            (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
-            (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer( visitFirst (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
-            (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer( visitFirst (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
-            (check (maybe False (not . isCommutativeAbsorption5) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
-            (check (maybe False (not . isCommutativeAbsorption6) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) 
 
---ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
---ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
+-- TODO LabeledStrategy (CtxLgc a) -> Rule (Logic a)
+-- ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
+-- ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Simple logic Strategies
@@ -158,15 +137,22 @@ ruleCommutativeTRuleDisjunction = convertToRule "Commutativity And T-Rule Disjun
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Advanced logic Strategies
 --------------------------------------------------------------------------------------------------------------------------------------
-deMorganComplete, deMorgan, multiDeMorgan, deMorganDeriv, deMorganDeriv1, deMorganDeriv2, deMorganDeriv3, deMorganDeriv4,
+stratCommutativeAbsorption, deMorganComplete, stratDeMorgan, multiDeMorgan, deMorganDeriv, deMorganDeriv1, deMorganDeriv2, deMorganDeriv3, deMorganDeriv4,
     negation, multiNegation, multiDoubleNot, implicationEliminationDeriv1, implicationEliminationDeriv2, implicationEliminationDeriv3,
     implicationEliminationDeriv4, multiImplicationElimination, implicationEliminationDeriv, implicationEliminationComplete,
     mulitImplicationEliminationDeriv, multiDeMorganDeriv :: Ord a => Eq a => LSCtxLgc a
 
-deMorgan = label "DeMorgan" $ stratMultiRuleChoice [ruleDeMorganOr, ruleDeMorganAnd]
+stratCommutativeAbsorption = label "Commutativity-Absortion" s
+    where
+        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitLeftMost (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
+            (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
+            (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer (visitFirst(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
+            (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer (visitFirst(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption)
+
+stratDeMorgan = label "DeMorgan" $ stratMultiRuleChoice [ruleDeMorganOr, ruleDeMorganAnd]
 negation = label "Negate" $ stratMultiRuleChoice [ruleTRuleNotF, ruleFRuleNotT]
 
-multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere deMorgan)
+multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere stratDeMorgan)
 
 --ruleDeMorgan :: Ord a => Eq a => LgcRule a
 --ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" deMorgan
@@ -219,7 +205,7 @@ deMorganDeriv1 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (li
 
 --deMorgan (Not (p :&&: F)) = Just (Not p :||: Not F) = Just (Not p :||: T) = Just T
 --deMorgan (Not (F :&&: p)) = Just (Not F :||: Not p) = Just (T :||: Not p) = Just T
-deMorganDeriv2 = label "DeMorgan Derivative" $  innermost deMorgan .*. oncetdPref (liftToContext ruleTRuleNotF)-- .*. liftToContext ruleTRuleConjunction
+deMorganDeriv2 = label "DeMorgan Derivative" $  innermost stratDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF)-- .*. liftToContext ruleTRuleConjunction
 --deMorganDeriv2 = label "DeMorgan Derivative" $  deMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleDisjunction
 --deMorganDeriv2 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleDisjunction
 --deMorganDeriv2 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleDisjunction .*. multiNegation
@@ -227,14 +213,14 @@ deMorganDeriv2 = label "DeMorgan Derivative" $  innermost deMorgan .*. oncetdPre
 
 --deMorgan (Not (p :||: T)) = Just (Not p :&&: Not T) = Just (Not p :&&: F) = Just F
 --deMorgan (Not (T :||: p)) = Just (Not T :&&: Not p) = Just (F :&&: Not p) = Just F
-deMorganDeriv3 = label "DeMorgan Derivative" $  deMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction
+deMorganDeriv3 = label "DeMorgan Derivative" $  stratDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction
 --deMorganDeriv3 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction
 --deMorganDeriv3 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction .*. multiNegation
 --deMorganDeriv3 = label "DeMorgan Derivative 3" $  multiDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction .*. multiNegation .*. multiDoubleNot
 
 --deMorgan (Not (p :||: F)) = Just (Not p :&&: Not F) = Just (Not p :&&: T) = Just Not p
 --deMorgan (Not (F :||: p)) = Just (Not F :&&: Not p) = Just (T :&&: Not p) = Just Not p
-deMorganDeriv4 = label "DeMorgan Derivative" $  deMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction
+deMorganDeriv4 = label "DeMorgan Derivative" $  stratDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction
 --deMorganDeriv4 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction
 --deMorganDeriv4 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction .*. multiNegation
 --deMorganDeriv4 = label "DeMorgan Derivative 4" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction .*. multiNegation .*. multiDoubleNot
