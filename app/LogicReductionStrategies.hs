@@ -11,15 +11,22 @@ import Ideas.Common.Strategy.Traversal hiding (layer)
 import Ideas.Common.Traversal.Navigator
 import qualified Ideas.Common.Strategy.Combinators as Combinators
 
+
 testl :: Ord a => Eq a => LgcRule a -> LSCtxLgc a
-testl s = label description strategy
+testl s = label description str
     where
         description = "Layered First " ++ ( show . getId ) s
-        rule = liftToContext ruleDeMorganOr .|. liftToContext ruleDeMorganAnd
+        ru = liftToContext ruleDeMorganOr .|. liftToContext ruleDeMorganAnd
         --strategy =  fix $ \x -> somewhere ( try(rule) .*. ruleDown .*. (check (not.hasRight) |> (ruleRight .*. x)
-        strat = rule |> layer(visitFirst (rule)) 
-        strategy = somewhere (strat .*. try(strat) .*. try(strat) .*. try(strat) .*. try(strat))
-
+        --strat = rule |> layer (visitFirst (rule)) 
+        --vis s = fix $ \x -> s |> (check (not.hasRight) |> (ruleRight .*. x))
+        --strategy = somewhere (strat .*. try(strat) .*. ruleDown .*. try(strat) .*. try(strat) .*. try(strat) .*. try(strat) .*. try(strat) .*. try(strat) .*. ruleUp)
+        --str = ru .*. (check (not.hasDown) |> ruleDown .*. visitTryAll(ru))
+        --str = somewhere( ru |> layer (visitFirst (ru)) )
+        -- str = somewhere (ru |> layer (visitFirst (ru))) .*. try(somewhere (ru |> layer (visitFirst (ru))))  .*. try (somewhere (ru |> layer (visitFirst (ru))))
+        la s = check(not.hasDown) |> ruleDown .*. s .*. ruleUp
+        vF s = fix $ \x -> (s .*. la(vF(ru))) |> (ruleRight .*. x)
+        str =  somewhere(ru .*. try(la(vF(ru))))
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
@@ -52,13 +59,13 @@ stratMultiRuleSeq xs = label description strategy
 --- oncetd s = fix $ \x -> s |> layerOne x
 ------------------------------
 -- left-biasedchoice
-visitFirst, visitAll, visitTryAll, visitId, visitLeftMostOnly :: (IsStrategy f, Navigator a) => f a -> Strategy a
-visitFirst s = fix $ \x -> s |> (check (not.hasRight) |> (ruleRight .*. x))
+visitFirst, visitAll, visitTryAll, visitId, visitLeftMost, visitRightMost :: (IsStrategy f, Navigator a) => f a -> Strategy a
+visitFirst s = fix $ \x -> s |> ruleRight .*. x
 visitAll s = fix $ \x -> s .*. (check (not.hasRight) |> (ruleRight .*. x))
-visitTryAll s = fix $ \x -> try (s) .*. (check (not.hasRight) |> (ruleRight .*. x))
+visitTryAll s = fix $ \x -> try(s) .*. (check (not.hasRight) |> (ruleRight .*. x))
 visitId s = check (isTop) |> ruleUp .*. ruleDown .*. s
-visitLeftMostOnly s = check (not.hasDown) |> (ruleDown .*.  s)
-visitRightMostOnly s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*. x)
+visitLeftMost s = check (not.hasDown) |> (ruleDown .*.  s)
+visitRightMost s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*. x)
 
 layer :: (Navigator a) => Strategy a -> Strategy a
 layer s = ruleDown .*. s .*. ruleUp
@@ -115,7 +122,7 @@ stratCommutativeAbsorption :: (Ord a, Eq a) => LSCtxLgc a
 --}
 stratCommutativeAbsorption = label "Commutativity-Absortion" s --strategy
     where
-        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitLeftMostOnly ( liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
+        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitLeftMost ( liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
             (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
             (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer( visitFirst (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
             (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer( visitFirst (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
@@ -201,7 +208,7 @@ testlta3 x = label description strategy
 testlmo x = label description strategy
     where
         description = "Layered Left Most Only " ++ ( show . getId ) x
-        strategy = x .*. layer (visitLeftMostOnly (x))
+        strategy = x .*. layer (visitLeftMost (x))
 
 --deMorgan (Not (p :&&: T)) = Just (Not p :||: Not T) = Just (Not p :||: F) = Just Not p
 --deMorgan (Not (T :&&: p)) = Just (Not T :||: Not p) = Just (F :||: Not p) = Just Not p
