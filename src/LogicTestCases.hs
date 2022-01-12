@@ -356,4 +356,16 @@ associativityTestSet =
                   Not ((Not (Not (Var 'p')) :||: T) :||: T :||: Not (Not (Var 'q')))   -- ¬((¬¬p ˄ T) ˄ T ˄ ¬¬q)        
                 ]
 
-
+distributivityTestSet =
+                [ 
+                  Var 'p' :||: (Var 'q' :&&: Var 'r'),                                -- p ˅ (q ˄ r)
+                  (Var 'p' :&&: Var 'q') :||: Var 'r',                                -- (p ˄ q) ˅ r)
+                  Not (Var 'p' :||: (Var 'q' :&&: Var 'r')),                          -- ¬(p ˅ (q ˄ r))
+                  Not ((Var 'p' :&&: Var 'q') :||: Var 'r'),                          -- ¬((p ˄ q) ˅ r)
+                  ((Var 'p' :&&: Var 'q') :||: Var 'r') :||: Var 's',                 -- ((p ˄ q) ˅ r) ˅ s
+                  Var 'o' :&&: ((Var 'p' :&&: Var 'q') :||: Var 'r'),                 -- o ˄ ((p ˄ q) ˅ r)
+                  Var 'o' :||: ((Var 'p' :&&: Var 'q') :||: Var 'r'),                 -- o ˅ ((p ˄ q) ˅ r)
+                  Var 'o' :||: (((Var 'p' :&&: Var 'q') :||: Var 'r') :&&: Var 's'),  -- o ˅ ((p ˄ q) ˅ r) ˄ s
+                  Var 'o' :&&: (((Var 'p' :&&: Var 'q') :||: Var 'r') :||: Var 's'),  -- o ˄ ((p ˄ q) ˅ r) ˅ s
+                  Var 'o' :||: (((Var 'p' :&&: Var 'q') :||: Var 'r') :||: Var 's')   -- o ˅ ((p ˄ q) ˅ r) ˅ s
+                ]
