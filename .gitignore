@@ -1,3 +1,4 @@
 ideas-1.8
 ideas-math-types-1.1
-IdeasProject.sublime-workspace
+*.sublime-workspace
+*.sublime-project
