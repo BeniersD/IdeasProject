@@ -52,7 +52,8 @@ main = do
     --tstRuleFRuleDisjunction
     --tstRuleTRuleDisjunction
     --tstRuleFRuleNotT
-    tstRuleTRuleNotF
+    --tstRuleTRuleNotF
+    tstRuleDistributivity
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test Functions
@@ -82,6 +83,9 @@ tstRuleFRuleDisjunction = tstRuleGeneric ruleFRuleDisjunction boolRuleDisjunctio
 tstRuleTRuleDisjunction = tstRuleGeneric ruleTRuleDisjunction boolRuleDisjunctionTestSet 
 tstRuleFRuleNotT = tstRuleGeneric ruleFRuleNotT boolRuleNotTestSet 
 tstRuleTRuleNotF = tstRuleGeneric ruleTRuleNotF boolRuleNotTestSet 
+
+tstRuleDistributivity = tstRuleGeneric ruleDistributivity distributivityTestSet 
+
 
 
     --pptest "deMorganDerivTestSet" deMorganDerivTestSet
