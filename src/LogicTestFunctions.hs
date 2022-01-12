@@ -35,9 +35,10 @@ pptest desc xs = putStr $ desc ++ ":\n" ++ result ++ "\n"
         resultset  = zipResults xs
         result     = resultToStr resultset
 
-tstRuleGeneric :: (Show a, IsTerm a) => String -> [Logic a] -> LgcRule a -> IO ()
-tstRuleGeneric t xs r = do
-    putStrLn t
+tstRuleGeneric :: (Show a, IsTerm a) => LgcRule a -> [Logic a] -> IO ()
+tstRuleGeneric r xs = do
+    let desc = "Rule: " ++ description r ++ "\n"
+    putStrLn desc
     pptest "Input  (Simple testset): " xs
     pptest "Output (Simple testset): " [applyD (liftToContext r) $ newContext $ termNavigator x | x <- xs ]
 

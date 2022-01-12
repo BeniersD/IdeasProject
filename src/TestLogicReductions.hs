@@ -41,26 +41,47 @@ main = do
     --tstRuleCommutativity
     --tstRuleCommutativityOrd
     --tstRuleAbsorption
-    tstRuleDoubleNot
+    --tstRuleDoubleNot
+    --tstRuleEquivalenceElimination
+    --tstRuleIdempotency
+    --tstRuleImplicationElimination
+    --tstRuleFRuleComplement
+    --tstRuleTRuleComplement
+    --tstRuleFRuleConjunction
+    --tstRuleTRuleConjunction
+    --tstRuleFRuleDisjunction
+    --tstRuleTRuleDisjunction
+    --tstRuleFRuleNotT
+    tstRuleTRuleNotF
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test Functions
 --------------------------------------------------------------------------------------------------------------------------------------
 tstRuleAbsorption, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativityOrd, tstRuleDeMorganAndComplex, 
     tstRuleDeMorganAndSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganOrSimple, tstRuleDeMorganComplex, 
-    tstRuleDeMorganSimple :: IO ()
-tstRuleAbsorption = tstRuleGeneric "Absorption Rule" absorptionTestSet ruleAbsorption
-tstRuleAssociativity = tstRuleGeneric "Associativity Rule" associativityTestSet ruleAssociativity
-tstRuleCommutativity = tstRuleGeneric "Commutativity Rule" commutativityTestSet ruleCommutativity
-tstRuleCommutativityOrd = tstRuleGeneric "Ordered Commutativity Rule" commutativityTestSet ruleCommutativityOrd
-tstRuleDeMorganAndComplex = tstRuleGeneric "DeMorgan-And Rule" deMorganAndTestSetComplex ruleDeMorganAnd
-tstRuleDeMorganAndSimple = tstRuleGeneric "DeMorgan-And Rule" deMorganAndTestSetSimple ruleDeMorganAnd
-tstRuleDeMorganOrComplex = tstRuleGeneric "DeMorgan-Or Rule" deMorganOrTestSetComplex ruleDeMorganOr
-tstRuleDeMorganOrSimple = tstRuleGeneric "DeMorgan-Or Rule" deMorganOrTestSetSimple ruleDeMorganOr
-tstRuleDeMorganComplex = tstRuleGeneric "DeMorgan Rule" (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) ruleDeMorgan
-tstRuleDeMorganSimple = tstRuleGeneric "DeMorgan Rule" (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) ruleDeMorgan
-tstRuleDoubleNot = tstRuleGeneric "DoubleNot Rule" doubleNotTestSet ruleDoubleNot
-
+    tstRuleDeMorganSimple, tstRuleEquivalenceElimination, tstRuleIdempotency :: IO ()
+tstRuleAbsorption = tstRuleGeneric ruleAbsorption absorptionTestSet 
+tstRuleAssociativity = tstRuleGeneric ruleAssociativity associativityTestSet 
+tstRuleCommutativity = tstRuleGeneric ruleCommutativity commutativityTestSet 
+tstRuleCommutativityOrd = tstRuleGeneric ruleCommutativityOrd commutativityTestSet 
+tstRuleDeMorganAndComplex = tstRuleGeneric ruleDeMorganAnd deMorganAndTestSetComplex 
+tstRuleDeMorganAndSimple = tstRuleGeneric ruleDeMorganAnd deMorganAndTestSetSimple 
+tstRuleDeMorganOrComplex = tstRuleGeneric ruleDeMorganOr deMorganOrTestSetComplex 
+tstRuleDeMorganOrSimple = tstRuleGeneric ruleDeMorganOr deMorganOrTestSetSimple 
+tstRuleDeMorganComplex = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstRuleDeMorganSimple = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstRuleDoubleNot = tstRuleGeneric ruleDoubleNot doubleNotTestSet 
+tstRuleEquivalenceElimination = tstRuleGeneric ruleEquivalenceElimination equivalenceEliminationTestSet 
+tstRuleIdempotency = tstRuleGeneric ruleIdempotency idempotencyTestSet 
+tstRuleImplicationElimination = tstRuleGeneric ruleImplicationElimination implicationEliminationTestSet 
+tstRuleFRuleComplement = tstRuleGeneric ruleFRuleComplement boolRuleComplementTestSet 
+tstRuleTRuleComplement = tstRuleGeneric ruleTRuleComplement boolRuleComplementTestSet 
+tstRuleFRuleConjunction = tstRuleGeneric ruleFRuleConjunction boolRuleConjunctionTestSet 
+tstRuleTRuleConjunction = tstRuleGeneric ruleTRuleConjunction boolRuleConjunctionTestSet 
+tstRuleFRuleDisjunction = tstRuleGeneric ruleFRuleDisjunction boolRuleDisjunctionTestSet 
+tstRuleTRuleDisjunction = tstRuleGeneric ruleTRuleDisjunction boolRuleDisjunctionTestSet 
+tstRuleFRuleNotT = tstRuleGeneric ruleFRuleNotT boolRuleNotTestSet 
+tstRuleTRuleNotF = tstRuleGeneric ruleTRuleNotF boolRuleNotTestSet 
 
 
     --pptest "deMorganDerivTestSet" deMorganDerivTestSet
@@ -124,56 +145,16 @@ tstRuleDoubleNot = tstRuleGeneric "DoubleNot Rule" doubleNotTestSet ruleDoubleNo
 
     putStrLn "\nComplete Implication Elimination Derivative Strategy:"
     mapM_ print $ [apply (implicationEliminationComplete) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
---}
-{-- Test code:   
+    Test code:   
     putStrLn "hasRule / applyRule / applyRuleD doubleNotRule:"
     print $ map (hasRule doubleNotRule) samples
     print $ map (applyRule doubleNotRule) samples
     print $ map (applyRuleD doubleNotRule) samples
 
-    putStrLn "\napplyRuleAll doubleNotRule:"
-    --print $ applyRuleAll reduction doubleNot (samples !! 1)
-    print $ applyRuleAll doubleNotRule (samples !! 2)
-    print $ applyRuleAll doubleNotRule (samples !! 3)    
-    print $ applyRuleAll doubleNotRule (samples !! 7)
-    print $ applyRuleAll doubleNotRule (samples !! 8)    
-
-    putStrLn "\nhasRule / applyRule / applyRuleD deMorganRule:"
-    print $ map (hasRule deMorganRule) samples
-    print $ map (applyRule deMorganRule) samples
-    print $ map (applyRuleD deMorganRule) samples
-
-    putStrLn "\napplyRuleAll deMorganRule:"    
-    print $ applyRuleAll doubleNotRule (samples !! 2)
-    print $ applyRuleAll doubleNotRule (samples !! 3)
-    print $ applyRuleAll doubleNotRule (samples !! 7)
-    print $ applyRuleAll doubleNotRule (samples !! 8)    
-
-    putStrLn "\nApply doubleNotOrDeMorgan:"
-    print $ map (apply doubleNotOrDeMorgan) samples
-    print $ map (applyD doubleNotOrDeMorgan) samples
-    print $ map (applyAll doubleNotOrDeMorgan) samples
-
     putStrLn "\nApply minimalExercise:"
     print $ map (apply (minimalExercise doubleNotOrDeMorgan)) samples
     print $ map (applyD (minimalExercise doubleNotOrDeMorgan)) samples
     print $ map (applyAll (minimalExercise doubleNotOrDeMorgan)) samples    
-    --putStrLn "\n"
-    --mapM_ print $ map (apply ruleDoubleNot) samples    
-    --putStrLn "\n"
-    --mapM_ print $ map (apply doubleNot) samples    
-    --putStrLn "\n"
-    --mapM_ print $ map (applyD ruleDoubleNot) samples    
-    --putStrLn "\n"
-    --mapM_ print $ map (applyD doubleNot) samples    
-    --putStrLn "\n"
-    --mapM_ print $ map (applicable ruleDoubleNot) samples    
-    --putStrLn "\n"
-    --mapM_ print $ map (applicable doubleNot) samples    
-    --putStrLn "\n"
-    --mapM_ print $ map (applyAll ruleDoubleNot) samples    
-    --putStrLn "\ncommutativity:"
-    --mapM_ print $ map (applyAll ruleCommutativity) samples    
 
     --putStrLn "\nMultirule commutativity:"
     --mapM_ print $ [apply (multiRule2Strategy ruleCommutativity) $ newContext $ termNavigator x | x <- samples]
