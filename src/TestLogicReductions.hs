@@ -92,13 +92,14 @@ tstRuleTRuleDisjunction = tstRuleGeneric ruleTRuleDisjunction boolRuleDisjunctio
 tstRuleFRuleNotT = tstRuleGeneric ruleFRuleNotT boolRuleNotTestSet 
 tstRuleTRuleNotF = tstRuleGeneric ruleTRuleNotF boolRuleNotTestSet 
 tstRuleDistributivity = tstRuleGeneric ruleDistributivity distributivityTestSet 
-
 tstRuleFRuleConjunctionC = tstRuleGeneric ruleFRuleConjunctionC boolRuleConjunctionTestSet 
 tstRuleTRuleConjunctionC = tstRuleGeneric ruleTRuleConjunctionC boolRuleConjunctionTestSet 
 tstRuleFRuleComplementC = tstRuleGeneric ruleFRuleComplementC boolRuleComplementTestSet 
 tstRuleTRuleComplementC = tstRuleGeneric ruleTRuleComplementC boolRuleComplementTestSet 
 tstRuleFRuleDisjunctionC = tstRuleGeneric ruleFRuleDisjunctionC boolRuleDisjunctionTestSet 
 tstRuleTRuleDisjunctionC = tstRuleGeneric ruleTRuleDisjunctionC boolRuleDisjunctionTestSet 
+
+--tstRuleTRuleDisjunctionC2 = tstRuleGeneric stratRuleAllC(ruleTRuleDisjunctionC) boolRuleDisjunctionTestSet
 
 
 

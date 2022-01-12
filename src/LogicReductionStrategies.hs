@@ -97,37 +97,37 @@ layerTryAll s = layer (visitTryAll s)
 --------------------------------------------------------------------------------------------------------------------------------------
 stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
     stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd :: (Ord a, Eq a) => LSLgc a
-stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check f .*. ruleCommutativity .*. ruleFRuleComplement
+stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check f .*. stratRuleC (ruleFRuleComplement)
     where 
         f :: Eq a => Logic a -> Bool
         f (Not p :&&: q) | p == q = True
         f _                       = False
 
-stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. ruleCommutativity .*. ruleFRuleConjunction
+stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. stratRuleC (ruleFRuleConjunction)
     where 
         f :: Eq a => Logic a -> Bool
         f (F :&&: p) = True
         f _          = False
 
-stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check f .*. ruleCommutativity .*. ruleTRuleConjunction
+stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check f .*. stratRuleC (ruleTRuleConjunction)
     where 
         f :: Eq a => Logic a -> Bool 
         f (T :&&: p) = True
         f _          = False
 
-stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. ruleCommutativity .*. ruleTRuleComplement
+stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. stratRuleC (ruleTRuleComplement)
     where
         f :: Eq a => Logic a -> Bool 
         f (Not p :||: q) | p == q = True
         f _                       = False
 
-stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check f .*. ruleCommutativity .*. ruleFRuleDisjunction
+stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check f .*. stratRuleC (ruleFRuleDisjunction)
     where 
         f :: Logic a -> Bool 
         f (F :||: p) = True
         f _          = False
 
-stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check f .*. ruleCommutativity .*. ruleTRuleDisjunction
+stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check f .*. stratRuleC (ruleTRuleDisjunction)
     where
         f :: Logic a -> Bool 
         f (T :||: p) = True
