@@ -173,7 +173,7 @@ stratCommutativeAbsorption = label "Commutativity-Absortion" s
             (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer (visitFirst(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption)
 
 -- TODO LabeledStrategy (CtxLgc a) -> Rule (Logic a)
---ruleCommutativeAbsorption :: LgcRule a
+--ruleCommutativeAbsorption :: Rule a
 --ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
 
 isOr :: Ord a => Logic a -> Bool

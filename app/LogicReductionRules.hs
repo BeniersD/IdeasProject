@@ -13,10 +13,11 @@ import Data.Maybe
 import Data.List
 
 type LgcRule a = Rule (Logic a)
+type LS a = LabeledStrategy a
 type LgcRed a = Logic a -> Maybe (Logic a) 
-type LSLgc a = LabeledStrategy (Logic a)
+type LSLgc a = LS (Logic a)
 type CtxLgc a = Context (Logic a)
-type LSCtxLgc a = LabeledStrategy (CtxLgc a)
+type LSCtxLgc a = LS (CtxLgc a)
 
 ------------------------------------------------------------------------------------------------------------
 -- Generic rewrite/reduction functions

@@ -16,7 +16,7 @@ main = do
     --tstRuleDeMorganOrComplex
     --tstRuleDeMorganAndSimple
     --tstRuleDeMorganAndComplex
-    tstStratDeMorganSimple
+    --tstStratDeMorganSimple
     --tstStratDeMorganComplex
 
 
