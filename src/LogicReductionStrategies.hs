@@ -13,9 +13,9 @@ import Ideas.Common.Strategy.Abstract
 import qualified Ideas.Common.Strategy.Combinators as Combinators
 
 testl :: Ord a => Eq a => LgcRule a -> LSCtxLgc a
-testl s = label description str
+testl r = label d s
     where
-        description = "Layered First " ++ ( show . getId ) s
+        d = "Layered First " ++ showId r
         ru = liftToContext ruleDeMorganOr .|. liftToContext ruleDeMorganAnd
         --strategy =  fix $ \x -> somewhere ( try(rule) .*. ruleDown .*. (check (not.hasRight) |> (ruleRight .*. x)
         --strat = rule |> layer (visitFirst (rule)) 
@@ -26,33 +26,49 @@ testl s = label description str
         -- str = somewhere (ru |> layer (visitFirst (ru))) .*. try(somewhere (ru |> layer (visitFirst (ru))))  .*. try (somewhere (ru |> layer (visitFirst (ru))))
         la s = check(not.hasDown) |> ruleDown .*. s .*. ruleUp
         vF s = fix $ \x -> (s .*. la(vF(ru))) |> (ruleRight .*. x)
-        str =  somewhere(ru .*. try(la(vF(ru))))
+        s =  somewhere(ru .*. try(la(vF(ru))))
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
 --------------------------------------------------------------------------------------------------------------------------------------
--- Apply a rule multiple times somewhere
-stratMultiRule :: Eq a => LgcRule a -> LSCtxLgc a
-stratMultiRule x = label ("rewrite.multi." ++ showId x) (repeatS (somewhere (liftToContext x)))
-
 -- Apply of a given list of rules (choice)
 stratMultiRuleChoice, stratMultiRuleOrElse, stratMultiRuleSeq :: Eq a => [LgcRule a] -> LSCtxLgc a
-stratMultiRuleChoice xs = label description strategy
+stratMultiRuleChoice xs = label d s
     where
-        description = intercalate "-or-" (map showId xs)
-        strategy = choice (map liftToContext xs)
+        d = intercalate "-or-" (map showId xs)
+        s = choice (map liftToContext xs)
 
 -- Apply of a given list of rules (orelse)
-stratMultiRuleOrElse xs = label description strategy
+stratMultiRuleOrElse xs = label d s
     where
-        description = intercalate "-orelse-" (map showId xs)
-        strategy = orelse (map liftToContext xs)
+        d = intercalate "-orelse-" (map showId xs)
+        s = orelse (map liftToContext xs)
 
--- Apply of a given list of rules (orelse)
-stratMultiRuleSeq xs = label description strategy
+-- Apply of a given list of rules (sequence)
+stratMultiRuleSeq xs = label d s
     where
-        description = intercalate "-and-" (map showId xs)
-        strategy = Combinators.sequence (map liftToContext xs)
+        d = intercalate "-and-" (map showId xs)
+        s = Combinators.sequence (map liftToContext xs)
+
+-- Apply a rule once somewhere
+stratRuleOnce :: Eq a => LgcRule a -> LSCtxLgc a
+stratRuleOnce r = label ("rewrite.single." ++ showId r) (somewhere (liftToContext r))
+
+-- Apply a rule multiple times somewhere
+stratRuleAll :: Eq a => LgcRule a -> LSCtxLgc a
+stratRuleAll r = label ("rewrite.multi." ++ showId r) (repeatS (stratRuleOnce r))
+
+-- Commutative version of a rule
+stratRuleC :: Ord a => LgcRule a -> LSLgc a
+stratRuleC r = label ("rewrite.commutative." ++ showId r) (ruleCommutativity .*. r)
+
+-- Commutative version of a rule
+stratRuleOnceC :: Ord a => LgcRule a -> LSCtxLgc a
+stratRuleOnceC r = label ("rewrite.commutative." ++ showId r) (stratRuleOnce ruleCommutativity .*. liftToContext r)
+
+-- Commutative version of a rule
+stratRuleAllC :: Ord a => LgcRule a -> LSCtxLgc a
+stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (stratRuleAll ruleCommutativity .*. liftToContext r)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Visits
@@ -102,7 +118,7 @@ stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunct
 stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. ruleCommutativity .*. ruleTRuleComplement
     where
         f :: Eq a => Logic a -> Bool 
-        f (p :||: Not q) | p == q = True
+        f (Not p :||: q) | p == q = True
         f _                       = False
 
 stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check f .*. ruleCommutativity .*. ruleFRuleDisjunction
@@ -189,7 +205,7 @@ multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere (liftToContext ruleD
 --ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" deMorgan
 
 multiNegation = label "Multi Negate" $ repeatS (somewhere negation)
-multiDoubleNot = stratMultiRule ruleDoubleNot
+multiDoubleNot = stratRuleAll ruleDoubleNot
 
 deMorganDeriv = label "DeMorgan Derivative" $ deMorganDeriv1 .|. deMorganDeriv2 .|. deMorganDeriv3 .|. deMorganDeriv4
 multiDeMorganDeriv = label "Multi DeMorgan Derivative" $ repeatS (somewhere deMorganDeriv)

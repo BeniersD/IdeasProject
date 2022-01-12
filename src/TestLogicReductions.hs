@@ -53,14 +53,22 @@ main = do
     --tstRuleTRuleDisjunction
     --tstRuleFRuleNotT
     --tstRuleTRuleNotF
-    tstRuleDistributivity
+    --tstRuleDistributivity
+    --tstRuleFRuleConjunctionC
+    --tstRuleTRuleConjunctionC
+    --tstRuleFRuleComplementC
+    --tstRuleTRuleComplementC
+    --tstRuleFRuleDisjunctionC
+    tstRuleTRuleDisjunctionC
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test Functions
 --------------------------------------------------------------------------------------------------------------------------------------
 tstRuleAbsorption, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativityOrd, tstRuleDeMorganAndComplex, 
     tstRuleDeMorganAndSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganOrSimple, tstRuleDeMorganComplex, 
-    tstRuleDeMorganSimple, tstRuleEquivalenceElimination, tstRuleIdempotency :: IO ()
+    tstRuleDeMorganSimple, tstRuleEquivalenceElimination, tstRuleIdempotency, tstRuleFRuleConjunctionC,
+    tstRuleTRuleConjunctionC, tstRuleFRuleComplementC, tstRuleTRuleComplementC, tstRuleFRuleDisjunctionC,
+    tstRuleTRuleDisjunctionC  :: IO ()
 tstRuleAbsorption = tstRuleGeneric ruleAbsorption absorptionTestSet 
 tstRuleAssociativity = tstRuleGeneric ruleAssociativity associativityTestSet 
 tstRuleCommutativity = tstRuleGeneric ruleCommutativity commutativityTestSet 
@@ -83,8 +91,14 @@ tstRuleFRuleDisjunction = tstRuleGeneric ruleFRuleDisjunction boolRuleDisjunctio
 tstRuleTRuleDisjunction = tstRuleGeneric ruleTRuleDisjunction boolRuleDisjunctionTestSet 
 tstRuleFRuleNotT = tstRuleGeneric ruleFRuleNotT boolRuleNotTestSet 
 tstRuleTRuleNotF = tstRuleGeneric ruleTRuleNotF boolRuleNotTestSet 
-
 tstRuleDistributivity = tstRuleGeneric ruleDistributivity distributivityTestSet 
+
+tstRuleFRuleConjunctionC = tstRuleGeneric ruleFRuleConjunctionC boolRuleConjunctionTestSet 
+tstRuleTRuleConjunctionC = tstRuleGeneric ruleTRuleConjunctionC boolRuleConjunctionTestSet 
+tstRuleFRuleComplementC = tstRuleGeneric ruleFRuleComplementC boolRuleComplementTestSet 
+tstRuleTRuleComplementC = tstRuleGeneric ruleTRuleComplementC boolRuleComplementTestSet 
+tstRuleFRuleDisjunctionC = tstRuleGeneric ruleFRuleDisjunctionC boolRuleDisjunctionTestSet 
+tstRuleTRuleDisjunctionC = tstRuleGeneric ruleTRuleDisjunctionC boolRuleDisjunctionTestSet 
 
 
 

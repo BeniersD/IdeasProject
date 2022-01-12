@@ -7,10 +7,10 @@ import Domain.Logic.Formula  hiding (not)
 type LgcChar  = Logic Char
 type LsLgcChar = [LgcChar]
 
-doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTestSetSimple, deMorganOrTestSetComplex, deMorganAndTestSetComplex, deMorganAndDoubleNotTestSet,
+commutativityTestSet, doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTestSetSimple, deMorganOrTestSetComplex, deMorganAndTestSetComplex, deMorganAndDoubleNotTestSet,
   implicationEliminationTestSet, implicationEliminationDerivTestSet , absorptionTestSet, idempotencyTestSet, boolRuleConjunctionTestSet, boolRuleDisjunctionTestSet,
   boolRuleComplementTestSet, boolRuleNotTestSet, deMorganAndImplicationEliminationTestSet, deMorganAndEquivalenceEliminationTestSet,
-  equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet, commutativityTestSet :: LsLgcChar
+  equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet :: LsLgcChar
 commutativityTestSet =
                 [ Var 'p' :&&: Var 'q',
                   Var 'q' :&&: Var 'p',
@@ -25,7 +25,10 @@ commutativityTestSet =
                   Var 'p' :&&: T,
                   F :&&: Var 'p',
                   Var 'p' :&&: F, 
-                  Var 'p' :&&: (Var 'p' :&&: Var 'q'),
+                  Var 'p' :&&: (Var 'q' :&&: Var 'r'),
+                  Var 'p' :||: (Var 'q' :||: Var 'r'),
+                  Var 'p' :&&: (Var 'q' :&&: Var 'p'),
+                  Var 'p' :&&: (Var 'p' :||: Var 'q'),
                   (Var 'p' :&&: Var 'q') :&&: Var 'p',
                   (Var 'p' :&&: Var 'q') :&&: (Var 'q' :&&: Var 'p'),
                   Var 'p' :||: Var 'q',
@@ -136,17 +139,17 @@ doubleNotTestSet =
                 ]
 
 deMorganAndTestSetSimple = 
-                [ Not (Var 'p' :&&: Var 'q'),                                                                              -- ¬(q ˄ p)  
-                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r'),                                                                 -- ¬(q ˄ p ˄ r)  
-                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's'),                                                    -- ¬(q ˄ p ˄ r ˄ s)  
-                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's' :&&: Var 't')                                       -- ¬(q ˄ p ˄ r ˄ s ˄ t)                  
+                [ Not (Var 'p' :&&: Var 'q'),                                       -- ¬(q ˄ p)  
+                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r'),                          -- ¬(q ˄ p ˄ r)  
+                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's'),             -- ¬(q ˄ p ˄ r ˄ s)  
+                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's' :&&: Var 't') -- ¬(q ˄ p ˄ r ˄ s ˄ t)                  
                 ]
 
 deMorganOrTestSetSimple =                   
-                [ Not (Var 'p' :||: Var 'q'),                                                                              -- ¬(q ˅ p)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 'r'),                                                                 -- ¬(q ˅ p ˅ r)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 'r' :||: Var 's'),                                                    -- ¬(q ˅ p ˅ r ˅ s)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 'r' :||: Var 's' :||: Var 't')                                        -- ¬(q ˅ p ˅ r ˅ s ˅ t)                  
+                [ Not (Var 'p' :||: Var 'q'),                                       -- ¬(q ˅ p)  
+                  Not (Var 'q' :||: Var 'p' :||: Var 'r'),                          -- ¬(q ˅ p ˅ r)  
+                  Not (Var 'q' :||: Var 'p' :||: Var 'r' :||: Var 's'),             -- ¬(q ˅ p ˅ r ˅ s)  
+                  Not (Var 'q' :||: Var 'p' :||: Var 'r' :||: Var 's' :||: Var 't') -- ¬(q ˅ p ˅ r ˅ s ˅ t)                  
                 ]
 
 deMorganAndTestSetComplex = 
