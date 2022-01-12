@@ -8,8 +8,28 @@ import LogicReductionStrategies
 import LogicExercices
 import LogicTestCases
 import LogicTestFunctions
-import LogicTests
 
+quickTestSet :: LsLgcChar
+quickTestSet = [
+                Not (Var 'p' :&&: Var 'q'),                                         -- ¬(p ˄ q)
+                Not (Var 'q' :&&: Var 'p' :&&: Var 'r'),                            -- ¬(p ˄ q ˄ r)
+                Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's'),               -- ¬(p ˄ q ˄ r ˄ s)
+                Not (Var 'q' :&&: Var 'r' :&&: Var 's' :&&: Var 'p'),               -- ¬(p ˄ r ˄ s ˄ p)                
+                Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's' :&&: Var 't'),  -- ¬(p ˄ q ˄ r ˄ s ˄ t)
+                Not (Not (Var 'p' :&&: Var 'q')),                                   -- ¬¬(p ˄ q)
+                Not (Not (Var 'q' :&&: Var 'p')),                                   -- ¬¬(q ˄ p)  
+                Not (Not (Var 'q' :&&: Var 'r' :&&: Var 'p')),                      -- ¬¬(q ˄ r ˄ p)                
+                Not (Not (Not (Var 'p')) :&&: T),                                   -- ¬(¬¬p ˄ T) 
+                Not (Not (Not (Var 'p')) :&&: T :&&: T),                            -- ¬(¬¬p ˄ T ˄ T)
+                Not (Not (Not (Var 'p')) :&&: T :&&: F),                            -- ¬(¬¬p ˄ T ˄ F)                
+                Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'p'))),          -- ¬(¬¬p ˄ T ˄ ¬¬p)    
+                Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'q'))),          -- ¬(¬¬p ˄ T ˄ ¬¬q)        
+                Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: T)                 -- ¬(¬¬p ˄ ¬p ˄ T)
+               ]
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Main
+--------------------------------------------------------------------------------------------------------------------------------------
 main :: IO ()
 main = do
     --tstRuleDeMorganOrSimple
@@ -19,7 +39,28 @@ main = do
     --tstRuleDeMorganSimple
     --tstRuleDeMorganComplex
     --tstRuleCommutativity
-    tstRuleCommutativityOrd
+    --tstRuleCommutativityOrd
+    --tstRuleAbsorption
+    tstRuleDoubleNot
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Test Functions
+--------------------------------------------------------------------------------------------------------------------------------------
+tstRuleAbsorption, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativityOrd, tstRuleDeMorganAndComplex, 
+    tstRuleDeMorganAndSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganOrSimple, tstRuleDeMorganComplex, 
+    tstRuleDeMorganSimple :: IO ()
+tstRuleAbsorption = tstRuleGeneric "Absorption Rule" absorptionTestSet ruleAbsorption
+tstRuleAssociativity = tstRuleGeneric "Associativity Rule" associativityTestSet ruleAssociativity
+tstRuleCommutativity = tstRuleGeneric "Commutativity Rule" commutativityTestSet ruleCommutativity
+tstRuleCommutativityOrd = tstRuleGeneric "Ordered Commutativity Rule" commutativityTestSet ruleCommutativityOrd
+tstRuleDeMorganAndComplex = tstRuleGeneric "DeMorgan-And Rule" deMorganAndTestSetComplex ruleDeMorganAnd
+tstRuleDeMorganAndSimple = tstRuleGeneric "DeMorgan-And Rule" deMorganAndTestSetSimple ruleDeMorganAnd
+tstRuleDeMorganOrComplex = tstRuleGeneric "DeMorgan-Or Rule" deMorganOrTestSetComplex ruleDeMorganOr
+tstRuleDeMorganOrSimple = tstRuleGeneric "DeMorgan-Or Rule" deMorganOrTestSetSimple ruleDeMorganOr
+tstRuleDeMorganComplex = tstRuleGeneric "DeMorgan Rule" (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) ruleDeMorgan
+tstRuleDeMorganSimple = tstRuleGeneric "DeMorgan Rule" (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) ruleDeMorgan
+tstRuleDoubleNot = tstRuleGeneric "DoubleNot Rule" doubleNotTestSet ruleDoubleNot
+
 
 
     --pptest "deMorganDerivTestSet" deMorganDerivTestSet
@@ -28,20 +69,9 @@ main = do
 
 
     -- putStrLn "\n"    
-    --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet 
     --mapM_ print $ [apply (checkStrategy) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
     --mapM_ print $ [apply (layerFirst  lift ruleCommutativity) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet]     
     --mapM_ print $ [apply (testlf ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
-
-
-    -- putStrLn "\n"    
-    --mapM_ print $ [apply (testlf2 ruleDeMorganOr) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
-
-    -- putStrLn "\n"         
-    --mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
-
-    -- putStrLn "\n"         
-    --mapM_ print $ [apply (testlf3 (multiRuleOrElseStrategy [ruleDeMorganAnd, ruleDeMorganOr])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
 
     -- putStrLn "\n"         
     --mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr, ruleTRuleNotF])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
@@ -51,11 +81,9 @@ main = do
     --mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr, ruleFRuleNotT, ruleTRuleNotF])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
 
 
-    --putStrLn "\nruleCommutativity:"
-    --mapM_ print $ map (applyD ruleCommutativity) commutativityTestSet    
-
     --putStrLn "\nT-Rule Complement testSet:"
     --mapM_ print boolRuleComplementTestSet
+
     --putStrLn "\nruleTRuleComplement:"
     --mapM_ print $ map (applyD ruleTRuleComplement) boolRuleComplementTestSet   
 

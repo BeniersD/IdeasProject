@@ -58,7 +58,6 @@ stratMultiRuleSeq xs = label description strategy
 -- Visits
 --------------------------------------------------------------------------------------------------------------------------------------
 visitFirst, visitAll, visitTryAll, id, visitLeftMost, visitRightMost :: (IsStrategy f, Navigator a) => f a -> Strategy a
-
 visitAll s = fix $ \x -> s .*. (check (not.hasRight) |> (ruleRight .*. x))
 visitFirst s = fix $ \x -> s |> ruleRight .*. x
 visitTryAll s = fix $ \x -> try(s) .*. (check (not.hasRight) |> (ruleRight .*. x))
@@ -70,7 +69,6 @@ id s = check (isTop) |> ruleUp .*. ruleDown .*. s
 -- On-elayer visits
 --------------------------------------------------------------------------------------------------------------------------------------
 layer :: (Navigator a) => Strategy a -> Strategy a
-
 layer s = ruleDown .*. s .*. ruleUp
 layerAll s = layer (visitAll s)
 layerFirst s = layer (visitFirst s)
@@ -83,7 +81,6 @@ layerTryAll s = layer (visitTryAll s)
 --------------------------------------------------------------------------------------------------------------------------------------
 stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
     stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd :: (Ord a, Eq a) => LSLgc a
-
 stratFRuleComplementC  = label "Commutative-and-F-Rule Complement"  $ check f .*. ruleCommutativity .*. ruleFRuleComplement
     where 
         f :: Eq a => Logic a -> Bool
@@ -132,7 +129,6 @@ stratDeMorgan = label "DeMorgan" $ ruleDeMorganOr .|. ruleDeMorganAnd
 
 ruleFRuleConjunctionC, ruleTRuleConjunctionC, ruleFRuleComplementC, ruleTRuleComplementC, ruleFRuleDisjunctionC, 
     ruleTRuleDisjunctionC, ruleCommutativityOrd, ruleDeMorgan :: (Ord a, Eq a) => LgcRule a
-
 ruleFRuleConjunctionC = convertToRule "Commutativity And F-Rule Conjunction" "single.commutativity.and.fruleconjunction" stratFRuleConjunctionC
 ruleTRuleConjunctionC = convertToRule "Commutativity And T-Rule Conjunction" "single.commutativity.and.trulecomplement" stratTRuleConjunctionC
 ruleFRuleComplementC  = convertToRule "Commutativity And F-Rule Complement" "single.commutativity.and.frulecomplement" stratFRuleComplementC

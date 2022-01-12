@@ -1,10 +1,13 @@
 module LogicTestFunctions where
 
 import Data.Foldable as Foldable
+import Domain.Logic.Formula
+import Ideas.Common.Library
 import Data.Function
-import LogicReductionRules_Old
 import LogicTestCases
 import LogicReductionRules
+
+type LgcCharReduction = (LgcChar -> LgcChar)
 
 tupleToStr :: (Show a) => (Int, a) -> String
 tupleToStr x = numbers ++ ". " ++ formula ++ "\n"
@@ -16,21 +19,27 @@ resultToStr :: (Show a) => [(Int, a)] -> String
 resultToStr = foldl' (++) "" . map tupleToStr
 
 zipResults :: [a] -> [(Int, a)]
-zipResults x = zip numbers x
+zipResults xs = zip numbers xs
     where
-        numbers = [1..length x]
+        numbers = [1..length xs]
 
-reduceFormula :: Maybe (Reduction, LChrLogic) -> [ChrLogic]
+reduceFormula :: Maybe (LgcCharReduction, LsLgcChar) -> [LgcChar]
 reduceFormula x = 
     case x of
         Just x  -> uncurry map x
         Nothing -> []
 
 pptest :: (Show a) => String -> [a] -> IO ()
-pptest desc y = putStr $ desc ++ ":\n" ++ result ++ "\n"
+pptest desc xs = putStr $ desc ++ ":\n" ++ result ++ "\n"
     where 
-        resultset  = zipResults y
+        resultset  = zipResults xs
         result     = resultToStr resultset
+
+tstRuleGeneric :: (Show a, IsTerm a) => String -> [Logic a] -> LgcRule a -> IO ()
+tstRuleGeneric t xs r = do
+    putStrLn t
+    pptest "Input  (Simple testset): " xs
+    pptest "Output (Simple testset): " [applyD (liftToContext r) $ newContext $ termNavigator x | x <- xs ]
 
 {--
 testReduction :: [Char] -> [Char] -> IO ()

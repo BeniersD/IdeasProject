@@ -1,8 +1,9 @@
 module LogicReductionRules 
    ( LgcRule, LgcRed, LSLgc, LSCtxLgc, CtxLgc, hasRule,  createRule, convertToRule,
-     ruleDoubleNot, ruleDeMorganAnd, ruleDeMorganOr, ruleImplicationElimination, ruleEquivalenceElimination, ruleAbsorption, 
-     ruleIdempotency, ruleFRuleConjunction, ruleTRuleConjunction, ruleFRuleDisjunction, ruleTRuleDisjunction, 
-     ruleFRuleComplement, ruleTRuleComplement, ruleFRuleNotT, ruleTRuleNotF, ruleCommutativity, commutativity
+     ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, 
+     ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, ruleIdempotency, ruleImplicationElimination, 
+     ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT, ruleTRuleComplement, 
+     ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF, commutativity
    ) where
 
 import Ideas.Common.Library hiding (description)

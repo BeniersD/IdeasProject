@@ -340,6 +340,20 @@ deMorganAndEquivalenceEliminationTestSet =
                  Not (Not (Var 'p' :<->: Not (Not (Var 'q'))) :<->: Not (Not (Var 'p') :<->: Not (Not (Var 'q'))))
                 ]
 
-
+associativityTestSet =
+                [ 
+                  (Var 'q' :&&: Var 'p') :&&: Var 'r',                                 -- (q ˄ p) ˄ r
+                  Not ((Var 'q' :&&: Var 'p') :&&: Var 'r'),                           -- ¬((q ˄ p) ˄ r)  
+                  (Var 'q' :||: Var 'p') :||: Var 'r',                                 -- (q ˅ p) ˅ r
+                  Not ((Var 'q' :||: Var 'p') :||: Var 'r'),                           -- ¬((q ˅ p) ˅ r)  
+                  ((Var 'q' :||: Var 'p') :||: Var 'r') :||: Var 's',                  -- ((q ˅ p) ˅ r) ˅ s)  
+                  Not (((Var 'q' :||: Var 'p') :||: Var 'r') :||: Var 's'),            -- ¬((q ˅ p) ˅ r) ˅ s)  
+                  ((Var 'q' :||: Var 'p') :||: Var 'r') :||: Var 's',                  -- ((q ˅ p) ˅ r) ˅ s)  
+                  Not (((Var 'q' :||: Var 'p') :||: Var 'r') :||: Var 's'),            -- ¬((q ˅ p) ˅ r) ˅ s)  
+                  (Not (Not (Var 'p')) :&&: T) :&&: T,                                 -- (¬¬p ˄ T) ˄ T
+                  Not ((Not (Not (Var 'p')) :&&: T) :&&: F),                           -- ¬((¬¬p ˄ T) ˄ F)                
+                  Not ( T :&&: (Not (Not (Var 'p')) :&&: T) :&&: Not (Not (Var 'p'))), -- ¬(T ˄ (¬¬p ˄ T) ˄ ¬¬p)    
+                  Not ((Not (Not (Var 'p')) :||: T) :||: T :||: Not (Not (Var 'q')))   -- ¬((¬¬p ˄ T) ˄ T ˄ ¬¬q)        
+                ]
 
 

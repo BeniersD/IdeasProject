@@ -22,7 +22,6 @@ import Ideas.Common.Library
 import Ideas.Main.Default
 
 type ChrLogic  = Logic Char
-type Reduction = (ChrLogic -> ChrLogic)
 type LChrLogic = [ChrLogic]
 
 isDoubleNot :: Logic a -> Bool
