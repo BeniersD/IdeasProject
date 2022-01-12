@@ -181,8 +181,8 @@ stratCommutativeAbsorption = label "Rewrite Strategy Commutativity-Absortion" s
     where
         s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitLeftMost (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
             (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
-            (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer (visitFirst(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
-            (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer (visitFirst(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption)
+            (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer (layerRightMost(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
+            (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer (layerRightMost(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption)
 
 -- TODO LabeledStrategy (CtxLgc a) -> Rule (Logic a)
 --ruleCommutativeAbsorption :: Rule a
