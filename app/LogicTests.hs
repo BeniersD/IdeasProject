@@ -25,8 +25,8 @@ quickTestSet = [
                 Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: T)                 -- ¬(¬¬p ˄ ¬p ˄ T)
                ]
 
-tstRuleDeMorganOrSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganAndSimple, tstRuleDeMorganAndComplex, testRuleDeMorganAndComplex, 
-    tstStratDeMorganSimple :: IO ()
+tstRuleDeMorganOrSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganAndSimple, tstRuleDeMorganAndComplex, tstRuleDeMorganSimple, tstRuleDeMorganComplex, 
+    tstRuleCommutativity :: IO ()
 
 tstRuleDeMorganOrSimple = do
     putStrLn "DeMorgan-Or Rule"
@@ -58,14 +58,26 @@ testRuleDeMorganAndComplex = do
     pptest "Input  (Complex testset): " xs
     pptest "Output (Complex testset): " [applyD (liftToContext ruleDeMorganAnd) $ newContext $ termNavigator x | x <- xs ]
 
-tstStratDeMorganSimple = do
+tstRuleDeMorganSimple = do
     putStrLn "DeMorgan-And Rule"
     let xs = deMorganAndTestSetSimple ++ deMorganOrTestSetSimple
     pptest "Input  (Simple testset): " xs
     pptest "Output (Simple testset): " [applyD (liftToContext ruleDeMorgan) $ newContext $ termNavigator x | x <- xs ]
 
-tstStratDeMorganComplex = do
+tstRuleDeMorganComplex = do
     putStrLn "DeMorgan-And Rule"
     let xs = deMorganAndTestSetComplex ++ deMorganOrTestSetComplex
     pptest "Input  (Simple testset): " xs
     pptest "Output (Simple testset): " [applyD (liftToContext ruleDeMorgan) $ newContext $ termNavigator x | x <- xs ]
+
+tstRuleCommutativity = do
+    putStrLn "Commutativity"
+    let xs = commutativityTestSet
+    pptest "Input  (Simple testset): " xs
+    pptest "Output (Simple testset): " [applyD (liftToContext ruleCommutativity) $ newContext $ termNavigator x | x <- xs ]
+
+tstRuleCommutativityOrd = do
+    putStrLn "Ordered Commutativity"
+    let xs = commutativityTestSet
+    pptest "Input  (Simple testset): " xs
+    pptest "Output (Simple testset): " [applyD (liftToContext ruleCommutativityOrd) $ newContext $ termNavigator x | x <- xs ]

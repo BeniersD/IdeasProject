@@ -16,16 +16,17 @@ main = do
     --tstRuleDeMorganOrComplex
     --tstRuleDeMorganAndSimple
     --tstRuleDeMorganAndComplex
-    --tstStratDeMorganSimple
-    --tstStratDeMorganComplex
+    --tstRuleDeMorganSimple
+    --tstRuleDeMorganComplex
+    --tstRuleCommutativity
+    tstRuleCommutativityOrd
 
 
     --pptest "deMorganDerivTestSet" deMorganDerivTestSet
     --pptest "DeMorgan Strategy" [applyD (deMorgan) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
     --pptest "Test Layer Top All" [applyD (testlta ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
 
-    --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet
-    --mapM_ print $ map (apply ruleCommutativity) commutativityTestSet 
+
     -- putStrLn "\n"    
     --mapM_ print $ map (apply ruleCommutativityOrdered) commutativityTestSet 
     --mapM_ print $ [apply (checkStrategy) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 

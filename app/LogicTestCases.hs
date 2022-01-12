@@ -14,6 +14,9 @@ doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTestSetSimple, deMorganOrT
 commutativityTestSet =
                 [ Var 'p' :&&: Var 'q',
                   Var 'q' :&&: Var 'p',
+                  Var 'p' :&&: Not (Var 'p'),
+                  Var 'q' :&&: Not (Var 'p'),
+                  Var 'p' :&&: Not (Var 'q'),
                   Var 'p' :&&: Not (Not (Var 'p')),
                   Not (Not (Var 'p') :&&: Var 'p'),
                   T :&&: F,

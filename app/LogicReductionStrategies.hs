@@ -123,8 +123,8 @@ stratTRuleDisjunctionC = label "Commutative-and-T-Rule Disjunction" $ check f .*
 stratCommutativityOrd = label "Commutativity-Ordered" $ check f |> ruleCommutativity
     where
         f :: Ord a => Logic a -> Bool
-        f (p :&&: q) | p > q = True
-        f (p :||: q) | p > q = True
+        f (p :&&: q) | p < q = True
+        f (p :||: q) | p < q = True
         f _                  = False
 
 stratDeMorgan :: Ord a => LSLgc a
