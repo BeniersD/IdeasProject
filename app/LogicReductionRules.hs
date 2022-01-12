@@ -24,7 +24,7 @@ type LSCtxLgc a = LabeledStrategy (CtxLgc a)
 hasRule :: LgcRule a -> Logic a -> Bool
 hasRule x = isJust . apply x
 
-createRule :: Ord a => Eq a => String -> String -> LgcRed a -> LgcRule a
+createRule :: (Ord a, Eq a) => String -> String -> LgcRed a -> LgcRule a
 createRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) f
 
 convertToRule :: Eq a => String -> String -> LSLgc a -> LgcRule a
@@ -35,17 +35,9 @@ convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y 
 ------------------------------------------------------------------------------------------------------------
 ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, 
    ruleIdempotency, ruleImplicationElimination, ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT,
-   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF, ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
+   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: (Ord a, Eq a) => LgcRule a
 
 ruleAbsorption = createRule "Absorption" "single.absorption" absorption
-ruleCommutativeAbsorption = createRule "Absorption" "single.commutative.and.absorption" f
-   where
-      f :: Ord a => LgcRed a
-      f ((p :&&: q) :||: r) | p == r = Just r  -- check (((p :&&: q) :||: r) | p == r) .*. commutativity (lk) .*. absorption r -- absorption ((q :&&: p) :||: r) | otherwise = Nothing
-      f (p :&&: (q :||: r)) | p == r = Just p -- .|. absorption (p :&&: (r :||: q)) | otherwise = Nothing
-      f (p :||: (q :&&: r)) | p == q = Just p -- absorption ((r :&&: q) :||: p) | otherwise = Nothing 
-      f ((p :||: q) :&&: r) | q == r = Just r -- absorption (r :&&: (q :||: p)) | otherwise = Nothing
-      f _                            = Nothing
 ruleAssociativity = createRule "Associativity" "single.associativity" associativity
 ruleCommutativity = createRule "Commutativity" "single.commutativity" commutativity
 ruleDeMorganAnd = createRule "De Morgan And" "single.demorgan.and" deMorganAnd
@@ -70,7 +62,7 @@ ruleTRuleNotF = createRule "T-Rule Not F" "single.trulenotf" tRuleNotF
 ------------------------------------------------------------------------------------------------------------
 absorption, associativity, commutativity, deMorganAnd, deMorganOr, doubleNot, distributivity, equivalenceElimination, 
    fRuleConjunction, fRuleComplement, fRuleNotT, fRuleDisjunction, idempotency, implicationElimination,
-   tRuleConjunction, tRuleComplement, tRuleNotF, tRuleDisjunction :: Ord a => Eq a => LgcRed a
+   tRuleConjunction, tRuleComplement, tRuleNotF, tRuleDisjunction :: (Ord a, Eq a) => LgcRed a
 
 absorption ((p :&&: q) :||: r) | q == r = Just r 
 absorption (p :&&: (q :||: r)) | p == q = Just p

@@ -39,6 +39,7 @@ commutativityTestSet =
                   (Var 'p' :||: Var 'q') :||: Var 'p',
                   (Var 'p' :||: Var 'q') :||: (Var 'q' :||: Var 'p')
                 ]
+
 implicationEliminationDerivTestSet =
                 [ Var 'p' :->: Var 'q',
                   Var 'p' :->: Not (Not (Var 'p')),
@@ -73,7 +74,6 @@ equivalenceEliminationDerivTestSet =
                  (Not (Not (Var 'p')) :<->: Not (Not (Var 'p'))) :&&: (F :<->: Not (Var 'p')),
                  (Var 'p' :<->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: T)
                 ]
-
 
 deMorganDerivTestSet =
                 [ 

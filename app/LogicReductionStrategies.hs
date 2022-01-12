@@ -9,8 +9,8 @@ import Ideas.Utils.Prelude
 import LogicReductionRules
 import Ideas.Common.Strategy.Traversal hiding (layer)
 import Ideas.Common.Traversal.Navigator
+import Ideas.Common.Strategy.Abstract
 import qualified Ideas.Common.Strategy.Combinators as Combinators
-
 
 testl :: Ord a => Eq a => LgcRule a -> LSCtxLgc a
 testl s = label description str
@@ -54,33 +54,97 @@ stratMultiRuleSeq xs = label description strategy
         description = intercalate "-and-" (map (show . getId) xs)
         strategy = Combinators.sequence (map liftToContext xs)
 
-------------------------------
--- Usage: repeat (layerOne (ruleDoubleNot .*. ruleDeMorganOr .*. ruleDeMorganAnd))
---- oncetd s = fix $ \x -> s |> layerOne x
-------------------------------
--- left-biasedchoice
-visitFirst, visitAll, visitTryAll, visitId, visitLeftMost, visitRightMost :: (IsStrategy f, Navigator a) => f a -> Strategy a
-visitFirst s = fix $ \x -> s |> ruleRight .*. x
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Visits
+--------------------------------------------------------------------------------------------------------------------------------------
+visitFirst, visitAll, visitTryAll, id, visitLeftMost, visitRightMost :: (IsStrategy f, Navigator a) => f a -> Strategy a
+
 visitAll s = fix $ \x -> s .*. (check (not.hasRight) |> (ruleRight .*. x))
+visitFirst s = fix $ \x -> s |> ruleRight .*. x
 visitTryAll s = fix $ \x -> try(s) .*. (check (not.hasRight) |> (ruleRight .*. x))
-visitId s = check (isTop) |> ruleUp .*. ruleDown .*. s
 visitLeftMost s = check (not.hasDown) |> (ruleDown .*.  s)
 visitRightMost s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*. x)
+id s = check (isTop) |> ruleUp .*. ruleDown .*. s
 
+--------------------------------------------------------------------------------------------------------------------------------------
+-- On-elayer visits
+--------------------------------------------------------------------------------------------------------------------------------------
 layer :: (Navigator a) => Strategy a -> Strategy a
+
 layer s = ruleDown .*. s .*. ruleUp
+layerAll s = layer (visitAll s)
+layerFirst s = layer (visitFirst s)
+layerLeftMost s = layer (visitLeftMost s)
+layerRightMost s = layer (visitRightMost s)
+layerTryAll s = layer (visitTryAll s)
 
-isOrdered :: Ord a => Logic a -> Bool
-isOrdered (p :&&: q) | p > q = True
-isOrdered (p :||: q) | p > q = True
-isOrdered _                  = False
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Simple logic Strategies
+--------------------------------------------------------------------------------------------------------------------------------------
+stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
+    stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd :: (Ord a, Eq a) => LSLgc a
 
-stratCommutativityOrd :: Ord a => LSLgc a
-stratCommutativityOrd = label "Commutativity-Ordered" $ check isOrdered |> ruleCommutativity
+stratFRuleComplementC  = label "Commutative-and-F-Rule Complement"  $ check f .*. ruleCommutativity .*. ruleFRuleComplement
+    where 
+        f :: Eq a => Logic a -> Bool
+        f (Not p :&&: q) | p == q = True
+        f _                       = False
 
-ruleCommutativityOrd :: Ord a => Eq a => LgcRule a
+stratFRuleConjunctionC = label "Commutative-and-T-Rule Complement"  $ check f .*. ruleCommutativity .*. ruleFRuleConjunction
+    where 
+        f :: Eq a => Logic a -> Bool
+        f (F :&&: p) = True
+        f _          = False
+
+stratTRuleConjunctionC = label "Commutative-and-T-Rule Conjunction" $ check f .*. ruleCommutativity .*. ruleTRuleConjunction
+    where 
+        f :: Eq a => Logic a -> Bool 
+        f (T :&&: p) = True
+        f _          = False
+
+stratTRuleComplementC  = label "Commutative-and-T-Rule Complement"  $ check f .*. ruleCommutativity .*. ruleTRuleComplement
+    where
+        f :: Eq a => Logic a -> Bool 
+        f (p :||: Not q) | p == q = True
+        f _                       = False
+
+stratFRuleDisjunctionC = label "Commutative-and-F-Rule Disjunction" $ check f .*. ruleCommutativity .*. ruleFRuleDisjunction
+    where 
+        f :: Logic a -> Bool 
+        f (F :||: p) = True
+        f _          = False
+
+stratTRuleDisjunctionC = label "Commutative-and-T-Rule Disjunction" $ check f .*. ruleCommutativity .*. ruleTRuleDisjunction
+    where
+        f :: Logic a -> Bool 
+        f (T :||: p) = True
+        f _          = False        
+
+stratCommutativityOrd = label "Commutativity-Ordered" $ check f |> ruleCommutativity
+    where
+        f :: Ord a => Logic a -> Bool
+        f (p :&&: q) | p > q = True
+        f (p :||: q) | p > q = True
+        f _                  = False
+
+stratDeMorgan :: Ord a => LSLgc a
+stratDeMorgan = label "DeMorgan" $ ruleDeMorganOr .|. ruleDeMorganAnd
+
+ruleFRuleConjunctionC, ruleTRuleConjunctionC, ruleFRuleComplementC, ruleTRuleComplementC, ruleFRuleDisjunctionC, 
+    ruleTRuleDisjunctionC, ruleCommutativityOrd, ruleDeMorgan :: (Ord a, Eq a) => LgcRule a
+
+ruleFRuleConjunctionC = convertToRule "Commutativity And F-Rule Conjunction" "single.commutativity.and.fruleconjunction" stratFRuleConjunctionC
+ruleTRuleConjunctionC = convertToRule "Commutativity And T-Rule Conjunction" "single.commutativity.and.trulecomplement" stratTRuleConjunctionC
+ruleFRuleComplementC  = convertToRule "Commutativity And F-Rule Complement" "single.commutativity.and.frulecomplement" stratFRuleComplementC
+ruleTRuleComplementC  = convertToRule "Commutativity And T-Rule Complement" "single.commutativity.and.trulecomplement" stratTRuleComplementC
+ruleFRuleDisjunctionC = convertToRule "Commutativity And F-Rule Disjunction" "single.commutativity.and.fruledisjunction" stratFRuleDisjunctionC
+ruleTRuleDisjunctionC = convertToRule "Commutativity And T-Rule Disjunction" "single.commutativity.and.truledisjunction" stratTRuleDisjunctionC
 ruleCommutativityOrd = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
+ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" stratDeMorgan
 
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Advanced logic Strategies
+--------------------------------------------------------------------------------------------------------------------------------------
 isCommutativeAbsorption1, isCommutativeAbsorption2, isCommutativeAbsorption3, isCommutativeAbsorption4 :: Eq a => Logic a -> Bool 
 isCommutativeAbsorption1 ((p :&&: q) :||: r) | p == r = True
 isCommutativeAbsorption1 _                            = False
@@ -96,48 +160,7 @@ isCommutativeAbsorption3 _                            = False
 isCommutativeAbsorption4 (p :&&: (q :||: r)) | p == r = True
 isCommutativeAbsorption4 _                            = False
 
-
-
-isOr :: Ord a => Logic a -> Bool
-isOr (p :||: q) = True
-isOr _          = False
-
-isAnd :: Ord a => Logic a -> Bool
-isAnd (p :&&: q) = True
-isAnd _          = False
-
-
--- TODO LabeledStrategy (CtxLgc a) -> Rule (Logic a)
--- ruleCommutativeAbsorption :: Ord a => Eq a => LgcRule a
--- ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
-
---------------------------------------------------------------------------------------------------------------------------------------
--- Simple logic Strategies
---------------------------------------------------------------------------------------------------------------------------------------
-commutativeFRuleComplement, commutativeFRuleConjunction, commutativeFRuleDisjunction, commutativeTRuleComplement,
-    commutativeTRuleConjunction, commutativeTRuleDisjunction :: (Ord a, Eq a) => LSLgc a
-
-commutativeFRuleComplement  = label "Commutative-and-F-Rule Complement"  $ ruleCommutativity .*. ruleFRuleComplement
-commutativeFRuleConjunction = label "Commutative-and-T-Rule Complement"  $ ruleCommutativity .*. ruleFRuleConjunction
-commutativeFRuleDisjunction = label "Commutative-and-F-Rule Disjunction" $ ruleCommutativity .*. ruleFRuleDisjunction
-commutativeTRuleComplement  = label "Commutative-and-T-Rule Complement"  $ ruleCommutativity .*. ruleTRuleComplement
-commutativeTRuleConjunction = label "Commutative-and-T-Rule Conjunction" $ ruleCommutativity .*. ruleTRuleConjunction
-commutativeTRuleDisjunction = label "Commutative-and-T-Rule Disjunction" $ ruleCommutativity .*. ruleTRuleDisjunction
-
-ruleCommutativeFRuleComplement, ruleCommutativeFRuleConjunction, ruleCommutativeFRuleDisjunction, ruleCommutativeTRuleComplement,
-    ruleCommutativeTRuleConjunction, ruleCommutativeTRuleDisjunction :: Ord a => Eq a => LgcRule a
-
-ruleCommutativeFRuleComplement  = convertToRule "Commutativity And F-Rule Complement" "single.commutativity.and.frulecomplement" commutativeFRuleComplement
-ruleCommutativeFRuleConjunction = convertToRule "Commutativity And F-Rule Conjunction" "single.commutativity.and.fruleconjunction" commutativeFRuleConjunction
-ruleCommutativeFRuleDisjunction = convertToRule "Commutativity And F-Rule Disjunction" "single.commutativity.and.fruledisjunction" commutativeFRuleDisjunction
-ruleCommutativeTRuleComplement  = convertToRule "Commutativity And T-Rule Complement" "single.commutativity.and.trulecomplement" commutativeTRuleComplement
-ruleCommutativeTRuleConjunction = convertToRule "Commutativity And T-Rule Conjunction" "single.commutativity.and.trulecomplement" commutativeTRuleConjunction
-ruleCommutativeTRuleDisjunction = convertToRule "Commutativity And T-Rule Disjunction" "single.commutativity.and.truledisjunction" commutativeTRuleDisjunction
-
---------------------------------------------------------------------------------------------------------------------------------------
--- Advanced logic Strategies
---------------------------------------------------------------------------------------------------------------------------------------
-stratCommutativeAbsorption, deMorganComplete, stratDeMorgan, multiDeMorgan, deMorganDeriv, deMorganDeriv1, deMorganDeriv2, deMorganDeriv3, deMorganDeriv4,
+stratCommutativeAbsorption, deMorganComplete, multiDeMorgan, deMorganDeriv, deMorganDeriv1, deMorganDeriv2, deMorganDeriv3, deMorganDeriv4,
     negation, multiNegation, multiDoubleNot, implicationEliminationDeriv1, implicationEliminationDeriv2, implicationEliminationDeriv3,
     implicationEliminationDeriv4, multiImplicationElimination, implicationEliminationDeriv, implicationEliminationComplete,
     mulitImplicationEliminationDeriv, multiDeMorganDeriv :: Ord a => Eq a => LSCtxLgc a
@@ -149,10 +172,22 @@ stratCommutativeAbsorption = label "Commutativity-Absortion" s
             (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer (visitFirst(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
             (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer (visitFirst(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption)
 
-stratDeMorgan = label "DeMorgan" $ stratMultiRuleChoice [ruleDeMorganOr, ruleDeMorganAnd]
+-- TODO LabeledStrategy (CtxLgc a) -> Rule (Logic a)
+--ruleCommutativeAbsorption :: LgcRule a
+--ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
+
+isOr :: Ord a => Logic a -> Bool
+isOr (p :||: q) = True
+isOr _          = False
+
+isAnd :: Ord a => Logic a -> Bool
+isAnd (p :&&: q) = True
+isAnd _          = False
+
+
 negation = label "Negate" $ stratMultiRuleChoice [ruleTRuleNotF, ruleFRuleNotT]
 
-multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere stratDeMorgan)
+multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere (liftToContext ruleDeMorgan))
 
 --ruleDeMorgan :: Ord a => Eq a => LgcRule a
 --ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" deMorgan
@@ -205,7 +240,7 @@ deMorganDeriv1 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (li
 
 --deMorgan (Not (p :&&: F)) = Just (Not p :||: Not F) = Just (Not p :||: T) = Just T
 --deMorgan (Not (F :&&: p)) = Just (Not F :||: Not p) = Just (T :||: Not p) = Just T
-deMorganDeriv2 = label "DeMorgan Derivative" $  innermost stratDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF)-- .*. liftToContext ruleTRuleConjunction
+deMorganDeriv2 = label "DeMorgan Derivative" $  innermost (liftToContext ruleDeMorgan) .*. oncetdPref (liftToContext ruleTRuleNotF)-- .*. liftToContext ruleTRuleConjunction
 --deMorganDeriv2 = label "DeMorgan Derivative" $  deMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleDisjunction
 --deMorganDeriv2 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleDisjunction
 --deMorganDeriv2 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleDisjunction .*. multiNegation
@@ -213,14 +248,14 @@ deMorganDeriv2 = label "DeMorgan Derivative" $  innermost stratDeMorgan .*. once
 
 --deMorgan (Not (p :||: T)) = Just (Not p :&&: Not T) = Just (Not p :&&: F) = Just F
 --deMorgan (Not (T :||: p)) = Just (Not T :&&: Not p) = Just (F :&&: Not p) = Just F
-deMorganDeriv3 = label "DeMorgan Derivative" $  stratDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction
+deMorganDeriv3 = label "DeMorgan Derivative" $  liftToContext ruleDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction
 --deMorganDeriv3 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction
 --deMorganDeriv3 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction .*. multiNegation
 --deMorganDeriv3 = label "DeMorgan Derivative 3" $  multiDeMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleConjunction .*. multiNegation .*. multiDoubleNot
 
 --deMorgan (Not (p :||: F)) = Just (Not p :&&: Not F) = Just (Not p :&&: T) = Just Not p
 --deMorgan (Not (F :||: p)) = Just (Not F :&&: Not p) = Just (T :&&: Not p) = Just Not p
-deMorganDeriv4 = label "DeMorgan Derivative" $  stratDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction
+deMorganDeriv4 = label "DeMorgan Derivative" $  liftToContext ruleDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction
 --deMorganDeriv4 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction
 --deMorganDeriv4 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction .*. multiNegation
 --deMorganDeriv4 = label "DeMorgan Derivative 4" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction .*. multiNegation .*. multiDoubleNot

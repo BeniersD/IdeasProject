@@ -12,12 +12,12 @@ import LogicTests
 
 main :: IO ()
 main = do
-    --testRuleDeMorganOrSimple
-    --testRuleDeMorganOrComplex
-    --testRuleDeMorganAndSimple
-    --testRuleDeMorganAndComplex
-    --tstStratDeMorganSimple
-    tstStratDeMorganComplex
+    --tstRuleDeMorganOrSimple
+    --tstRuleDeMorganOrComplex
+    --tstRuleDeMorganAndSimple
+    --tstRuleDeMorganAndComplex
+    tstStratDeMorganSimple
+    --tstStratDeMorganComplex
 
 
     --pptest "deMorganDerivTestSet" deMorganDerivTestSet
