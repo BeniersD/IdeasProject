@@ -7,21 +7,20 @@ import LogicReductionRules
 import Ideas.Common.Traversal.Navigator
 import qualified Ideas.Common.Strategy.Combinators as Combinators
 
-testl :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
-testl r = label d s
+stratRuleMultiTerm, stratRuleMultiTermOnce :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
+stratRuleMultiTerm r = label d s
     where
         d = "Layered First " ++ showId r
-        ru = liftToContext ruleDeMorganOr .|. liftToContext ruleDeMorganAnd
-        --strategy =  fix $ \x -> somewhere ( try(rule) .*. ruleDown .*. (check (not.hasRight) |> (ruleRight .*. x)
-        --strat = rule |> layer (visitFirst (rule)) 
-        --vis s = fix $ \x -> s |> (check (not.hasRight) |> (ruleRight .*. x))
-        --strategy = somewhere (strat .*. try(strat) .*. ruleDown .*. try(strat) .*. try(strat) .*. try(strat) .*. try(strat) .*. try(strat) .*. try(strat) .*. ruleUp)
-        --str = ru .*. (check (not.hasDown) |> ruleDown .*. visitTryAll(ru))
-        --str = somewhere( ru |> layer (visitFirst (ru)) )
-        -- str = somewhere (ru |> layer (visitFirst (ru))) .*. try(somewhere (ru |> layer (visitFirst (ru))))  .*. try (somewhere (ru |> layer (visitFirst (ru))))
-        la s = check (not.hasDown) |> ruleDown .*. s .*. ruleUp
-        vF s = fix $ \x -> (s .*. la(vF(ru))) |> (ruleRight .*. x)
-        s =  somewhere(ru .*. try(la(vF(ru))))
+        lr = liftToContext r
+        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
+        s = lr .*. l (visitRightMost (lr))
+
+stratRuleMultiTermOnce r = label d s
+    where
+        d = "Layered First " ++ showId r
+        lr = liftToContext r
+        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
+        s = somewhere (lr .*. l (visitRightMost (lr)))
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
@@ -66,13 +65,13 @@ stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (stratRuleAll ruleC
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Visits
 --------------------------------------------------------------------------------------------------------------------------------------
-visitFirst, visitAll, visitTryAll, id, visitLeftMost, visitRightMost :: (IsStrategy f, Navigator a) => f a -> Strategy a
+visitFirst, visitAll, visitTryAll, visitId, visitLeftMost, visitRightMost :: (IsStrategy f, Navigator a) => f a -> Strategy a
 visitAll s = fix $ \x -> s .*. (check (not.hasRight) |> (ruleRight .*. x))
 visitFirst s = fix $ \x -> s |> ruleRight .*. x
 visitTryAll s = fix $ \x -> try(s) .*. (check (not.hasRight) |> (ruleRight .*. x))
 visitLeftMost s = check (not.hasDown) |> (ruleDown .*.  s)
 visitRightMost s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*. x)
-id s = check (isTop) |> ruleUp .*. ruleDown .*. s
+visitId s = check (isTop) |> ruleUp .*. ruleDown .*. s
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- On-elayer visits

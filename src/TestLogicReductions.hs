@@ -16,15 +16,22 @@ quickTestSet = [
                 Not (q :&&: p :&&: r :&&: s),                     -- ¬(p ˄ q ˄ r ˄ s)
                 Not (q :&&: r :&&: s :&&: p),                     -- ¬(p ˄ r ˄ s ˄ p)                
                 Not (q :&&: p :&&: r :&&: s :&&: t),              -- ¬(p ˄ q ˄ r ˄ s ˄ t)
-                Not (Not (p :&&: q)),                             -- ¬¬(p ˄ q)
-                Not (Not (q :&&: p)),                             -- ¬¬(q ˄ p)  
-                Not (Not (q :&&: r :&&: p)),                      -- ¬¬(q ˄ r ˄ p)                
+                --Not (Not (p :&&: q))                             -- ¬¬(p ˄ q)
+                --Not (Not (q :&&: p)),                             -- ¬¬(q ˄ p)  
+                --Not (Not (q :&&: r :&&: p)),                      -- ¬¬(q ˄ r ˄ p)                
                 Not (Not (Not (p)) :&&: T),                       -- ¬(¬¬p ˄ T) 
                 Not (Not (Not (p)) :&&: T :&&: T),                -- ¬(¬¬p ˄ T ˄ T)
                 Not (Not (Not (p)) :&&: T :&&: F),                -- ¬(¬¬p ˄ T ˄ F)                
                 Not (Not (Not (p)) :&&: T :&&: Not (Not (p))),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
                 Not (Not (Not (p)) :&&: T :&&: Not (Not (q))),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
                 Not (Not (Not (p)) :&&: Not (p) :&&: T)           -- ¬(¬¬p ˄ ¬p ˄ T)
+               ]
+
+quickTestSet2 :: [Logic String]
+quickTestSet2 = [
+                Not (Not (p :&&: q)),                             -- ¬¬(p ˄ q)
+                Not (Not (q :&&: p)),                            -- ¬¬(q ˄ p)  
+                Not (Not (q :&&: r :&&: p))                      -- ¬¬(q ˄ r ˄ p)                
                ]
 
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -59,7 +66,12 @@ main = do
     --tstRuleFRuleComplementC
     --tstRuleTRuleComplementC
     --tstRuleFRuleDisjunctionC
-    tstRuleTRuleDisjunctionC
+    --tstRuleTRuleDisjunctionC
+    mapM_ print quickTestSet
+    --pptest "Test Layer Top All" [applyD (stratRuleMultiTerm ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
+    --pptest "Test Layer Top All" [applyD (stratRuleMultiTermOnce ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
+    pptest "Test Layer Top All" [applyD (stratRuleMultiTermOnce ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
+    
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test Functions
@@ -78,7 +90,7 @@ tstRuleDeMorganAndSimple = tstRuleGeneric ruleDeMorganAnd deMorganAndTestSetSimp
 tstRuleDeMorganOrComplex = tstRuleGeneric ruleDeMorganOr deMorganOrTestSetComplex 
 tstRuleDeMorganOrSimple = tstRuleGeneric ruleDeMorganOr deMorganOrTestSetSimple 
 tstRuleDeMorganComplex = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
-tstRuleDeMorganSimple = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstRuleDeMorganSimple = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
 tstRuleDoubleNot = tstRuleGeneric ruleDoubleNot doubleNotTestSet 
 tstRuleEquivalenceElimination = tstRuleGeneric ruleEquivalenceElimination equivalenceEliminationTestSet 
 tstRuleIdempotency = tstRuleGeneric ruleIdempotency idempotencyTestSet 
