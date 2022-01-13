@@ -8,10 +8,7 @@ import Ideas.Utils.Prelude (splitsWithElem, readM)
 import LogicReductionRules
 import LogicReductionStrategies
 
-type ExLgc a = Exercise (Logic a)
-type Ex a = LSLgc a -> ExLgc a
-
-minimalExercise :: Show a => Ex a
+minimalExercise :: Show a => LabeledStrategy (Logic a) -> Exercise (Logic a)
 minimalExercise x = emptyExercise
    { 
       exerciseId    = describe "Evaluate an expression (minimal)" $ newId "eval.minimal", 
@@ -19,7 +16,7 @@ minimalExercise x = emptyExercise
       prettyPrinter = show
    }
 
-basicExercise :: Show a => IsTerm a => Ex a
+basicExercise :: (IsTerm a, Show a) => LabeledStrategy (Logic a) -> Exercise (Logic a)
 basicExercise x = emptyExercise
    { 
       exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic", 
@@ -28,7 +25,7 @@ basicExercise x = emptyExercise
       prettyPrinter = show
    }
 
-eqExpr :: Eq a => Logic a -> Logic a -> Bool
+eqExpr :: (Eq a) => Logic a -> Logic a -> Bool
 eqExpr x y = x == y
 
 isLogicTerm :: Logic a -> Bool
@@ -53,7 +50,7 @@ indistinguishabilityS = makeService "basic.indistinguishability"
 --indExpr f = (==) `on` f
 
 
-evalExercise :: IsTerm a => Show a => Eq a => LSLgc a -> ExLgc a
+evalExercise :: (Show a, IsTerm a, Eq a) => LabeledStrategy (Logic a) -> Exercise (Logic a)
 evalExercise x = emptyExercise
    { 
       exerciseId    = describe "Evaluate an expression (full)" $ newId "eval.full", 

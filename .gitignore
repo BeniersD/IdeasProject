@@ -28,6 +28,8 @@ cabal.project.local~
 *.code-workspace
 *.gitignore
 *.gitattributes
+*_old.hs
+*_Old.hs
 
 # Ignored folders
 .vscode

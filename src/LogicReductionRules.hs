@@ -1,5 +1,5 @@
 module LogicReductionRules 
-   ( LgcRule, LgcRed, LSLgc, LSCtxLgc, CtxLgc, hasRule,  createRule, convertToRule,
+   ( hasRule,  createRule, convertToRule,
      ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, 
      ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, ruleIdempotency, ruleImplicationElimination, 
      ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT, ruleTRuleComplement, 
@@ -13,23 +13,16 @@ import Ideas.Utils.Prelude
 import Data.Maybe
 import Data.List
 
-type LgcRule a = Rule (Logic a)
-type LS a = LabeledStrategy a
-type LgcRed a = Logic a -> Maybe (Logic a) 
-type LSLgc a = LS (Logic a)
-type CtxLgc a = Context (Logic a)
-type LSCtxLgc a = LS (CtxLgc a)
-
 ------------------------------------------------------------------------------------------------------------
 -- Generic rewrite/reduction functions
 ------------------------------------------------------------------------------------------------------------
-hasRule :: LgcRule a -> Logic a -> Bool
+hasRule :: Rule (Logic a) -> Logic a -> Bool
 hasRule x = isJust . apply x
 
-createRule :: (Ord a, Eq a) => String -> String -> LgcRed a -> LgcRule a
+createRule :: String -> String -> (Logic a -> Maybe (Logic a)) -> Rule (Logic a)
 createRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) f
 
-convertToRule :: Eq a => String -> String -> LSLgc a -> LgcRule a
+convertToRule :: String -> String -> LabeledStrategy (Logic a) -> Rule (Logic a)
 convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) (apply f)
 
 ------------------------------------------------------------------------------------------------------------
@@ -37,7 +30,7 @@ convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y 
 ------------------------------------------------------------------------------------------------------------
 ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, 
    ruleIdempotency, ruleImplicationElimination, ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT,
-   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: (Ord a, Eq a) => LgcRule a
+   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: Eq a => Rule (Logic a)
 
 ruleAbsorption = createRule "Absorption" "single.absorption" absorption
 ruleAssociativity = createRule "Associativity" "single.associativity" associativity
@@ -64,7 +57,7 @@ ruleTRuleNotF = createRule "T-Rule Not F" "single.trulenotf" tRuleNotF
 ------------------------------------------------------------------------------------------------------------
 absorption, associativity, commutativity, deMorganAnd, deMorganOr, doubleNot, distributivity, equivalenceElimination, 
    fRuleConjunction, fRuleComplement, fRuleNotT, fRuleDisjunction, idempotency, implicationElimination,
-   tRuleConjunction, tRuleComplement, tRuleNotF, tRuleDisjunction :: (Ord a, Eq a) => LgcRed a
+   tRuleConjunction, tRuleComplement, tRuleNotF, tRuleDisjunction :: Eq a => Logic a -> Maybe (Logic a)
 
 absorption ((p :&&: q) :||: r) | q == r = Just r 
 absorption (p :&&: (q :||: r)) | p == q = Just p

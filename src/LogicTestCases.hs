@@ -1,374 +1,380 @@
 module LogicTestCases
      where
 
-import LogicReductionRules
-import Domain.Logic.Formula  hiding (not)
+import Domain.Logic.Formula 
+import Ideas.Common.Library
+import Ideas.Main.Default
+import Ideas.Utils.Prelude (ShowString, subsets)
 
-type LgcChar  = Logic Char
-type LsLgcChar = [LgcChar]
+o = Var "o"
+p = Var "p"
+q = Var "q"
+r = Var "r"
+s = Var "s"
+t = Var "t"
 
 commutativityTestSet, doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTestSetSimple, deMorganOrTestSetComplex, deMorganAndTestSetComplex, deMorganAndDoubleNotTestSet,
   implicationEliminationTestSet, implicationEliminationDerivTestSet , absorptionTestSet, idempotencyTestSet, boolRuleConjunctionTestSet, boolRuleDisjunctionTestSet,
   boolRuleComplementTestSet, boolRuleNotTestSet, deMorganAndImplicationEliminationTestSet, deMorganAndEquivalenceEliminationTestSet,
-  equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet :: LsLgcChar
+  equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet :: [Logic String]
 commutativityTestSet =
-                [ Var 'p' :&&: Var 'q',
-                  Var 'q' :&&: Var 'p',
-                  Var 'p' :&&: Not (Var 'p'),
-                  Var 'q' :&&: Not (Var 'p'),
-                  Var 'p' :&&: Not (Var 'q'),
-                  Var 'p' :&&: Not (Not (Var 'p')),
-                  Not (Not (Var 'p') :&&: Var 'p'),
+                [ p :&&: q,
+                  q :&&: p,
+                  p :&&: Not (p),
+                  q :&&: Not (p),
+                  p :&&: Not (q),
+                  p :&&: Not (Not (p)),
+                  Not (Not (p) :&&: p),
                   T :&&: F,
                   F :&&: T,
-                  T :&&: Var 'p',
-                  Var 'p' :&&: T,
-                  F :&&: Var 'p',
-                  Var 'p' :&&: F, 
-                  Var 'p' :&&: (Var 'q' :&&: Var 'r'),
-                  Var 'p' :||: (Var 'q' :||: Var 'r'),
-                  Var 'p' :&&: (Var 'q' :&&: Var 'p'),
-                  Var 'p' :&&: (Var 'p' :||: Var 'q'),
-                  (Var 'p' :&&: Var 'q') :&&: Var 'p',
-                  (Var 'p' :&&: Var 'q') :&&: (Var 'q' :&&: Var 'p'),
-                  Var 'p' :||: Var 'q',
-                  Var 'q' :||: Var 'p',
-                  Var 'p' :||: Not (Not (Var 'p')),
-                  Not (Not (Var 'p') :||: Var 'p'),
+                  T :&&: p,
+                  p :&&: T,
+                  F :&&: p,
+                  p :&&: F, 
+                  p :&&: (q :&&: r),
+                  p :||: (q :||: r),
+                  p :&&: (q :&&: p),
+                  p :&&: (p :||: q),
+                  (p :&&: q) :&&: p,
+                  (p :&&: q) :&&: (q :&&: p),
+                  p :||: q,
+                  q :||: p,
+                  p :||: Not (Not (p)),
+                  Not (Not (p) :||: p),
                   T :||: F,
                   F :||: T,
-                  T :||: Var 'p',
-                  Var 'p' :||: T,
-                  F :||: Var 'p',
-                  Var 'p' :||: F, 
-                  Var 'p' :||: (Var 'p' :||: Var 'q'),
-                  (Var 'p' :||: Var 'q') :||: Var 'p',
-                  (Var 'p' :||: Var 'q') :||: (Var 'q' :||: Var 'p')
+                  T :||: p,
+                  p :||: T,
+                  F :||: p,
+                  p :||: F, 
+                  p :||: (p :||: q),
+                  (p :||: q) :||: p,
+                  (p :||: q) :||: (q :||: p)
                 ]
 
 implicationEliminationDerivTestSet =
-                [ Var 'p' :->: Var 'q',
-                  Var 'p' :->: Not (Not (Var 'p')),
-                  Var 'p' :->: (Var 'p' :&&: Var 'q'),
+                [ p :->: q,
+                  p :->: Not (Not (p)),
+                  p :->: (p :&&: q),
                   T :->: F,
                   F :->: T,
-                  T :->: Var 'p',
-                  F :->: Var 'p',
-                  Var 'p' :->: T,
-                  Var 'p' :->: F,
-                  T :->: Not (Not (Var 'p')),
-                  Not (Not (Var 'p')) :->: T,
-                  (Var 'p' :&&: Var 'q') :->: F,
-                  (Var 'p' :||: Var 'q') :->: T,              
-                  (Var 'p' :->: T) :&&: (F :->: Var 'p'),
-                  (T :->: Not (Not (Var 'p'))) :&&: (Not (Var 'p') :->: F),
-                  (Not (Not (Var 'p')) :->: T) :&&: (Not (Var 'p') :->: T),
+                  T :->: p,
+                  F :->: p,
+                  p :->: T,
+                  p :->: F,
+                  T :->: Not (Not (p)),
+                  Not (Not (p)) :->: T,
+                  (p :&&: q) :->: F,
+                  (p :||: q) :->: T,              
+                  (p :->: T) :&&: (F :->: p),
+                  (T :->: Not (Not (p))) :&&: (Not (p) :->: F),
+                  (Not (Not (p)) :->: T) :&&: (Not (p) :->: T),
                   (T :->: F) :->: (F :->: T)
                 ]
 
 equivalenceEliminationDerivTestSet = 
                 [
-                 Not (Var 'p' :<->: Var 'q'), 
-                 Not (Var 'p' :<->: Not (Not (Var 'q'))),
-                 Var 'p' :<->: Not (Not (Var 'p')),
+                 Not (p :<->: q), 
+                 Not (p :<->: Not (Not (q))),
+                 p :<->: Not (Not (p)),
                  Not (F :<->: T),
                  Not (T :<->: F),
-                 Not (F :<->: Var 'q'),
-                 Not (Not (Not (Var 'q'))) :<->: T,
-                 (Var 'p' :<->: T) :&&: (F :<->: Var 'p'),
-                 (F :<->: Not (Not (Var 'p'))) :&&: (Not (Var 'p') :<->: T),
-                 (Not (Not (Var 'p')) :<->: Not (Not (Var 'p'))) :&&: (F :<->: Not (Var 'p')),
-                 (Var 'p' :<->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: T)
+                 Not (F :<->: q),
+                 Not (Not (Not (q))) :<->: T,
+                 (p :<->: T) :&&: (F :<->: p),
+                 (F :<->: Not (Not (p))) :&&: (Not (p) :<->: T),
+                 (Not (Not (p)) :<->: Not (Not (p))) :&&: (F :<->: Not (p)),
+                 (p :<->: Not (Not (p))) :<->: (Not (p) :<->: T)
                 ]
 
 deMorganDerivTestSet =
                 [ 
-                  Not (Var 'p' :&&: Var 'q'),                                   -- ¬(p ˄ q)  
-                  Not (Var 'q' :&&: Var 'p'),                                   -- ¬(q ˄ p)  
-                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r'),                      -- ¬(q ˄ p ˄ r)  
-                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's'),         -- ¬(q ˄ p ˄ r ˄ s)  
-                  Not (Not (Var 'q' :&&: Var 'p')),                             -- ¬¬(q ˄ p)  
-                  Not (Not (Not (Var 'p')) :&&: T),                             -- ¬(¬¬p ˄ T) 
-                  Not (Not (Not (Var 'p')) :&&: T :&&: T),                      -- ¬(¬¬p ˄ T ˄ T)
-                  Not (Not (Not (Var 'p')) :&&: T :&&: F),                      -- ¬(¬¬p ˄ T ˄ F)                
-                  Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'p'))),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
-                  Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'q'))),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
-                  Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: T),          -- ¬(¬¬p ˄ ¬p ˄ T)
-                  Not (T :||: Not (Not (Var 'p'))),                             -- ¬(T ˅ ¬¬p)
-                  Not (Var 'q' :||: Var 'p' :||: Var 'r'),                      -- ¬(q ˅ p ˅ r)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 'r' :||: Var 's'),         -- ¬(q ˅ p ˅ r ˅ s)                  
-                  Not (Not (Not (Var 'p')) :||: T),                             -- ¬(¬¬p ˅ T)
-                  Not (Not (Not (Var 'p')) :||: T :||: T),                      -- ¬(¬¬p ˅ T ˅ T)        
-                  Not (Not (Not (Var 'p')) :||: T :||: F),                      -- ¬(¬¬p ˅ T ˅ F)                
-                  Not (T :||: Not (Not (Var 'p')) :||: Not (Not (Var 'p'))),    -- ¬(T ˅ ¬¬p ˅ ¬¬p)    
-                  Not (Not (Not (Var 'p')) :||: T :||: Not (Not (Var 'p'))),    -- ¬(¬¬p ˅ T ˅ ¬¬p)    
-                  Not (Not (Not (Var 'p')) :||: T :||: Not (Not (Var 'q'))),    -- ¬(¬¬p ˅ T ˅ ¬¬q)        
-                  Not (Not (Not (Var 'p')) :||: Not (Var 'p') :||: T),          -- ¬(¬¬p ˅ ¬p ˅ T)
-                  Not (F :&&: Not (Not (Var 'p'))),                             -- ¬(T ˄ ¬¬p)
-                  Not (Not (Not (Var 'p')) :&&: F),                             -- ¬(¬¬p ˄ F)
-                  Not (Not (Not (Var 'p')) :&&: F :&&: F),                      -- ¬(¬¬p ˄ F ˄ F)        
-                  Not (Not (Not (Var 'p')) :&&: F :&&: T),                      -- ¬(¬¬p ˄ F ˄ T)                
-                  Not (Not (Not (Var 'p')) :&&: F :&&: Not (Not (Var 'p'))),    -- ¬(¬¬p ˄ F ˄ ¬¬p)    
-                  Not (Not (Not (Var 'p')) :&&: F :&&: Not (Not (Var 'q'))),    -- ¬(¬¬p ˄ F ˄ ¬¬q)        
-                  Not (F :&&: Not (Not (Var 'p')) :&&: Not (Var 'p')),          -- ¬(F ˄ ¬¬p ˄ ¬p)        
-                  Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: F),          -- ¬(¬¬p ˄ ¬p ˄ F)
-                  Not (Not (Not (Var 'p')) :&&: F :&&: Not (Var 'p')),          -- ¬(¬¬p ˄ F ˄ ¬p)                
-                  Not (F :||: Not (Not (Var 'p'))),                             -- ¬(T ˅ ¬¬p)
-                  Not (F :||: Not (Not (Var 'p')) :||: Not (Not (Var 'p'))),    -- ¬(T ˅ ¬¬p ˅ ¬¬p)            
-                  Not (Not (Not (Var 'p')) :||: F),                             -- ¬(¬¬p ˅ F)
-                  Not (Not (Not (Var 'p')) :||: F :||: F),                      -- ¬(¬¬p ˅ F ˅ F)        
-                  Not (Not (Not (Var 'p')) :||: F :||: T),                      -- ¬(¬¬p ˅ F ˅ T)                
-                  Not (Not (Not (Var 'p')) :||: F :||: Not (Not (Var 'p'))),    -- ¬(¬¬p ˅ F ˅ ¬¬p)    
-                  Not (Not (Not (Var 'p')) :||: F :||: Not (Not (Var 'q'))),    -- ¬(¬¬p ˅ F ˅ ¬¬q)        
-                  Not (Not (Not (Var 'p')) :||: Not (Var 'p') :||: F)           -- ¬(¬¬p ˅ ¬p ˅ F)
+                  Not (p :&&: q),                                   -- ¬(p ˄ q)  
+                  Not (q :&&: p),                                   -- ¬(q ˄ p)  
+                  Not (q :&&: p :&&: r),                      -- ¬(q ˄ p ˄ r)  
+                  Not (q :&&: p :&&: r :&&: s),         -- ¬(q ˄ p ˄ r ˄ s)  
+                  Not (Not (q :&&: p)),                             -- ¬¬(q ˄ p)  
+                  Not (Not (Not (p)) :&&: T),                             -- ¬(¬¬p ˄ T) 
+                  Not (Not (Not (p)) :&&: T :&&: T),                      -- ¬(¬¬p ˄ T ˄ T)
+                  Not (Not (Not (p)) :&&: T :&&: F),                      -- ¬(¬¬p ˄ T ˄ F)                
+                  Not (Not (Not (p)) :&&: T :&&: Not (Not (p))),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
+                  Not (Not (Not (p)) :&&: T :&&: Not (Not (q))),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
+                  Not (Not (Not (p)) :&&: Not (p) :&&: T),          -- ¬(¬¬p ˄ ¬p ˄ T)
+                  Not (T :||: Not (Not (p))),                             -- ¬(T ˅ ¬¬p)
+                  Not (q :||: p :||: r),                      -- ¬(q ˅ p ˅ r)  
+                  Not (q :||: p :||: r :||: s),         -- ¬(q ˅ p ˅ r ˅ s)                  
+                  Not (Not (Not (p)) :||: T),                             -- ¬(¬¬p ˅ T)
+                  Not (Not (Not (p)) :||: T :||: T),                      -- ¬(¬¬p ˅ T ˅ T)        
+                  Not (Not (Not (p)) :||: T :||: F),                      -- ¬(¬¬p ˅ T ˅ F)                
+                  Not (T :||: Not (Not (p)) :||: Not (Not (p))),    -- ¬(T ˅ ¬¬p ˅ ¬¬p)    
+                  Not (Not (Not (p)) :||: T :||: Not (Not (p))),    -- ¬(¬¬p ˅ T ˅ ¬¬p)    
+                  Not (Not (Not (p)) :||: T :||: Not (Not (q))),    -- ¬(¬¬p ˅ T ˅ ¬¬q)        
+                  Not (Not (Not (p)) :||: Not (p) :||: T),          -- ¬(¬¬p ˅ ¬p ˅ T)
+                  Not (F :&&: Not (Not (p))),                             -- ¬(T ˄ ¬¬p)
+                  Not (Not (Not (p)) :&&: F),                             -- ¬(¬¬p ˄ F)
+                  Not (Not (Not (p)) :&&: F :&&: F),                      -- ¬(¬¬p ˄ F ˄ F)        
+                  Not (Not (Not (p)) :&&: F :&&: T),                      -- ¬(¬¬p ˄ F ˄ T)                
+                  Not (Not (Not (p)) :&&: F :&&: Not (Not (p))),    -- ¬(¬¬p ˄ F ˄ ¬¬p)    
+                  Not (Not (Not (p)) :&&: F :&&: Not (Not (q))),    -- ¬(¬¬p ˄ F ˄ ¬¬q)        
+                  Not (F :&&: Not (Not (p)) :&&: Not (p)),          -- ¬(F ˄ ¬¬p ˄ ¬p)        
+                  Not (Not (Not (p)) :&&: Not (p) :&&: F),          -- ¬(¬¬p ˄ ¬p ˄ F)
+                  Not (Not (Not (p)) :&&: F :&&: Not (p)),          -- ¬(¬¬p ˄ F ˄ ¬p)                
+                  Not (F :||: Not (Not (p))),                             -- ¬(T ˅ ¬¬p)
+                  Not (F :||: Not (Not (p)) :||: Not (Not (p))),    -- ¬(T ˅ ¬¬p ˅ ¬¬p)            
+                  Not (Not (Not (p)) :||: F),                             -- ¬(¬¬p ˅ F)
+                  Not (Not (Not (p)) :||: F :||: F),                      -- ¬(¬¬p ˅ F ˅ F)        
+                  Not (Not (Not (p)) :||: F :||: T),                      -- ¬(¬¬p ˅ F ˅ T)                
+                  Not (Not (Not (p)) :||: F :||: Not (Not (p))),    -- ¬(¬¬p ˅ F ˅ ¬¬p)    
+                  Not (Not (Not (p)) :||: F :||: Not (Not (q))),    -- ¬(¬¬p ˅ F ˅ ¬¬q)        
+                  Not (Not (Not (p)) :||: Not (p) :||: F)           -- ¬(¬¬p ˅ ¬p ˅ F)
                 ]
 
 doubleNotTestSet =
-                [ Not (Var 'p'), 
-                  Not (Not (Var 'p')),
-                  Not (Not (Var 'p')) :&&: Not( Not( Var 'p')),
-                  Not (Not (Var 'p')) :&&: Not( Not( Var 'p')) :||: Not( Not( Not( Not( Var 'p')))),
-                  Not (Not (Var 'p')) :||: Not( Not( Var 'p')) :||: Not( Not( Not( Not( Var 'p')))),
-                  Not (Not (Var 'p')) :&&: Not( Not( Var 'p')) :&&: Not( Not( Not( Not( Var 'p')))) :||: Not( Not( Not( Not( Var 'p')))),
-                  Not (Not (Var 'p')) :||: Not( Not( Var 'p')) :||: Not( Not( Not( Not( Var 'p')))) :||: Not( Not( Not( Not( Var 'p')))),
-                  Not (Not (Not (Not (Not (Not (Var 'p')) :||: Not( Not( Var 'p')))))),
-                  Not (Not (Not (Not (Var 'p')) :||: Not (Not (Var 'p')) :||: Not (Not (Not (Not (Var 'p')))))),
-                  (Var 'p' :->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: Not (Var 'p')),
-                  (Var 'p' :->: Not (Not (Var 'p')) :<->: Not (Not (Var 'p'))) :<->: (Not (Var 'p'):<->: Not (Var 'p')),
-                  (Var 'p' :->: Not (Not (Not (Var 'p')):<->: Not (Not (Var 'p')))) :<->: (Not (Var 'p'):<->: Not (Not (Var 'p')))
+                [ Not (p), 
+                  Not (Not (p)),
+                  Not (Not (p)) :&&: Not( Not( p)),
+                  Not (Not (p)) :&&: Not( Not( p)) :||: Not( Not( Not( Not( p)))),
+                  Not (Not (p)) :||: Not( Not( p)) :||: Not( Not( Not( Not( p)))),
+                  Not (Not (p)) :&&: Not( Not( p)) :&&: Not( Not( Not( Not( p)))) :||: Not( Not( Not( Not( p)))),
+                  Not (Not (p)) :||: Not( Not( p)) :||: Not( Not( Not( Not( p)))) :||: Not( Not( Not( Not( p)))),
+                  Not (Not (Not (Not (Not (Not (p)) :||: Not( Not( p)))))),
+                  Not (Not (Not (Not (p)) :||: Not (Not (p)) :||: Not (Not (Not (Not (p)))))),
+                  (p :->: Not (Not (p))) :<->: (Not (p) :<->: Not (p)),
+                  (p :->: Not (Not (p)) :<->: Not (Not (p))) :<->: (Not (p):<->: Not (p)),
+                  (p :->: Not (Not (Not (p)):<->: Not (Not (p)))) :<->: (Not (p):<->: Not (Not (p)))
                 ]
 
 deMorganAndTestSetSimple = 
-                [ Not (Var 'p' :&&: Var 'q'),                                       -- ¬(q ˄ p)  
-                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r'),                          -- ¬(q ˄ p ˄ r)  
-                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's'),             -- ¬(q ˄ p ˄ r ˄ s)  
-                  Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's' :&&: Var 't') -- ¬(q ˄ p ˄ r ˄ s ˄ t)                  
+                [ Not (p :&&: q),                                       -- ¬(q ˄ p)  
+                  Not (q :&&: p :&&: r),                          -- ¬(q ˄ p ˄ r)  
+                  Not (q :&&: p :&&: r :&&: s),             -- ¬(q ˄ p ˄ r ˄ s)  
+                  Not (q :&&: p :&&: r :&&: s :&&: t) -- ¬(q ˄ p ˄ r ˄ s ˄ t)                  
                 ]
 
 deMorganOrTestSetSimple =                   
-                [ Not (Var 'p' :||: Var 'q'),                                       -- ¬(q ˅ p)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 'r'),                          -- ¬(q ˅ p ˅ r)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 'r' :||: Var 's'),             -- ¬(q ˅ p ˅ r ˅ s)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 'r' :||: Var 's' :||: Var 't') -- ¬(q ˅ p ˅ r ˅ s ˅ t)                  
+                [ Not (p :||: q),                                       -- ¬(q ˅ p)  
+                  Not (q :||: p :||: r),                          -- ¬(q ˅ p ˅ r)  
+                  Not (q :||: p :||: r :||: s),             -- ¬(q ˅ p ˅ r ˅ s)  
+                  Not (q :||: p :||: r :||: s :||: t) -- ¬(q ˅ p ˅ r ˅ s ˅ t)                  
                 ]
 
 deMorganAndTestSetComplex = 
                 [ 
-                  Not (Not (Var 'p' :&&: Var 'q')),                                                                          -- ¬¬(p ˄ q)  
-                  Not (Not (Var 'q' :&&: Var 'p')),                                                                          -- ¬¬(q ˄ p)  
-                  Not (Not (Var 'q' :&&: Var 'p' :&&: Var 'r')),                                                             -- ¬¬(q ˄ p ˄ r)  
-                  Not (Var 'q' :||: Var 'p' :&&: Var 'r'),                                                                   -- ¬¬(q ˄ p ˄ r)  
-                  Not (Var 'q' :||: Var 'p' :&&: Var 'r' :||: Var 's'),                                                      -- ¬¬(q ˄ p ˄ r ˄ s)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 's' :&&: Var 'r'),                                                      -- ¬¬(q ˄ p ˄ s ˄ r)  
-                  (Var 'p' :->: Not (Not (Var 'p') :<->: Not (Not (Var 'p')))) :<->: Not (Not (Var 'p') :&&: Not (Var 'p')), -- (p → ¬(¬p ↔ ¬¬p)) ↔ ¬(¬p ˄ p))                  
-                  Not (Var 'p' :&&: Var 'q') :||: Not (Var 'p' :&&: Var 'q'),                                                -- ¬(p ˄ q) ˅ ¬(p ˄ q)
-                  Not (Not (Var 'p' :&&: Var 'q') :||: Not( Var 'p' :&&: Var 'q')),                                          -- ¬(¬(p ˄ q) ˅ ¬(p ˄ q))                
-                  Not (Not (Var 'p' :&&: Var 'q')) :||: Not (Not (Var 'p' :&&: Var 'q')),                                    -- ¬¬(p ˄ q) ˅ ¬¬(p ˄ q))
-                  Not (Not (Var 'p' :&&: Var 'q') :||: Not (Var 'p' :&&: Var 'q')),                                          -- ¬¬(p ˄ q) ˅ ¬(p ˄ q))
-                  Not (Not (Not (Var 'p' :&&: Var 'q') :||: Not (Var 'p' :&&: Var 'q')) :||: Var 'p'),                       -- ¬(¬(¬(p ˄ q) ˅ ¬(p ˄ q))) ˅ p)
-                  Not (Not (Not (Var 'p')) :&&: T),                                                                          -- ¬(¬¬p ˄ T) 
-                  Not (Not (Not (Var 'p')) :&&: T :&&: T),                                                                   -- ¬(¬¬p ˄ T ˄ T)
-                  Not (Not (Not (Var 'p')) :&&: T :&&: F),                                                                   -- ¬(¬¬p ˄ T ˄ F)                
-                  Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'p'))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬p)    
-                  Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'q'))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬q)        
-                  Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: T),                                                       -- ¬(¬¬p ˄ ¬p ˄ T)
-                  (Var 'p' :->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: Not (Var 'p'))                               -- ¬(¬¬p ˄ ¬p ˄ T)
+                  Not (Not (p :&&: q)),                                                                          -- ¬¬(p ˄ q)  
+                  Not (Not (q :&&: p)),                                                                          -- ¬¬(q ˄ p)  
+                  Not (Not (q :&&: p :&&: r)),                                                             -- ¬¬(q ˄ p ˄ r)  
+                  Not (q :||: p :&&: r),                                                                   -- ¬¬(q ˄ p ˄ r)  
+                  Not (q :||: p :&&: r :||: s),                                                      -- ¬¬(q ˄ p ˄ r ˄ s)  
+                  Not (q :||: p :||: s :&&: r),                                                      -- ¬¬(q ˄ p ˄ s ˄ r)  
+                  (p :->: Not (Not (p) :<->: Not (Not (p)))) :<->: Not (Not (p) :&&: Not (p)), -- (p → ¬(¬p ↔ ¬¬p)) ↔ ¬(¬p ˄ p))                  
+                  Not (p :&&: q) :||: Not (p :&&: q),                                                -- ¬(p ˄ q) ˅ ¬(p ˄ q)
+                  Not (Not (p :&&: q) :||: Not( p :&&: q)),                                          -- ¬(¬(p ˄ q) ˅ ¬(p ˄ q))                
+                  Not (Not (p :&&: q)) :||: Not (Not (p :&&: q)),                                    -- ¬¬(p ˄ q) ˅ ¬¬(p ˄ q))
+                  Not (Not (p :&&: q) :||: Not (p :&&: q)),                                          -- ¬¬(p ˄ q) ˅ ¬(p ˄ q))
+                  Not (Not (Not (p :&&: q) :||: Not (p :&&: q)) :||: p),                       -- ¬(¬(¬(p ˄ q) ˅ ¬(p ˄ q))) ˅ p)
+                  Not (Not (Not (p)) :&&: T),                                                                          -- ¬(¬¬p ˄ T) 
+                  Not (Not (Not (p)) :&&: T :&&: T),                                                                   -- ¬(¬¬p ˄ T ˄ T)
+                  Not (Not (Not (p)) :&&: T :&&: F),                                                                   -- ¬(¬¬p ˄ T ˄ F)                
+                  Not (Not (Not (p)) :&&: T :&&: Not (Not (p))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬p)    
+                  Not (Not (Not (p)) :&&: T :&&: Not (Not (q))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬q)        
+                  Not (Not (Not (p)) :&&: Not (p) :&&: T),                                                       -- ¬(¬¬p ˄ ¬p ˄ T)
+                  (p :->: Not (Not (p))) :<->: (Not (p) :<->: Not (p))                               -- ¬(¬¬p ˄ ¬p ˄ T)
                 ]
 
 deMorganOrTestSetComplex = 
                 [ 
-                  Not (Not (Var 'p' :||: Var 'q')),                                                                          -- ¬¬(p ˄ q)  
-                  Not (Not (Var 'q' :||: Var 'p')),                                                                          -- ¬¬(q ˄ p)  
-                  Not (Not (Var 'q' :||: Var 'p' :||: Var 'r')),                                                             -- ¬¬(q ˄ p ˄ r)  
-                  Not (Var 'q' :||: Var 'p' :&&: Var 'r'),                                                                   -- ¬¬(q ˄ p ˄ r)  
-                  Not (Var 'q' :||: Var 'p' :&&: Var 'r' :||: Var 's'),                                                      -- ¬¬(q ˄ p ˄ r ˄ s)  
-                  Not (Var 'q' :||: Var 'p' :||: Var 's' :&&: Var 'r'),                                                      -- ¬¬(q ˄ p ˄ s ˄ r)  
-                  (Var 'p' :->: Not (Not (Var 'p') :<->: Not (Not (Var 'p')))) :<->: Not (Not (Var 'p') :||: Not (Var 'p')), -- (p → ¬(¬p ↔ ¬¬p)) ↔ ¬(¬p ˄ p))                  
-                  Not (Var 'p' :||: Var 'q') :||: Not (Var 'p' :||: Var 'q'),                                                -- ¬(p ˄ q) ˅ ¬(p ˄ q)
-                  Not (Not (Var 'p' :||: Var 'q') :||: Not( Var 'p' :||: Var 'q')),                                          -- ¬(¬(p ˄ q) ˅ ¬(p ˄ q))                
-                  Not (Not (Var 'p' :||: Var 'q')) :||: Not (Not (Var 'p' :||: Var 'q')),                                    -- ¬¬(p ˄ q) ˅ ¬¬(p ˄ q))
-                  Not (Not (Var 'p' :||: Var 'q') :||: Not (Var 'p' :||: Var 'q')),                                          -- ¬¬(p ˄ q) ˅ ¬(p ˄ q))
-                  Not (Not (Not (Var 'p' :||: Var 'q') :||: Not (Var 'p' :||: Var 'q')) :||: Var 'p'),                       -- ¬(¬(¬(p ˄ q) ˅ ¬(p ˄ q))) ˅ p)
-                  Not (Not (Not (Var 'p')) :||: T),                                                                          -- ¬(¬¬p ˄ T) 
-                  Not (Not (Not (Var 'p')) :||: T :||: T),                                                                   -- ¬(¬¬p ˄ T ˄ T)
-                  Not (Not (Not (Var 'p')) :||: T :||: F),                                                                   -- ¬(¬¬p ˄ T ˄ F)                
-                  Not (Not (Not (Var 'p')) :||: T :||: Not (Not (Var 'p'))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬p)    
-                  Not (Not (Not (Var 'p')) :||: T :||: Not (Not (Var 'q'))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬q)        
-                  Not (Not (Not (Var 'p')) :||: Not (Var 'p') :&&: T),                                                       -- ¬(¬¬p ˄ ¬p ˄ T)
-                  (Var 'p' :->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: Not (Var 'p'))                               -- ¬(¬¬p ˄ ¬p ˄ T)
+                  Not (Not (p :||: q)),                                                                          -- ¬¬(p ˄ q)  
+                  Not (Not (q :||: p)),                                                                          -- ¬¬(q ˄ p)  
+                  Not (Not (q :||: p :||: r)),                                                             -- ¬¬(q ˄ p ˄ r)  
+                  Not (q :||: p :&&: r),                                                                   -- ¬¬(q ˄ p ˄ r)  
+                  Not (q :||: p :&&: r :||: s),                                                      -- ¬¬(q ˄ p ˄ r ˄ s)  
+                  Not (q :||: p :||: s :&&: r),                                                      -- ¬¬(q ˄ p ˄ s ˄ r)  
+                  (p :->: Not (Not (p) :<->: Not (Not (p)))) :<->: Not (Not (p) :||: Not (p)), -- (p → ¬(¬p ↔ ¬¬p)) ↔ ¬(¬p ˄ p))                  
+                  Not (p :||: q) :||: Not (p :||: q),                                                -- ¬(p ˄ q) ˅ ¬(p ˄ q)
+                  Not (Not (p :||: q) :||: Not( p :||: q)),                                          -- ¬(¬(p ˄ q) ˅ ¬(p ˄ q))                
+                  Not (Not (p :||: q)) :||: Not (Not (p :||: q)),                                    -- ¬¬(p ˄ q) ˅ ¬¬(p ˄ q))
+                  Not (Not (p :||: q) :||: Not (p :||: q)),                                          -- ¬¬(p ˄ q) ˅ ¬(p ˄ q))
+                  Not (Not (Not (p :||: q) :||: Not (p :||: q)) :||: p),                       -- ¬(¬(¬(p ˄ q) ˅ ¬(p ˄ q))) ˅ p)
+                  Not (Not (Not (p)) :||: T),                                                                          -- ¬(¬¬p ˄ T) 
+                  Not (Not (Not (p)) :||: T :||: T),                                                                   -- ¬(¬¬p ˄ T ˄ T)
+                  Not (Not (Not (p)) :||: T :||: F),                                                                   -- ¬(¬¬p ˄ T ˄ F)                
+                  Not (Not (Not (p)) :||: T :||: Not (Not (p))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬p)    
+                  Not (Not (Not (p)) :||: T :||: Not (Not (q))),                                                 -- ¬(¬¬p ˄ T ˄ ¬¬q)        
+                  Not (Not (Not (p)) :||: Not (p) :&&: T),                                                       -- ¬(¬¬p ˄ ¬p ˄ T)
+                  (p :->: Not (Not (p))) :<->: (Not (p) :<->: Not (p))                               -- ¬(¬¬p ˄ ¬p ˄ T)
                 ]
 
 deMorganAndDoubleNotTestSet =
-                [ Var 'p',
-                  Not (Var 'p'),
-                  Not (Not (Var 'p')),
-                  Not (Var 'p' :&&: Var 'q'), 
-                  Not (Var 'p' :&&: Var 'q') :||: Not (Var 'p' :&&: Var 'q'),
-                  Not (Not (Var 'p' :&&: Var 'q') :||: Not( Var 'p' :&&: Var 'q')),
-                  Not (Not (Var 'p' :&&: Var 'q')) :||: Not (Not (Var 'p' :&&: Var 'q')),
-                  Not (Not (Var 'p' :&&: Var 'q') :||: Not (Var 'p' :&&: Var 'q')),
-                  Not (Not (Not (Var 'p' :&&: Var 'q') :||: Not (Var 'p' :&&: Var 'q')) :||: Var 'p'),
-                  (Var 'p' :->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: Not (Var 'p')),
-                  (Var 'p' :->: Not (Not (Var 'p') :<->: Not (Not (Var 'p')))) :<->: (Not (Var 'p') :<->: Not (Var 'p'))
+                [ p,
+                  Not (p),
+                  Not (Not (p)),
+                  Not (p :&&: q), 
+                  Not (p :&&: q) :||: Not (p :&&: q),
+                  Not (Not (p :&&: q) :||: Not( p :&&: q)),
+                  Not (Not (p :&&: q)) :||: Not (Not (p :&&: q)),
+                  Not (Not (p :&&: q) :||: Not (p :&&: q)),
+                  Not (Not (Not (p :&&: q) :||: Not (p :&&: q)) :||: p),
+                  (p :->: Not (Not (p))) :<->: (Not (p) :<->: Not (p)),
+                  (p :->: Not (Not (p) :<->: Not (Not (p)))) :<->: (Not (p) :<->: Not (p))
                 ]
 
 implicationEliminationTestSet =
                 [
-                  Var 'p' :->: Not (Not (Var 'p')),
-                  (Var 'p' :->: Var 'p') :&&: (Var 'p' :->: Var 'p'),
-                  (Var 'p' :->: Not (Not (Var 'p'))) :&&: (Not (Var 'p') :->: Not (Var 'p')),
-                  (Not (Not (Var 'p')) :->: Not (Not (Var 'p'))) :&&: (Not (Var 'p') :->: Not (Var 'p')),
-                  (Var 'p' :->: Not (Not (Var 'p'))) :->: (Not (Var 'p') :->: Not (Var 'p'))
+                  p :->: Not (Not (p)),
+                  (p :->: p) :&&: (p :->: p),
+                  (p :->: Not (Not (p))) :&&: (Not (p) :->: Not (p)),
+                  (Not (Not (p)) :->: Not (Not (p))) :&&: (Not (p) :->: Not (p)),
+                  (p :->: Not (Not (p))) :->: (Not (p) :->: Not (p))
                 ]
 
 equivalenceEliminationTestSet =
                 [
-                 Var 'p' :<->: Not (Not (Var 'p')),
-                 (Var 'p' :<->: Var 'p') :&&: (Var 'p' :<->: Var 'p'),
-                 (Var 'p' :<->: Not (Not (Var 'p'))) :&&: (Not (Var 'p') :<->: Not (Var 'p')),
-                 (Not (Not (Var 'p')) :<->: Not (Not (Var 'p'))) :&&: (Not (Var 'p') :<->: Not (Var 'p')),
-                 (Var 'p' :<->: Not (Not (Var 'p'))) :<->: (Not (Var 'p') :<->: Not (Var 'p'))
+                 p :<->: Not (Not (p)),
+                 (p :<->: p) :&&: (p :<->: p),
+                 (p :<->: Not (Not (p))) :&&: (Not (p) :<->: Not (p)),
+                 (Not (Not (p)) :<->: Not (Not (p))) :&&: (Not (p) :<->: Not (p)),
+                 (p :<->: Not (Not (p))) :<->: (Not (p) :<->: Not (p))
                 ]
 
 absorptionTestSet =
                 [
-                 (Var 'p' :&&: Var 'q') :||: Var 'r',
-                 Var 'p' :&&: Not( Var 'q') :||: Var 'r',
-                 (Var 'p' :&&: Var 'q') :||: Var 'q',
-                 (Var 'p' :&&: Not( Var 'q')) :||: Not( Var 'q'),
-                 Var 'r' :||: (Var 'p' :&&: Var 'q'),
-                 Not (Not (Var 'r')) :||: (Var 'p' :&&: Var 'q'),
-                 Var 'p' :||: (Var 'p' :&&: Var 'q'),
-                 Not (Not (Var 'p')) :||: (Var 'p' :&&: Var 'q'),
-                 Var 'q' :||: (Var 'p' :&&: Var 'q'),
-                 Var 'q' :||: (Var 'p' :&&: Not( Not( Var 'q'))),
-                 Var 'p' :&&: (Var 'p' :||: Var 'q'),
-                 Var 'p' :&&: (Var 'p' :||: Var 'q'),
-                 Var 'q' :&&: (Var 'p' :||: Var 'q'),
-                 Not (Not (Var 'q')) :&&: (Not (Not (Var 'p')) :||: Not( Not (Var 'q'))),
-                 (Var 'p' :||: Var 'q') :&&: Var 'p',
-                 (Var 'p' :||: Var 'q') :&&: Not (Not (Var 'p')),
-                 (Var 'p' :||: Var 'q') :&&: Var 'q',
-                 (Not (Not (Var 'p')) :||: Not (Not (Var 'q'))) :&&: Not (Not (Var 'q')),
-                 ((Var 'p' :||: Var 'q') :&&: Var 'p') :&&: ((Var 'p' :&&: Var 'q') :||: Var 'q'),
-                 ((Var 'p' :&&: Var 'q') :||: Var 'q') :&&: ((Var 'p' :&&: Var 'q') :||: Var 'q'),
-                 (((Var 'p' :||: Var 'q') :&&: Var 'q') :&&: ((Var 'p' :&&: Var 'q') :||: Var 'q')) :||: Var 'q'
+                 (p :&&: q) :||: r,
+                 p :&&: Not( q) :||: r,
+                 (p :&&: q) :||: q,
+                 (p :&&: Not( q)) :||: Not( q),
+                 r :||: (p :&&: q),
+                 Not (Not (r)) :||: (p :&&: q),
+                 p :||: (p :&&: q),
+                 Not (Not (p)) :||: (p :&&: q),
+                 q :||: (p :&&: q),
+                 q :||: (p :&&: Not( Not( q))),
+                 p :&&: (p :||: q),
+                 p :&&: (p :||: q),
+                 q :&&: (p :||: q),
+                 Not (Not (q)) :&&: (Not (Not (p)) :||: Not( Not (q))),
+                 (p :||: q) :&&: p,
+                 (p :||: q) :&&: Not (Not (p)),
+                 (p :||: q) :&&: q,
+                 (Not (Not (p)) :||: Not (Not (q))) :&&: Not (Not (q)),
+                 ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: q),
+                 ((p :&&: q) :||: q) :&&: ((p :&&: q) :||: q),
+                 (((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q
                 ]
 
 idempotencyTestSet =
                 [
-                 Var 'p' :&&: Var 'p',
-                 Not( Not (Var 'p')) :&&: Var 'p',
-                 Var 'p' :||: Var 'p',
-                 Var 'p' :||: Not (Not (Var 'p')),
-                 (Var 'p' :&&: Var 'q') :&&: (Var 'p' :&&: Var 'q'),
-                 (Not (Not (Var 'p')) :&&: Var 'q') :&&: (Not (Not (Var 'p')) :&&: Not (Not (Var 'q'))),
-                 (Var 'p' :||: Var 'p') :&&: (Var 'p' :||: Var 'p'),
-                 (Var 'p' :||: Var 'p') :&&: (Var 'p' :||: Not (Not (Var 'p'))),
-                 (Var 'p' :&&: Var 'p') :&&: (Var 'p' :||: Var 'p'),
-                 (Var 'p' :&&: Not (Not (Var 'p'))) :&&: (Var 'p' :||: Not (Not (Var 'p'))),
-                 (Var 'p' :&&: Var 'q') :&&: (Var 'q' :&&: Var 'p'),
-                 (Var 'p' :&&: Not (Not (Var 'q'))) :&&: (Var 'q' :&&: Not (Not (Var 'p'))),
-                 (Var 'p' :&&: Var 'p') :&&: Var 'p',
-                 (Not (Not (Var 'p')) :&&: Not (Not (Var 'p'))) :&&: Not (Not (Var 'p'))
+                 p :&&: p,
+                 Not( Not (p)) :&&: p,
+                 p :||: p,
+                 p :||: Not (Not (p)),
+                 (p :&&: q) :&&: (p :&&: q),
+                 (Not (Not (p)) :&&: q) :&&: (Not (Not (p)) :&&: Not (Not (q))),
+                 (p :||: p) :&&: (p :||: p),
+                 (p :||: p) :&&: (p :||: Not (Not (p))),
+                 (p :&&: p) :&&: (p :||: p),
+                 (p :&&: Not (Not (p))) :&&: (p :||: Not (Not (p))),
+                 (p :&&: q) :&&: (q :&&: p),
+                 (p :&&: Not (Not (q))) :&&: (q :&&: Not (Not (p))),
+                 (p :&&: p) :&&: p,
+                 (Not (Not (p)) :&&: Not (Not (p))) :&&: Not (Not (p))
                 ]
 
 boolRuleConjunctionTestSet =
                 [
-                 Var 'p' :&&: F,
-                 Var 'p' :&&: T,
-                 F :&&: Var 'p',
-                 T :&&: Var 'p',
-                 (F :&&: Var 'p') :&&: (Var 'p' :&&: F),
-                 (T :&&: Var 'p') :&&: (Var 'p' :&&: T),
-                 (F :&&: Var 'p') :&&: Var 'p',
-                 (T :&&: Var 'p') :&&: Var 'p',
-                 Var 'p' :&&: (F :&&: Var 'p'), 
-                 Var 'p' :&&: (T :&&: Var 'p'),
-                 (F :&&: Var 'p') :&&: (Var 'p' :&&: F) :&&: Var 'p',
-                 (T :&&: Var 'p') :&&: (Var 'p' :&&: T) :&&: Var 'p'
+                 p :&&: F,
+                 p :&&: T,
+                 F :&&: p,
+                 T :&&: p,
+                 (F :&&: p) :&&: (p :&&: F),
+                 (T :&&: p) :&&: (p :&&: T),
+                 (F :&&: p) :&&: p,
+                 (T :&&: p) :&&: p,
+                 p :&&: (F :&&: p), 
+                 p :&&: (T :&&: p),
+                 (F :&&: p) :&&: (p :&&: F) :&&: p,
+                 (T :&&: p) :&&: (p :&&: T) :&&: p
                 ]
 
 boolRuleDisjunctionTestSet =
                 [
-                 Var 'p' :||: F,
-                 Var 'p' :||: T,
-                 F :||: Var 'p',
-                 T :||: Var 'p',
-                 (F :||: Var 'p') :||: (Var 'p' :||: F),
-                 (T :||: Var 'p') :||: (Var 'p' :||: T),
-                 (F :||: Var 'p') :||: Var 'p',
-                 (T :||: Var 'p') :||: Var 'p',
-                 Var 'p' :&&: (F :||: Var 'p'),
-                 Var 'p' :||: (T :||: Var 'p'), 
-                 (F :||: Var 'p') :||: (Var 'p' :||: F) :||: Var 'p',
-                 (T :||: Var 'p') :||: (Var 'p' :||: T) :||: Var 'p'
+                 p :||: F,
+                 p :||: T,
+                 F :||: p,
+                 T :||: p,
+                 (F :||: p) :||: (p :||: F),
+                 (T :||: p) :||: (p :||: T),
+                 (F :||: p) :||: p,
+                 (T :||: p) :||: p,
+                 p :&&: (F :||: p),
+                 p :||: (T :||: p), 
+                 (F :||: p) :||: (p :||: F) :||: p,
+                 (T :||: p) :||: (p :||: T) :||: p
                 ]
 
 boolRuleComplementTestSet =
                 [
-                 Var 'p' :&&: Not (Var 'p'),
-                 Var 'p' :||: Not( Var 'p'),
-                 Not (Var 'p') :&&: Var 'p',
-                 Not (Var 'p') :||: Var 'p',
-                 (Not (Var 'p') :&&: Var 'p') :&&: T,
-                 (Not (Var 'p') :||: Var 'p') :||: F
+                 p :&&: Not (p),
+                 p :||: Not( p),
+                 Not (p) :&&: p,
+                 Not (p) :||: p,
+                 (Not (p) :&&: p) :&&: T,
+                 (Not (p) :||: p) :||: F
                 ]
 
 boolRuleNotTestSet =
                 [
                  Not T,
                  Not F,
-                 Var 'p' :&&: Not T,
-                 Var 'p' :&&: Not F,
-                 Var 'p' :&&: Not (Not T),
-                 Var 'p' :&&: Not (Not F),
-                 Var 'p' :&&: Not T :||: Not T,
-                 Var 'p' :&&: Not F :||: Not F
+                 p :&&: Not T,
+                 p :&&: Not F,
+                 p :&&: Not (Not T),
+                 p :&&: Not (Not F),
+                 p :&&: Not T :||: Not T,
+                 p :&&: Not F :||: Not F
                 ]
 
 deMorganAndImplicationEliminationTestSet =
                 [
-                 Not (Var 'p' :->: Var 'q'),
-                 Not (Var 'p' :->: Not (Not (Var 'q'))),
-                 Not (Var 'p' :->: Not (Not (Var 'q'))) :||: Not (Not (Var 'p') :->: Not (Not (Var 'q'))),
-                 Not (Not (Var 'p' :->: Not (Not (Var 'q'))) :->: Not (Not (Var 'p') :->: Not (Not (Var 'q'))))
+                 Not (p :->: q),
+                 Not (p :->: Not (Not (q))),
+                 Not (p :->: Not (Not (q))) :||: Not (Not (p) :->: Not (Not (q))),
+                 Not (Not (p :->: Not (Not (q))) :->: Not (Not (p) :->: Not (Not (q))))
                 ]
 
 deMorganAndEquivalenceEliminationTestSet =
                 [
-                 Not (Var 'p' :<->: Var 'q'),
-                 Not (Var 'p' :<->: Not (Not (Var 'q'))),
-                 Not (Var 'p' :<->: Not (Not (Var 'q'))) :||: Not (Not (Var 'p') :<->: Not (Not (Var 'q'))),
-                 Not (Not (Var 'p' :<->: Not (Not (Var 'q'))) :<->: Not (Not (Var 'p') :<->: Not (Not (Var 'q'))))
+                 Not (p :<->: q),
+                 Not (p :<->: Not (Not (q))),
+                 Not (p :<->: Not (Not (q))) :||: Not (Not (p) :<->: Not (Not (q))),
+                 Not (Not (p :<->: Not (Not (q))) :<->: Not (Not (p) :<->: Not (Not (q))))
                 ]
 
 associativityTestSet =
                 [ 
-                  (Var 'q' :&&: Var 'p') :&&: Var 'r',                                 -- (q ˄ p) ˄ r
-                  Not ((Var 'q' :&&: Var 'p') :&&: Var 'r'),                           -- ¬((q ˄ p) ˄ r)  
-                  (Var 'q' :||: Var 'p') :||: Var 'r',                                 -- (q ˅ p) ˅ r
-                  Not ((Var 'q' :||: Var 'p') :||: Var 'r'),                           -- ¬((q ˅ p) ˅ r)  
-                  ((Var 'q' :||: Var 'p') :||: Var 'r') :||: Var 's',                  -- ((q ˅ p) ˅ r) ˅ s)  
-                  Not (((Var 'q' :||: Var 'p') :||: Var 'r') :||: Var 's'),            -- ¬((q ˅ p) ˅ r) ˅ s)  
-                  ((Var 'q' :||: Var 'p') :||: Var 'r') :||: Var 's',                  -- ((q ˅ p) ˅ r) ˅ s)  
-                  Not (((Var 'q' :||: Var 'p') :||: Var 'r') :||: Var 's'),            -- ¬((q ˅ p) ˅ r) ˅ s)  
-                  (Not (Not (Var 'p')) :&&: T) :&&: T,                                 -- (¬¬p ˄ T) ˄ T
-                  Not ((Not (Not (Var 'p')) :&&: T) :&&: F),                           -- ¬((¬¬p ˄ T) ˄ F)                
-                  Not ( T :&&: (Not (Not (Var 'p')) :&&: T) :&&: Not (Not (Var 'p'))), -- ¬(T ˄ (¬¬p ˄ T) ˄ ¬¬p)    
-                  Not ((Not (Not (Var 'p')) :||: T) :||: T :||: Not (Not (Var 'q')))   -- ¬((¬¬p ˄ T) ˄ T ˄ ¬¬q)        
+                  (q :&&: p) :&&: r,                                 -- (q ˄ p) ˄ r
+                  Not ((q :&&: p) :&&: r),                           -- ¬((q ˄ p) ˄ r)  
+                  (q :||: p) :||: r,                                 -- (q ˅ p) ˅ r
+                  Not ((q :||: p) :||: r),                           -- ¬((q ˅ p) ˅ r)  
+                  ((q :||: p) :||: r) :||: s,                  -- ((q ˅ p) ˅ r) ˅ s)  
+                  Not (((q :||: p) :||: r) :||: s),            -- ¬((q ˅ p) ˅ r) ˅ s)  
+                  ((q :||: p) :||: r) :||: s,                  -- ((q ˅ p) ˅ r) ˅ s)  
+                  Not (((q :||: p) :||: r) :||: s),            -- ¬((q ˅ p) ˅ r) ˅ s)  
+                  (Not (Not (p)) :&&: T) :&&: T,                                 -- (¬¬p ˄ T) ˄ T
+                  Not ((Not (Not (p)) :&&: T) :&&: F),                           -- ¬((¬¬p ˄ T) ˄ F)                
+                  Not ( T :&&: (Not (Not (p)) :&&: T) :&&: Not (Not (p))), -- ¬(T ˄ (¬¬p ˄ T) ˄ ¬¬p)    
+                  Not ((Not (Not (p)) :||: T) :||: T :||: Not (Not (q)))   -- ¬((¬¬p ˄ T) ˄ T ˄ ¬¬q)        
                 ]
 
 distributivityTestSet =
                 [ 
-                  Var 'p' :||: (Var 'q' :&&: Var 'r'),                                -- p ˅ (q ˄ r)
-                  (Var 'p' :&&: Var 'q') :||: Var 'r',                                -- (p ˄ q) ˅ r)
-                  Not (Var 'p' :||: (Var 'q' :&&: Var 'r')),                          -- ¬(p ˅ (q ˄ r))
-                  Not ((Var 'p' :&&: Var 'q') :||: Var 'r'),                          -- ¬((p ˄ q) ˅ r)
-                  ((Var 'p' :&&: Var 'q') :||: Var 'r') :||: Var 's',                 -- ((p ˄ q) ˅ r) ˅ s
-                  Var 'o' :&&: ((Var 'p' :&&: Var 'q') :||: Var 'r'),                 -- o ˄ ((p ˄ q) ˅ r)
-                  Var 'o' :||: ((Var 'p' :&&: Var 'q') :||: Var 'r'),                 -- o ˅ ((p ˄ q) ˅ r)
-                  Var 'o' :||: (((Var 'p' :&&: Var 'q') :||: Var 'r') :&&: Var 's'),  -- o ˅ ((p ˄ q) ˅ r) ˄ s
-                  Var 'o' :&&: (((Var 'p' :&&: Var 'q') :||: Var 'r') :||: Var 's'),  -- o ˄ ((p ˄ q) ˅ r) ˅ s
-                  Var 'o' :||: (((Var 'p' :&&: Var 'q') :||: Var 'r') :||: Var 's')   -- o ˅ ((p ˄ q) ˅ r) ˅ s
+                  p :||: (q :&&: r),                                -- p ˅ (q ˄ r)
+                  (p :&&: q) :||: r,                                -- (p ˄ q) ˅ r)
+                  Not (p :||: (q :&&: r)),                          -- ¬(p ˅ (q ˄ r))
+                  Not ((p :&&: q) :||: r),                          -- ¬((p ˄ q) ˅ r)
+                  ((p :&&: q) :||: r) :||: s,                 -- ((p ˄ q) ˅ r) ˅ s
+                  o :&&: ((p :&&: q) :||: r),                 -- o ˄ ((p ˄ q) ˅ r)
+                  o :||: ((p :&&: q) :||: r),                 -- o ˅ ((p ˄ q) ˅ r)
+                  o :||: (((p :&&: q) :||: r) :&&: s),  -- o ˅ ((p ˄ q) ˅ r) ˄ s
+                  o :&&: (((p :&&: q) :||: r) :||: s),  -- o ˄ ((p ˄ q) ˅ r) ˅ s
+                  o :||: (((p :&&: q) :||: r) :||: s)   -- o ˅ ((p ˄ q) ˅ r) ˅ s
                 ]

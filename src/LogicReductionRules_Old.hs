@@ -1,10 +1,9 @@
 module LogicReductionRules_Old
-    (ChrLogic,Reduction, LChrLogic,
-     isDoubleNot, hasDoubleNot, singleDoubleNot, multiDoubleNot, multiDeMorgan, multiDeMorganAndMultiDoubleNot, multiImpl, multiAbsorp, multiIdemp, 
-     multiFRuleConj, multiTRuleConj, multiFRuleDisj, multiTRuleDisj, multiFRuleCompl, multiTRuleCompl, multiTRuleNot, multiFRuleNot, 
-     multiImplAndMultiDoubleNot, multiLogEq, multiLogEqAndMultiDoubleNot, multiAbsorpAndMultiDoubleNot, multiIdempAndMultiDoubleNot, 
-     multiDeMorganAndMultiImpl, multiDeMorganAndMultiImplAndDoubleNot, multiDeMorganAndMultiLogEq, multiDeMorganAndMultiLogEqAndDoubleNot,
-     multiReduc, (~=)
+    ( isDoubleNot, hasDoubleNot, singleDoubleNot, multiDoubleNot, multiDeMorgan, multiDeMorganAndMultiDoubleNot, multiImpl, multiAbsorp, multiIdemp, 
+      multiFRuleConj, multiTRuleConj, multiFRuleDisj, multiTRuleDisj, multiFRuleCompl, multiTRuleCompl, multiTRuleNot, multiFRuleNot, 
+      multiImplAndMultiDoubleNot, multiLogEq, multiLogEqAndMultiDoubleNot, multiAbsorpAndMultiDoubleNot, multiIdempAndMultiDoubleNot, 
+      multiDeMorganAndMultiImpl, multiDeMorganAndMultiImplAndDoubleNot, multiDeMorganAndMultiLogEq, multiDeMorganAndMultiLogEqAndDoubleNot,
+      multiReduc, (~=)
     ) where
 
 import Control.Applicative
@@ -21,25 +20,22 @@ import Ideas.Utils.Uniplate
 import Ideas.Common.Library
 import Ideas.Main.Default
 
-type ChrLogic  = Logic Char
-type LChrLogic = [ChrLogic]
-
-isDoubleNot :: Logic a -> Bool
+isDoubleNot :: SLogic -> Bool
 isDoubleNot (Not (Not _)) = True
 isDoubleNot _             = False
 
-hasDoubleNot :: Logic a -> Bool
+hasDoubleNot :: SLogic -> Bool
 hasDoubleNot (Not (Not _)) = True
 hasDoubleNot p             = any hasDoubleNot (children p) -- = or (map hasDoubleNot (children p))
 
-singleDoubleNot :: Logic a -> Logic a
+singleDoubleNot :: SLogic -> SLogic
 singleDoubleNot (Not (Not p)) =  p
 singleDoubleNot p             =  p
 
-multiReduc :: (Logic a -> Logic a) -> (Logic a -> Logic a) -> Logic a -> Logic a 
+multiReduc :: (SLogic -> SLogic) -> (SLogic -> SLogic) -> SLogic -> SLogic 
 multiReduc f g p = f (descend g p)
 
-multiDoubleNot:: Logic a -> Logic a
+multiDoubleNot:: SLogic -> SLogic
 --multiDoubleNot (Not (Not p)) = multiDoubleNot p
 --multiDoubleNot p = descend multiDoubleNot p
 --multiDoubleNot p = f (descend multiDoubleNot p)
@@ -48,26 +44,26 @@ multiDoubleNot = multiReduc f multiDoubleNot
         f (Not (Not p)) = f p
         f p             = p 
 
-multiDeMorgan :: Logic a -> Logic a
+multiDeMorgan :: SLogic -> SLogic
 multiDeMorgan = multiReduc f multiDeMorgan
     where
         f (Not (p :&&: q)) = f (Not p) :||: f (Not q)
         f (Not (p :||: q)) = f (Not p) :&&: f (Not q)
         f p                = p 
 
-multiImpl :: Logic a -> Logic a
+multiImpl :: SLogic -> SLogic
 multiImpl = multiReduc f multiImpl
     where
         f (p :->: q) = f (Not p) :||: f q
         f p          = p 
 
-multiLogEq :: Logic a -> Logic a
+multiLogEq :: SLogic -> SLogic
 multiLogEq = multiReduc f multiLogEq
     where
         f (p :<->: q) = f (p :&&: q) :||: f (Not p :&&: Not q)
         f p           = p 
 
-multiAbsorp :: Eq a => Logic a -> Logic a
+multiAbsorp :: SLogic -> SLogic
 multiAbsorp = multiReduc f multiAbsorp
     where
         f ((p :&&: q) :||: r) = if q == r || p == r then f r else f (p :&&: q) :||: f r
@@ -76,92 +72,92 @@ multiAbsorp = multiReduc f multiAbsorp
         f ((p :||: q) :&&: r) = if p == r || q == r then f r else f (p :||: q) :&&: f r
         f p                   = p 
 
-multiIdemp :: Eq a => Logic a -> Logic a
+multiIdemp :: SLogic -> SLogic
 multiIdemp = multiReduc f multiIdemp
     where
         f (p :||: q) = if p == q then f p else f p :||: f q
         f (p :&&: q) = if p == q then f p else f p :&&: f q
         f p          = p 
 
-multiFRuleConj :: Logic a -> Logic a
+multiFRuleConj :: SLogic -> SLogic
 multiFRuleConj = multiReduc f multiFRuleConj
     where
         f (p :&&: F) = F
         f (F :&&: p) = F        
         f p          = p 
 
-multiTRuleConj :: Logic a -> Logic a
+multiTRuleConj :: SLogic -> SLogic
 multiTRuleConj = multiReduc f multiTRuleConj
     where
         f (p :&&: T) = p
         f (T :&&: p) = p
         f p          = p 
 
-multiFRuleDisj :: Logic a -> Logic a
+multiFRuleDisj :: SLogic -> SLogic
 multiFRuleDisj = multiReduc f multiFRuleDisj
     where
         f (p :||: F) = p
         f (F :||: p) = p        
         f p          = p 
 
-multiTRuleDisj :: Logic a -> Logic a
+multiTRuleDisj :: SLogic -> SLogic
 multiTRuleDisj  = multiReduc f multiTRuleDisj
     where
         f (p :||: T) = T
         f (T :||: p) = T       
         f p          = p 
 
-multiFRuleCompl :: Eq a => Logic a -> Logic a
+multiFRuleCompl :: SLogic -> SLogic
 multiFRuleCompl = multiReduc f multiFRuleCompl
     where
         f (p :&&: Not q) = if p == q then F else f p :&&: f (Not q)
         f (Not p :&&: q) = if p == q then F else f (Not p) :&&: f q 
         f p              = p 
 
-multiTRuleCompl :: Eq a => Logic a -> Logic a
+multiTRuleCompl :: SLogic -> SLogic
 multiTRuleCompl = multiReduc f multiTRuleCompl
     where
         f (p :||: Not q) = if p == q then T else f p :||: f (Not q)
         f (Not p :||: q) = if p == q then T else f (Not p) :||: f q 
         f p              = p 
 
-multiFRuleNot :: Logic a -> Logic a
+multiFRuleNot :: SLogic -> SLogic
 multiFRuleNot p = multiReduc f multiFRuleNot p
     where
         f (Not T) = F
         f p       = p 
 
-multiTRuleNot :: Logic a -> Logic a
+multiTRuleNot :: SLogic -> SLogic
 multiTRuleNot p =  multiReduc f multiTRuleNot p
     where
         f (Not F) = T
         f p       = p 
 
-multiDeMorganAndMultiDoubleNot :: Logic a -> Logic a
+multiDeMorganAndMultiDoubleNot :: SLogic -> SLogic
 multiDeMorganAndMultiDoubleNot = multiDoubleNot . multiDeMorgan  
 
-multiImplAndMultiDoubleNot :: Logic a -> Logic a
+multiImplAndMultiDoubleNot :: SLogic -> SLogic
 multiImplAndMultiDoubleNot = multiDoubleNot . multiImpl  
 
-multiLogEqAndMultiDoubleNot :: Logic a -> Logic a
+multiLogEqAndMultiDoubleNot :: SLogic -> SLogic
 multiLogEqAndMultiDoubleNot = multiDoubleNot . multiLogEq
 
-multiAbsorpAndMultiDoubleNot :: Eq a => Logic a -> Logic a
+multiAbsorpAndMultiDoubleNot :: SLogic -> SLogic
 multiAbsorpAndMultiDoubleNot = multiAbsorp . multiDoubleNot
 
-multiIdempAndMultiDoubleNot :: Eq a => Logic a -> Logic a
+multiIdempAndMultiDoubleNot :: SLogic -> SLogic
 multiIdempAndMultiDoubleNot = multiIdemp . multiDoubleNot
 
-multiDeMorganAndMultiImpl :: Logic a -> Logic a
+multiDeMorganAndMultiImpl :: SLogic -> SLogic
 multiDeMorganAndMultiImpl = multiDeMorgan . multiImpl
 
-multiDeMorganAndMultiImplAndDoubleNot :: Logic a -> Logic a
+multiDeMorganAndMultiImplAndDoubleNot :: SLogic -> SLogic
 multiDeMorganAndMultiImplAndDoubleNot = multiDoubleNot . multiDeMorgan . multiImpl  
 
-multiDeMorganAndMultiLogEq :: Logic a -> Logic a
+multiDeMorganAndMultiLogEq :: SLogic -> SLogic
 multiDeMorganAndMultiLogEq = multiDeMorgan . multiLogEq  
 
-multiDeMorganAndMultiLogEqAndDoubleNot :: Logic a -> Logic a
+multiDeMorganAndMultiLogEqAndDoubleNot :: SLogic -> SLogic
 multiDeMorganAndMultiLogEqAndDoubleNot = multiDoubleNot . multiDeMorgan . multiLogEq  
 
 (~=) :: Eq a => (Logic a -> Logic a) -> Logic a -> Logic a -> Bool

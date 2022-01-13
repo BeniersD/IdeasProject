@@ -9,22 +9,22 @@ import LogicExercices
 import LogicTestCases
 import LogicTestFunctions
 
-quickTestSet :: LsLgcChar
+quickTestSet :: [Logic String]
 quickTestSet = [
-                Not (Var 'p' :&&: Var 'q'),                                         -- ¬(p ˄ q)
-                Not (Var 'q' :&&: Var 'p' :&&: Var 'r'),                            -- ¬(p ˄ q ˄ r)
-                Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's'),               -- ¬(p ˄ q ˄ r ˄ s)
-                Not (Var 'q' :&&: Var 'r' :&&: Var 's' :&&: Var 'p'),               -- ¬(p ˄ r ˄ s ˄ p)                
-                Not (Var 'q' :&&: Var 'p' :&&: Var 'r' :&&: Var 's' :&&: Var 't'),  -- ¬(p ˄ q ˄ r ˄ s ˄ t)
-                Not (Not (Var 'p' :&&: Var 'q')),                                   -- ¬¬(p ˄ q)
-                Not (Not (Var 'q' :&&: Var 'p')),                                   -- ¬¬(q ˄ p)  
-                Not (Not (Var 'q' :&&: Var 'r' :&&: Var 'p')),                      -- ¬¬(q ˄ r ˄ p)                
-                Not (Not (Not (Var 'p')) :&&: T),                                   -- ¬(¬¬p ˄ T) 
-                Not (Not (Not (Var 'p')) :&&: T :&&: T),                            -- ¬(¬¬p ˄ T ˄ T)
-                Not (Not (Not (Var 'p')) :&&: T :&&: F),                            -- ¬(¬¬p ˄ T ˄ F)                
-                Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'p'))),          -- ¬(¬¬p ˄ T ˄ ¬¬p)    
-                Not (Not (Not (Var 'p')) :&&: T :&&: Not (Not (Var 'q'))),          -- ¬(¬¬p ˄ T ˄ ¬¬q)        
-                Not (Not (Not (Var 'p')) :&&: Not (Var 'p') :&&: T)                 -- ¬(¬¬p ˄ ¬p ˄ T)
+                Not (p :&&: q),                                   -- ¬(p ˄ q)
+                Not (q :&&: p :&&: r),                            -- ¬(p ˄ q ˄ r)
+                Not (q :&&: p :&&: r :&&: s),                     -- ¬(p ˄ q ˄ r ˄ s)
+                Not (q :&&: r :&&: s :&&: p),                     -- ¬(p ˄ r ˄ s ˄ p)                
+                Not (q :&&: p :&&: r :&&: s :&&: t),              -- ¬(p ˄ q ˄ r ˄ s ˄ t)
+                Not (Not (p :&&: q)),                             -- ¬¬(p ˄ q)
+                Not (Not (q :&&: p)),                             -- ¬¬(q ˄ p)  
+                Not (Not (q :&&: r :&&: p)),                      -- ¬¬(q ˄ r ˄ p)                
+                Not (Not (Not (p)) :&&: T),                       -- ¬(¬¬p ˄ T) 
+                Not (Not (Not (p)) :&&: T :&&: T),                -- ¬(¬¬p ˄ T ˄ T)
+                Not (Not (Not (p)) :&&: T :&&: F),                -- ¬(¬¬p ˄ T ˄ F)                
+                Not (Not (Not (p)) :&&: T :&&: Not (Not (p))),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
+                Not (Not (Not (p)) :&&: T :&&: Not (Not (q))),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
+                Not (Not (Not (p)) :&&: Not (p) :&&: T)           -- ¬(¬¬p ˄ ¬p ˄ T)
                ]
 
 --------------------------------------------------------------------------------------------------------------------------------------
