@@ -123,53 +123,35 @@ layerLeftMost s = layer (visitLeftMost s)
 layerRightMost s = layer (visitRightMost s)
 layerTryAll s = layer (visitTryAll s)
 
+isOr, isAnd, isOrdered :: (Ord a) => Logic a -> Bool
+isOr (p :||: q) = True
+isOr _          = False
+
+isAnd (p :&&: q) = True
+isAnd _          = False
+
+isOrdered (p :&&: q) | p < q = True
+isOrdered (p :||: q) | p < q = True
+isOrdered _                  = False
+
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Simple logic Strategies
 --------------------------------------------------------------------------------------------------------------------------------------
 stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
     stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd :: (Eq a, Ord a) => LabeledStrategy (Logic a)
-stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check f .*. stratRuleC ruleFRuleComplement
-    where 
-        f :: Eq a => Logic a -> Bool
-        f (Not p :&&: q) | p == q = True
-        f _                       = False
+stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleFRuleComplement
 
-stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. stratRuleC ruleFRuleConjunction
-    where 
-        f :: Eq a => Logic a -> Bool
-        f (F :&&: p) = True
-        f _          = False
+stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleFRuleConjunction
 
-stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check f .*. stratRuleC ruleTRuleConjunction
-    where 
-        f :: Eq a => Logic a -> Bool 
-        f (T :&&: p) = True
-        f _          = False
+stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check (not.isOrdered) .*. stratRuleC ruleTRuleConjunction
 
-stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. stratRuleC ruleTRuleComplement
-    where
-        f :: Eq a => Logic a -> Bool 
-        f (Not p :||: q) | p == q = True
-        f _                       = False
+stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleTRuleComplement
 
-stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check f .*. stratRuleC ruleFRuleDisjunction
-    where 
-        f :: Logic a -> Bool 
-        f (F :||: p) = True
-        f _          = False
+stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check (not.isOrdered) .*. stratRuleC ruleFRuleDisjunction
 
-stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check f .*. stratRuleC ruleTRuleDisjunction
-    where
-        f :: Logic a -> Bool 
-        f (T :||: p) = True
-        f _          = False        
+stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check (not.isOrdered) .*. stratRuleC ruleTRuleDisjunction
 
-stratCommutativityOrd = label "Rewrite Strategy Commutativity-Ordered" $ check f |> ruleCommutativity
-    where
-        f :: Ord a => Logic a -> Bool
-        f (p :&&: q) | p < q = True
-        f (p :||: q) | p < q = True
-        f _                  = False
+stratCommutativityOrd = label "Rewrite Strategy Commutativity-Ordered" $ check (not.isOrdered) |> ruleCommutativity
 
 stratDeMorgan :: Eq a => LabeledStrategy (Logic a) 
 stratDeMorgan = label "Rewrite Strategy DeMorgan" $ ruleDeMorganOr .|. ruleDeMorganAnd
@@ -215,17 +197,10 @@ stratCommutativeAbsorption = label "Rewrite Strategy Commutativity-Absortion" s
             (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer (layerRightMost(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
             (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer (layerRightMost(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption)
 
+
 -- TODO LabeledStrategy (CtxLgc a) -> Rule (Logic a)
 --ruleCommutativeAbsorption :: Rule a
 --ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
-
-isOr :: Logic a -> Bool
-isOr (p :||: q) = True
-isOr _          = False
-
-isAnd :: Logic a -> Bool
-isAnd (p :&&: q) = True
-isAnd _          = False
 
 
 negation = label "Negate" $ stratMultiRuleChoice [ruleTRuleNotF, ruleFRuleNotT]

@@ -48,7 +48,7 @@ main = do
     --tstRuleDeMorganSimple
     --tstRuleDeMorganComplex
     --tstRuleCommutativity
-    --tstRuleCommutativityOrd
+    tstRuleCommutativityOrd
     --tstRuleAbsorption
     --tstRuleDoubleNot
     --tstRuleEquivalenceElimination
