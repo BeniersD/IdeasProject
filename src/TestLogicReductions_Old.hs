@@ -75,7 +75,7 @@ testEquivalence x y = putStr $ "Test equivalence with '" ++ x ++ "':\n" ++ resul
         resultset = zipResults evaluations 
         result    = unlines [ show x ++ ". " ++ show ys | (x, ys) <- resultset ]
 
-reduceFormula :: Maybe ((SLogic -> SLogic), LabeledStrategy (SLogic)) -> [SLogic]
+reduceFormula :: Maybe (SLogic -> SLogic, LabeledStrategy SLogic) -> [SLogic]
 reduceFormula x = 
     case x of
         Just x  -> uncurry map x
@@ -110,7 +110,7 @@ defineFunction x =
         "multiDeMorganAndMultiLogEqAndDoubleNot" -> multiDeMorganAndMultiLogEqAndDoubleNot
 
 
-defineTest :: String -> Maybe ((SLogic -> SLogic), [SLogic])
+defineTest :: String -> Maybe (SLogic -> SLogic, [SLogic])
 defineTest x = 
     case x of
         "singleDoubleNot"                        -> Just (defineFunction x, doubleNotTestSet)

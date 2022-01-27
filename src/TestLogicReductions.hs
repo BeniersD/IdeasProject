@@ -19,21 +19,21 @@ quickTestSet = [
                 --Not (Not (p :&&: q))                             -- ¬¬(p ˄ q)
                 --Not (Not (q :&&: p)),                             -- ¬¬(q ˄ p)  
                 --Not (Not (q :&&: r :&&: p)),                      -- ¬¬(q ˄ r ˄ p)                
-                Not (Not (Not (p)) :&&: T),                       -- ¬(¬¬p ˄ T) 
-                Not (Not (Not (p)) :&&: T :&&: T),                -- ¬(¬¬p ˄ T ˄ T)
-                Not (Not (Not (p)) :&&: T :&&: F),                -- ¬(¬¬p ˄ T ˄ F)                
-                Not (Not (Not (p)) :&&: T :&&: Not (Not (p))),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
-                Not (Not (Not (p)) :&&: T :&&: Not (Not (q))),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
-                Not (Not (Not (p)) :&&: Not (p) :&&: T)           -- ¬(¬¬p ˄ ¬p ˄ T)
+                Not (Not (Not p) :&&: T),                       -- ¬(¬¬p ˄ T) 
+                Not (Not (Not p) :&&: T :&&: T),                -- ¬(¬¬p ˄ T ˄ T)
+                Not (Not (Not p) :&&: T :&&: F),                -- ¬(¬¬p ˄ T ˄ F)                
+                Not (Not (Not p) :&&: T :&&: Not (Not p)),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
+                Not (Not (Not p) :&&: T :&&: Not (Not q)),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
+                Not (Not (Not p) :&&: Not p :&&: T)           -- ¬(¬¬p ˄ ¬p ˄ T)
                ]
 
 quickTestSet2 :: [Logic String]
 quickTestSet2 = [
-                p :&&: (Not (p :&&: q)),                             
-                p :&&: (Not (q :&&: p)),                               
-                p :&&: (Not (q :&&: r :&&: p)),                          
-                p :&&: (Not (q :&&: p :&&: r :&&: s :&&: t)),          
-                p :&&: (p :&&: (Not (q :&&: p :&&: r :&&: s :&&: t)))                    
+                p :&&: Not (p :&&: q),                             
+                p :&&: Not (q :&&: p),                               
+                p :&&: Not (q :&&: r :&&: p),                          
+                p :&&: Not (q :&&: p :&&: r :&&: s :&&: t),          
+                p :&&: (p :&&: Not (q :&&: p :&&: r :&&: s :&&: t))                    
                ]
 
 --------------------------------------------------------------------------------------------------------------------------------------

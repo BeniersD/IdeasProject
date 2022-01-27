@@ -29,37 +29,37 @@ stratRuleMultiTerm r = label desc strat
         lifted = liftToContext r
         vis s = visit VisitMany ruleRight s
         lay s = ruleDown .*. s .*. ruleUp
-        strat = lifted .*. lay (vis (lifted))
+        strat = lifted .*. lay (vis lifted)
 
 strattst r = label desc strat
     where
         desc = "Layered First " ++ showId r
         --strat = fulltd (stratRuleMultiTerm (r)) --> no result
         --strat = oncetd (stratRuleMultiTerm (r))
-        strat = repeatS (oncetd (stratRuleMultiTerm (r)))      
+        strat = repeatS (oncetd (stratRuleMultiTerm r))      
 
 
 stratRuleMultiTerma r = label d s
     where
         d = "Layered First " ++ showId r
         lr = liftToContext r
-        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
-        s = lr .*. l (visitTryAll (lr))
+        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l s) |> succeed) .*. ruleUp)
+        s = lr .*. l (visitTryAll lr)
 
 
 stratRuleMultiTerm1 r = label d s
     where
         d = "Layered First " ++ showId r
         lr = liftToContext r
-        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
-        s = lr .*. l (visitTryAll (lr))
+        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l s) |> succeed) .*. ruleUp)
+        s = lr .*. l (visitTryAll lr)
 
 stratRuleMultiTerm2 r = label d s
     where
         d = "Layered First " ++ showId r
         lr = liftToContext r
-        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
-        s = lr .*. l (visitRightMost (lr))
+        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l s) |> succeed) .*. ruleUp)
+        s = lr .*. l (visitRightMost lr)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
@@ -107,10 +107,10 @@ stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (stratRuleAll ruleC
 visitFirst, visitAll, visitTryAll, visitId, visitLeftMost, visitRightMost :: (IsStrategy f, Navigator a) => f a -> Strategy a
 visitAll s = fix $ \x -> s .*. (check (not.hasRight) |> (ruleRight .*. x))
 visitFirst s = fix $ \x -> s |> ruleRight .*. x
-visitTryAll s = fix $ \x -> try(s) .*. (check (not.hasRight) |> (ruleRight .*. x))
+visitTryAll s = fix $ \x -> try s .*. (check (not.hasRight) |> (ruleRight .*. x))
 visitLeftMost s = check (not.hasDown) |> (ruleDown .*.  s)
 visitRightMost s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*. x)
-visitId s = check (isTop) |> ruleUp .*. ruleDown .*. s
+visitId s = check isTop |> ruleUp .*. ruleDown .*. s
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- On-layer visits
@@ -128,37 +128,37 @@ layerTryAll s = layer (visitTryAll s)
 --------------------------------------------------------------------------------------------------------------------------------------
 stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
     stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd :: (Eq a, Ord a) => LabeledStrategy (Logic a)
-stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check f .*. stratRuleC (ruleFRuleComplement)
+stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check f .*. stratRuleC ruleFRuleComplement
     where 
         f :: Eq a => Logic a -> Bool
         f (Not p :&&: q) | p == q = True
         f _                       = False
 
-stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. stratRuleC (ruleFRuleConjunction)
+stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. stratRuleC ruleFRuleConjunction
     where 
         f :: Eq a => Logic a -> Bool
         f (F :&&: p) = True
         f _          = False
 
-stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check f .*. stratRuleC (ruleTRuleConjunction)
+stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check f .*. stratRuleC ruleTRuleConjunction
     where 
         f :: Eq a => Logic a -> Bool 
         f (T :&&: p) = True
         f _          = False
 
-stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. stratRuleC (ruleTRuleComplement)
+stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check f .*. stratRuleC ruleTRuleComplement
     where
         f :: Eq a => Logic a -> Bool 
         f (Not p :||: q) | p == q = True
         f _                       = False
 
-stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check f .*. stratRuleC (ruleFRuleDisjunction)
+stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check f .*. stratRuleC ruleFRuleDisjunction
     where 
         f :: Logic a -> Bool 
         f (F :||: p) = True
         f _          = False
 
-stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check f .*. stratRuleC (ruleTRuleDisjunction)
+stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check f .*. stratRuleC ruleTRuleDisjunction
     where
         f :: Logic a -> Bool 
         f (T :||: p) = True
@@ -256,23 +256,23 @@ testlf x = label description strategy
 testlta x = label description strategy
     where
         description = "Layered All " ++ showId x
-        strategy = (liftToContext x) .*. layer (visitFirst (liftToContext x))
+        strategy = liftToContext x .*. layer (visitFirst (liftToContext x))
 
 testlta2 x = label description strategy
     where
         description = "Layered All " ++ showId x
-        strategy = repeatS ((liftToContext x) .*. layer (visitFirst (liftToContext x)))
+        strategy = repeatS (liftToContext x .*. layer (visitFirst (liftToContext x)))
 
 testlta3, testlmo :: LabeledStrategy (Context (Logic a)) -> LabeledStrategy (Context (Logic a))
 testlta3 x = label description strategy
     where
         description = "Layered All " ++ showId x
-        strategy = x .*. layer (visitAll (x))
+        strategy = x .*. layer (visitAll x)
 
 testlmo x = label description strategy
     where
         description = "Layered Left Most Only " ++ showId x
-        strategy = x .*. layer (visitLeftMost (x))
+        strategy = x .*. layer (visitLeftMost x)
 
 --deMorgan (Not (p :&&: T)) = Just (Not p :||: Not T) = Just (Not p :||: F) = Just Not p
 --deMorgan (Not (T :&&: p)) = Just (Not T :||: Not p) = Just (F :||: Not p) = Just Not p
