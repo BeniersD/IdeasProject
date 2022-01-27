@@ -2,25 +2,64 @@ module LogicReductionStrategies where
 
 import Ideas.Common.Library hiding (layer)
 import Data.List
+import Data.Maybe
 import Domain.Logic.Formula hiding (isAnd, isOr)
 import LogicReductionRules
 import Ideas.Common.Traversal.Navigator
 import qualified Ideas.Common.Strategy.Combinators as Combinators
 
-stratRuleMultiTerm, stratRuleMultiTermOnce :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
-stratRuleMultiTerm r = label d s
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Visits -- from Traversal.sh
+--------------------------------------------------------------------------------------------------------------------------------------
+data Visit = VisitFirst | VisitOne | VisitSome | VisitAll | VisitMany
+
+visit :: (IsStrategy f, IsStrategy g) => Visit -> f a -> g a -> Strategy a
+visit v next s = fix $ \a ->
+   case v of
+      VisitFirst -> s  |> next .*. a
+      VisitOne   -> s .|. next .*. a
+      VisitSome  -> s .*. try (next .*. visit VisitMany next s) .|. next .*. a
+      VisitAll   -> s .*. (Combinators.not next |> (next .*. a))
+      VisitMany  -> try s .*. (Combinators.not next |> (next .*. a))
+
+stratRuleMultiTerm, stratRuleMultiTerma, stratRuleMultiTerm1, stratRuleMultiTerm2 :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
+stratRuleMultiTerm r = label desc strat
+    where
+        desc = "Layered First " ++ showId r
+        lifted = liftToContext r
+        vis s = visit VisitMany ruleRight s
+        lay s = ruleDown .*. s .*. ruleUp
+        strat = lifted .*. lay (vis (lifted))
+
+strattst r = label desc strat
+    where
+        desc = "Layered First " ++ showId r
+        --strat = fulltd (stratRuleMultiTerm (r)) --> no result
+        --strat = oncetd (stratRuleMultiTerm (r))
+        strat = repeatS (oncetd (stratRuleMultiTerm (r)))      
+
+
+stratRuleMultiTerma r = label d s
+    where
+        d = "Layered First " ++ showId r
+        lr = liftToContext r
+        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
+        s = lr .*. l (visitTryAll (lr))
+
+
+stratRuleMultiTerm1 r = label d s
+    where
+        d = "Layered First " ++ showId r
+        lr = liftToContext r
+        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
+        s = lr .*. l (visitTryAll (lr))
+
+stratRuleMultiTerm2 r = label d s
     where
         d = "Layered First " ++ showId r
         lr = liftToContext r
         l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
         s = lr .*. l (visitRightMost (lr))
-
-stratRuleMultiTermOnce r = label d s
-    where
-        d = "Layered First " ++ showId r
-        lr = liftToContext r
-        l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l(s)) |> succeed) .*. ruleUp)
-        s = somewhere (lr .*. l (visitRightMost (lr)))
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
@@ -74,7 +113,7 @@ visitRightMost s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*. x)
 visitId s = check (isTop) |> ruleUp .*. ruleDown .*. s
 
 --------------------------------------------------------------------------------------------------------------------------------------
--- On-elayer visits
+-- On-layer visits
 --------------------------------------------------------------------------------------------------------------------------------------
 layer :: (Navigator a) => Strategy a -> Strategy a
 layer s = ruleDown .*. s .*. ruleUp

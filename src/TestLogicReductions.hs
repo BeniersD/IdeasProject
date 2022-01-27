@@ -29,9 +29,11 @@ quickTestSet = [
 
 quickTestSet2 :: [Logic String]
 quickTestSet2 = [
-                Not (Not (p :&&: q)),                             -- ¬¬(p ˄ q)
-                Not (Not (q :&&: p)),                            -- ¬¬(q ˄ p)  
-                Not (Not (q :&&: r :&&: p))                      -- ¬¬(q ˄ r ˄ p)                
+                p :&&: (Not (p :&&: q)),                             
+                p :&&: (Not (q :&&: p)),                               
+                p :&&: (Not (q :&&: r :&&: p)),                          
+                p :&&: (Not (q :&&: p :&&: r :&&: s :&&: t)),          
+                p :&&: (p :&&: (Not (q :&&: p :&&: r :&&: s :&&: t)))                    
                ]
 
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -67,10 +69,12 @@ main = do
     --tstRuleTRuleComplementC
     --tstRuleFRuleDisjunctionC
     --tstRuleTRuleDisjunctionC
-    mapM_ print quickTestSet
-    --pptest "Test Layer Top All" [applyD (stratRuleMultiTerm ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
-    --pptest "Test Layer Top All" [applyD (stratRuleMultiTermOnce ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
-    pptest "Test Layer Top All" [applyD (stratRuleMultiTermOnce ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
+    --mapM_ print quickTestSet
+    mapM_ print quickTestSet2
+    --pptest "Test Layer Top All" [applyD (stratRuleMultiTerm1 ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
+    --pptest "Test Layer Top All" [applyD (stratRuleMultiTerma ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
+    pptest "Test Layer Top All" [applyD (stratRuleMultiTerm ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
+    pptest "Test Layer Top All" [applyD (strattst ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
     
 
 --------------------------------------------------------------------------------------------------------------------------------------
