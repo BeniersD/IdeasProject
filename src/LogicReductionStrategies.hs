@@ -11,31 +11,31 @@ import qualified Ideas.Common.Strategy.Combinators as Combinators
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Visits -- from Traversal.sh
 --------------------------------------------------------------------------------------------------------------------------------------
-data Visit = VisitFirst | VisitOne | VisitSome | VisitAll | VisitMany
+data Visit = VisitFirst | VisitOne | VisitSome | VisitAll | VisitMany | VisitLeftMost | VisitRightMost
 
-visit :: (IsStrategy f, IsStrategy g) => Visit -> f a -> g a -> Strategy a
+visit :: (Navigator a, IsStrategy f, IsStrategy g) => Visit -> f a -> g a -> Strategy a
 visit v next s = fix $ \a ->
    case v of
-      VisitFirst -> s  |> next .*. a
-      VisitOne   -> s .|. next .*. a
-      VisitSome  -> s .*. try (next .*. visit VisitMany next s) .|. next .*. a
-      VisitAll   -> s .*. (Combinators.not next |> (next .*. a))
-      VisitMany  -> try s .*. (Combinators.not next |> (next .*. a))
+      VisitFirst     -> s  |> next .*. a
+      VisitOne       -> s .|. next .*. a
+      VisitSome      -> s .*. try (next .*. visit VisitMany next s) .|. next .*. a
+      VisitAll       -> s .*. (Combinators.not next |> (next .*. a))
+      VisitMany      -> try s .*. (Combinators.not next |> (next .*. a))
+      VisitLeftMost  -> check (not.hasLeft) .*. s |> (ruleLeft .*. a)
+      VisitRightMost -> check (not.hasRight) .*. s |> (ruleRight .*. a)
 
 stratRuleMultiTerm, stratRuleMultiTerma, stratRuleMultiTerm1, stratRuleMultiTerm2 :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
 stratRuleMultiTerm r = label desc strat
     where
         desc = "Layered First " ++ showId r
-        lifted = liftToContext r
-        vis s = visit VisitMany ruleRight s
-        lay s = ruleDown .*. s .*. ruleUp
-        strat = lifted .*. lay (vis lifted)
+        rc = liftToContext r
+        v s = visit VisitMany ruleRight s
+        l s = ruleDown .*. s .*. ruleUp
+        strat = rc .*. l (v rc)
 
 strattst r = label desc strat
     where
         desc = "Layered First " ++ showId r
-        --strat = fulltd (stratRuleMultiTerm (r)) --> no result
-        --strat = oncetd (stratRuleMultiTerm (r))
         strat = repeatS (oncetd (stratRuleMultiTerm r))      
 
 

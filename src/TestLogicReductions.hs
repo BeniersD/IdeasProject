@@ -69,9 +69,9 @@ main = do
     --tstRuleTRuleComplementC
     --tstRuleFRuleDisjunctionC
     --tstRuleTRuleDisjunctionC
-    --mapM_ print quickTestSet
+    mapM_ print quickTestSet
     mapM_ print quickTestSet2
-    --pptest "Test Layer Top All" [applyD (stratRuleMultiTerm1 ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
+    pptest "Test Layer Top All" [applyD (stratRuleMultiTerm ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
     --pptest "Test Layer Top All" [applyD (stratRuleMultiTerma ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
     pptest "Test Layer Top All" [applyD (stratRuleMultiTerm ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
     pptest "Test Layer Top All" [applyD (strattst ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
