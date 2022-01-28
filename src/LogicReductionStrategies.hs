@@ -21,6 +21,7 @@ visit v next s = fix $ \a ->
       VisitSome      -> s .*. try (next .*. visit VisitMany next s) .|. next .*. a
       VisitAll       -> s .*. (Combinators.not next |> (next .*. a))
       VisitMany      -> try s .*. (Combinators.not next |> (next .*. a))
+
       VisitLeftMost  -> check (not.hasLeft) .*. s |> (ruleLeft .*. a)
       VisitRightMost -> check (not.hasRight) .*. s |> (ruleRight .*. a)
 
@@ -29,9 +30,9 @@ stratRuleMultiTerm r = label desc strat
     where
         desc = "Layered First " ++ showId r
         rc = liftToContext r
-        v s = visit VisitMany ruleRight s
-        l s = ruleDown .*. s .*. ruleUp
-        strat = rc .*. l (v rc)
+        --v s = s .*. l (v rc) |> (not.hasRight |> (next .*. a))
+        --l s = ruleDown .*. s .*. ruleUp
+        strat = rc .*. layer (visit VisitAll ruleRight (try strat) )
 
 strattst r = label desc strat
     where

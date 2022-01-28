@@ -48,7 +48,7 @@ main = do
     --tstRuleDeMorganSimple
     --tstRuleDeMorganComplex
     --tstRuleCommutativity
-    tstRuleCommutativityOrd
+    --tstRuleCommutativityOrd
     --tstRuleAbsorption
     --tstRuleDoubleNot
     --tstRuleEquivalenceElimination
@@ -74,7 +74,7 @@ main = do
     pptest "Test Layer Top All" [applyD (stratRuleMultiTerm ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
     --pptest "Test Layer Top All" [applyD (stratRuleMultiTerma ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
     pptest "Test Layer Top All" [applyD (stratRuleMultiTerm ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
-    pptest "Test Layer Top All" [applyD (strattst ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
+    --pptest "Test Layer Top All" [applyD (strattst ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
     
 
 --------------------------------------------------------------------------------------------------------------------------------------
