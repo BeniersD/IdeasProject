@@ -2,14 +2,14 @@ module TestLogicReductions (main) where
 
 import Ideas.Common.Library
 import Ideas.Main.Default
-import Domain.Logic.Formula 
+import Domain.Logic.Formula hiding (SLogic)
 import LogicReductionRules
 import LogicReductionStrategies
 import LogicExercices
 import LogicTestCases
 import LogicTestFunctions
 
-quickTestSet :: [Logic String]
+quickTestSet :: [SLogic]
 quickTestSet = [
                 Not (p :&&: q),                                   -- ¬(p ˄ q)
                 Not (q :&&: p :&&: r),                            -- ¬(p ˄ q ˄ r)

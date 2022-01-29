@@ -3,28 +3,14 @@ module LogicReductionStrategies where
 import Ideas.Common.Library hiding (layer)
 import Data.List
 import Data.Maybe
-import Domain.Logic.Formula hiding (isAnd, isOr)
+import Domain.Logic.Formula hiding (isAnd, isOr, SLogic)
 import LogicReductionRules
 import Ideas.Common.Traversal.Navigator
 import qualified Ideas.Common.Strategy.Combinators as Combinators
 
 --------------------------------------------------------------------------------------------------------------------------------------
--- Visits -- from Traversal.sh
+-- Strategies: under construction
 --------------------------------------------------------------------------------------------------------------------------------------
-data Visit = VisitFirst | VisitOne | VisitSome | VisitAll | VisitMany | VisitLeftMost | VisitRightMost
-
-visit :: (Navigator a, IsStrategy f, IsStrategy g) => Visit -> f a -> g a -> Strategy a
-visit v next s = fix $ \a ->
-   case v of
-      VisitFirst     -> s  |> next .*. a
-      VisitOne       -> s .|. next .*. a
-      VisitSome      -> s .*. try (next .*. visit VisitMany next s) .|. next .*. a
-      VisitAll       -> s .*. (Combinators.not next |> (next .*. a))
-      VisitMany      -> try s .*. (Combinators.not next |> (next .*. a))
-
-      VisitLeftMost  -> check (not.hasLeft) .*. s |> (ruleLeft .*. a)
-      VisitRightMost -> check (not.hasRight) .*. s |> (ruleRight .*. a)
-
 stratRuleMultiTerm, stratRuleMultiTerma, stratRuleMultiTerm1, stratRuleMultiTerm2 :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
 stratRuleMultiTerm r = label desc strat
     where
@@ -45,7 +31,7 @@ stratRuleMultiTerma r = label d s
         d = "Layered First " ++ showId r
         lr = liftToContext r
         l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l s) |> succeed) .*. ruleUp)
-        s = lr .*. l (visitTryAll lr)
+        s = lr .*. l (visit VisitAll ruleRight lr)
 
 
 stratRuleMultiTerm1 r = label d s
@@ -53,20 +39,51 @@ stratRuleMultiTerm1 r = label d s
         d = "Layered First " ++ showId r
         lr = liftToContext r
         l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l s) |> succeed) .*. ruleUp)
-        s = lr .*. l (visitTryAll lr)
+        s = lr .*. l (visit VisitAll ruleRight lr)
 
 stratRuleMultiTerm2 r = label d s
     where
         d = "Layered First " ++ showId r
         lr = liftToContext r
         l s = check (not.hasDown) |> (ruleDown .*. ((s .*. l s) |> succeed) .*. ruleUp)
-        s = lr .*. l (visitRightMost lr)
+        s = lr .*. l (visitm VisitRightMost lr)
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Visits -- from Traversal.sh
+--------------------------------------------------------------------------------------------------------------------------------------
+data Visit = VisitFirst | VisitOne | VisitSome | VisitAll | VisitMany | VisitLeftMost | VisitRightMost
+
+visit :: (Navigator a, IsStrategy f, IsStrategy g) => Visit -> f a -> g a -> Strategy a
+visit v next s = fix $ \a ->
+   case v of
+      VisitFirst     -> s  |> next .*. a
+      VisitOne       -> s .|. next .*. a
+      VisitSome      -> s .*. try (next .*. visit VisitMany next s) .|. next .*. a
+      VisitAll       -> s .*. (Combinators.not next |> (next .*. a))
+      VisitMany      -> try s .*. (Combinators.not next |> (next .*. a))
+
+visitm :: (Navigator a, IsStrategy f) => Visit -> f a -> Strategy a
+visitm v s = fix $ \a ->
+   case v of
+      VisitLeftMost  -> check (not.hasLeft) .*. s |> (ruleLeft .*. a)
+      VisitRightMost -> check (not.hasRight) .*. s |> (ruleRight .*. a)
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- On-layer visits
+--------------------------------------------------------------------------------------------------------------------------------------
+layer :: (Navigator a) => Strategy a -> Strategy a
+layer s          = ruleDown .*. s .*. ruleUp
+layerAll s       = layer (visit VisitAll ruleRight s)
+layerFirst s     = layer (visit VisitFirst ruleRight s)
+layerLeftMost s  = layer (visitm VisitLeftMost s)
+layerRightMost s = layer (visitm VisitRightMost s)
+layerTryAll s    = layer (visit VisitAll ruleRight s)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Apply of a given list of rules (choice)
-stratMultiRuleChoice, stratMultiRuleOrElse, stratMultiRuleSeq :: [Rule (Logic a)] -> LabeledStrategy (Context (Logic a))
+stratMultiRuleChoice, stratMultiRuleOrElse, stratMultiRuleSeq :: [Rule (SLogic)] -> LabeledStrategy (Context (SLogic))
 stratMultiRuleChoice xs = label d s
     where
         d = intercalate "-or-" (map showId xs)
@@ -85,44 +102,22 @@ stratMultiRuleSeq xs = label d s
         s = Combinators.sequence (map liftToContext xs)
 
 -- Apply a rule once somewhere
-stratRuleOnce, stratRuleAll :: Rule (Logic a) -> LabeledStrategy (Context (Logic a))
+stratRuleOnce, stratRuleAll :: Rule (SLogic) -> LabeledStrategy (Context (SLogic))
 stratRuleOnce r = label ("rewrite.single." ++ showId r) (somewhere (liftToContext r))
 
--- Apply a rule multiple times somewhere
+-- Apply a rule multiple times somewhere repeated
 stratRuleAll r = label ("rewrite.multi." ++ showId r) (repeatS (stratRuleOnce r))
 
 -- Commutative version of a rule
-stratRuleC :: Eq a => Rule (Logic a) -> LabeledStrategy (Logic a)
+stratRuleC :: Rule (SLogic) -> LabeledStrategy (SLogic)
 stratRuleC r = label ("rewrite.commutative." ++ showId r) (ruleCommutativity .*. r)
 
-stratRuleOnceC, stratRuleAllC :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
+stratRuleOnceC, stratRuleAllC :: Rule (SLogic) -> LabeledStrategy (Context (SLogic))
 -- Commutative version of a rule
 stratRuleOnceC r = label ("rewrite.commutative." ++ showId r) (stratRuleOnce ruleCommutativity .*. liftToContext r)
 
 -- Commutative version of a rule
 stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (stratRuleAll ruleCommutativity .*. liftToContext r)
-
---------------------------------------------------------------------------------------------------------------------------------------
--- Visits
---------------------------------------------------------------------------------------------------------------------------------------
-visitFirst, visitAll, visitTryAll, visitId, visitLeftMost, visitRightMost :: (IsStrategy f, Navigator a) => f a -> Strategy a
-visitAll s = fix $ \x -> s .*. (check (not.hasRight) |> (ruleRight .*. x))
-visitFirst s = fix $ \x -> s |> ruleRight .*. x
-visitTryAll s = fix $ \x -> try s .*. (check (not.hasRight) |> (ruleRight .*. x))
-visitLeftMost s = check (not.hasDown) |> (ruleDown .*.  s)
-visitRightMost s = fix $ \x -> (check (not.hasRight) .*. s) |> (ruleRight .*. x)
-visitId s = check isTop |> ruleUp .*. ruleDown .*. s
-
---------------------------------------------------------------------------------------------------------------------------------------
--- On-layer visits
---------------------------------------------------------------------------------------------------------------------------------------
-layer :: (Navigator a) => Strategy a -> Strategy a
-layer s = ruleDown .*. s .*. ruleUp
-layerAll s = layer (visitAll s)
-layerFirst s = layer (visitFirst s)
-layerLeftMost s = layer (visitLeftMost s)
-layerRightMost s = layer (visitRightMost s)
-layerTryAll s = layer (visitTryAll s)
 
 isOr, isAnd, isOrdered :: (Ord a) => Logic a -> Bool
 isOr (p :||: q) = True
@@ -136,42 +131,38 @@ isOrdered (p :||: q) | p < q = True
 isOrdered _                  = False
 
 --------------------------------------------------------------------------------------------------------------------------------------
--- Simple logic Strategies
+-- Set of simple logic strategies, including
+-- - Ordered commutativity
+-- - DeMorgan
+-- - Commutative variants of the rules complement, conjunction, disjunction, absorption and the TT and FF rules are also allowed.
 --------------------------------------------------------------------------------------------------------------------------------------
-stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
-    stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd :: (Eq a, Ord a) => LabeledStrategy (Logic a)
-stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleFRuleComplement
-
-stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleFRuleConjunction
-
-stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check (not.isOrdered) .*. stratRuleC ruleTRuleConjunction
-
-stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleTRuleComplement
-
-stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check (not.isOrdered) .*. stratRuleC ruleFRuleDisjunction
-
-stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check (not.isOrdered) .*. stratRuleC ruleTRuleDisjunction
-
-stratCommutativityOrd = label "Rewrite Strategy Commutativity-Ordered" $ check (not.isOrdered) |> ruleCommutativity
-
-stratDeMorgan :: Eq a => LabeledStrategy (Logic a) 
-stratDeMorgan = label "Rewrite Strategy DeMorgan" $ ruleDeMorganOr .|. ruleDeMorganAnd
-
-ruleFRuleConjunctionC, ruleTRuleConjunctionC, ruleFRuleComplementC, ruleTRuleComplementC, ruleFRuleDisjunctionC, 
-    ruleTRuleDisjunctionC, ruleCommutativityOrd, ruleDeMorgan :: (Ord a) => Rule (Logic a)
-ruleFRuleConjunctionC = convertToRule "Rewrite Commutative F-Rule Conjunction" "single.commutativity.and.fruleconjunction" stratFRuleConjunctionC
-ruleTRuleConjunctionC = convertToRule "Rewrite Commutative T-Rule Conjunction" "single.commutativity.and.trulecomplement" stratTRuleConjunctionC
-ruleFRuleComplementC  = convertToRule "Rewrite Commutative F-Rule Complement" "single.commutativity.and.frulecomplement" stratFRuleComplementC
-ruleTRuleComplementC  = convertToRule "Rewrite Commutative T-Rule Complement" "single.commutativity.and.trulecomplement" stratTRuleComplementC
-ruleFRuleDisjunctionC = convertToRule "Rewrite Commutative F-Rule Disjunction" "single.commutativity.and.fruledisjunction" stratFRuleDisjunctionC
-ruleTRuleDisjunctionC = convertToRule "Rewrite Commutative T-Rule Disjunction" "single.commutativity.and.truledisjunction" stratTRuleDisjunctionC
 ruleCommutativityOrd = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
 ruleDeMorgan = convertToRule "Rewrite De Morgan" "single.demorgan" stratDeMorgan
+stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
+    stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd, stratDeMorgan :: LabeledStrategy (SLogic)
+stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleFRuleComplement
+stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleFRuleConjunction
+stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check (not.isOrdered) .*. stratRuleC ruleTRuleConjunction
+stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleTRuleComplement
+stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check (not.isOrdered) .*. stratRuleC ruleFRuleDisjunction
+stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check (not.isOrdered) .*. stratRuleC ruleTRuleDisjunction
+stratCommutativityOrd  = label "Rewrite Strategy Commutativity-Ordered" $ check (not.isOrdered) |> ruleCommutativity
+stratDeMorgan          = label "Rewrite Strategy DeMorgan" $ ruleDeMorganOr .|. ruleDeMorganAnd
+
+ruleFRuleConjunctionC, ruleTRuleConjunctionC, ruleFRuleComplementC, ruleTRuleComplementC, ruleFRuleDisjunctionC, 
+    ruleTRuleDisjunctionC, ruleCommutativityOrd, ruleDeMorgan :: Rule (SLogic)
+ruleFRuleConjunctionC  = convertToRule "Rewrite Commutative F-Rule Conjunction" "single.commutativity.and.fruleconjunction" stratFRuleConjunctionC
+ruleTRuleConjunctionC  = convertToRule "Rewrite Commutative T-Rule Conjunction" "single.commutativity.and.trulecomplement" stratTRuleConjunctionC
+ruleFRuleComplementC   = convertToRule "Rewrite Commutative F-Rule Complement" "single.commutativity.and.frulecomplement" stratFRuleComplementC
+ruleTRuleComplementC   = convertToRule "Rewrite Commutative T-Rule Complement" "single.commutativity.and.trulecomplement" stratTRuleComplementC
+ruleFRuleDisjunctionC  = convertToRule "Rewrite Commutative F-Rule Disjunction" "single.commutativity.and.fruledisjunction" stratFRuleDisjunctionC
+ruleTRuleDisjunctionC  = convertToRule "Rewrite Commutative T-Rule Disjunction" "single.commutativity.and.truledisjunction" stratTRuleDisjunctionC
 
 --------------------------------------------------------------------------------------------------------------------------------------
--- Advanced logic Strategies
+-- Set of advanced logic Strategies, including:
+-- - Commutative variants of rules absorption
 --------------------------------------------------------------------------------------------------------------------------------------
-isCommutativeAbsorption1, isCommutativeAbsorption2, isCommutativeAbsorption3, isCommutativeAbsorption4 :: Eq a => Logic a -> Bool 
+isCommutativeAbsorption1, isCommutativeAbsorption2, isCommutativeAbsorption3, isCommutativeAbsorption4 :: SLogic -> Bool 
 isCommutativeAbsorption1 ((p :&&: q) :||: r) | p == r = True
 isCommutativeAbsorption1 _                            = False
 
@@ -186,14 +177,10 @@ isCommutativeAbsorption3 _                            = False
 isCommutativeAbsorption4 (p :&&: (q :||: r)) | p == r = True
 isCommutativeAbsorption4 _                            = False
 
-stratCommutativeAbsorption, deMorganComplete, multiDeMorgan, deMorganDeriv, deMorganDeriv1, deMorganDeriv2, deMorganDeriv3, deMorganDeriv4,
-    negation, multiNegation, multiDoubleNot, implicationEliminationDeriv1, implicationEliminationDeriv2, implicationEliminationDeriv3,
-    implicationEliminationDeriv4, multiImplicationElimination, implicationEliminationDeriv, implicationEliminationComplete,
-    mulitImplicationEliminationDeriv, multiDeMorganDeriv :: (Eq a, Ord a) => LabeledStrategy (Context (Logic a))
-
+stratCommutativeAbsorption :: LabeledStrategy (Context (SLogic))
 stratCommutativeAbsorption = label "Rewrite Strategy Commutativity-Absortion" s
     where
-        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitLeftMost (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
+        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitm VisitLeftMost (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
             (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
             (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer (layerRightMost(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
             (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer (layerRightMost(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption)
@@ -204,52 +191,14 @@ stratCommutativeAbsorption = label "Rewrite Strategy Commutativity-Absortion" s
 --ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
 
 
-negation = label "Negate" $ stratMultiRuleChoice [ruleTRuleNotF, ruleFRuleNotT]
-
-multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere (liftToContext ruleDeMorgan))
-
---ruleDeMorgan :: Ord a => Eq a => LgcRule a
---ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" deMorgan
-
-multiNegation = label "Multi Negate" $ repeatS (somewhere negation)
-multiDoubleNot = stratRuleAll ruleDoubleNot
-
-deMorganDeriv = label "DeMorgan Derivative" $ deMorganDeriv1 .|. deMorganDeriv2 .|. deMorganDeriv3 .|. deMorganDeriv4
-multiDeMorganDeriv = label "Multi DeMorgan Derivative" $ repeatS (somewhere deMorganDeriv)
-
-deMorganComplete = label "Complete DeMorgan" $ deMorganDeriv |> multiDeMorganDeriv |> multiDeMorgan
-
--- create new rule (draft)
--- ruleDeMorganComplete = convertToRule "DeMorgan Complete" "demorgan.complete" deMorganComplete
-
-testlf, testlta, testlta2 :: Rule (Logic a) -> LabeledStrategy (Context (Logic a))
---testlf = label "layered first" $  layerFirst (liftToContext ruleDoubleNot)
-testlf x = label description strategy
-    where
-        description = "Layered First " ++ showId x
-        strategy = layer (visitFirst (liftToContext x))
-
-testlta x = label description strategy
-    where
-        description = "Layered All " ++ showId x
-        strategy = liftToContext x .*. layer (visitFirst (liftToContext x))
-
-testlta2 x = label description strategy
-    where
-        description = "Layered All " ++ showId x
-        strategy = repeatS (liftToContext x .*. layer (visitFirst (liftToContext x)))
-
-testlta3, testlmo :: LabeledStrategy (Context (Logic a)) -> LabeledStrategy (Context (Logic a))
-testlta3 x = label description strategy
-    where
-        description = "Layered All " ++ showId x
-        strategy = x .*. layer (visitAll x)
-
-testlmo x = label description strategy
-    where
-        description = "Layered Left Most Only " ++ showId x
-        strategy = x .*. layer (visitLeftMost x)
-
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Set of advanced logic Strategies, including:
+-- - Derivative variants of rules DeMorgan (To be reviewed - needs extension?)
+-------------------------------------------------------------------------------------------------------------------------------------
+deMorganComplete, multiDeMorgan, deMorganDeriv, deMorganDeriv1, deMorganDeriv2, deMorganDeriv3, deMorganDeriv4,
+    negation, multiNegation, multiDoubleNot, implicationEliminationDeriv1, implicationEliminationDeriv2, implicationEliminationDeriv3,
+    implicationEliminationDeriv4, multiImplicationElimination, implicationEliminationDeriv, implicationEliminationComplete,
+    mulitImplicationEliminationDeriv, multiDeMorganDeriv :: LabeledStrategy (Context (SLogic))
 --deMorgan (Not (p :&&: T)) = Just (Not p :||: Not T) = Just (Not p :||: F) = Just Not p
 --deMorgan (Not (T :&&: p)) = Just (Not T :||: Not p) = Just (F :||: Not p) = Just Not p
 --deMorganDeriv1 = label "DeMorgan Derivative" $  deMorgan .*. oncetdPref (liftToContext ruleFRuleNotT) .*. liftToContext ruleFRuleDisjunction
@@ -278,6 +227,55 @@ deMorganDeriv4 = label "DeMorgan Derivative" $  liftToContext ruleDeMorgan .*. o
 --deMorganDeriv4 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction
 --deMorganDeriv4 = label "DeMorgan Derivative" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction .*. multiNegation
 --deMorganDeriv4 = label "DeMorgan Derivative 4" $  multiDeMorgan .*. oncetdPref (liftToContext ruleTRuleNotF) .*. liftToContext ruleTRuleConjunction .*. multiNegation .*. multiDoubleNot
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Legacy Code - to be reviewed
+--------------------------------------------------------------------------------------------------------------------------------------
+negation = label "Negate" $ stratMultiRuleChoice [ruleTRuleNotF, ruleFRuleNotT]
+multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere (liftToContext ruleDeMorgan))
+
+--ruleDeMorgan :: Ord a => Eq a => LgcRule a
+--ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" deMorgan
+
+multiNegation = label "Multi Negate" $ repeatS (somewhere negation)
+multiDoubleNot = stratRuleAll ruleDoubleNot
+
+deMorganDeriv = label "DeMorgan Derivative" $ deMorganDeriv1 .|. deMorganDeriv2 .|. deMorganDeriv3 .|. deMorganDeriv4
+multiDeMorganDeriv = label "Multi DeMorgan Derivative" $ repeatS (somewhere deMorganDeriv)
+
+deMorganComplete = label "Complete DeMorgan" $ deMorganDeriv |> multiDeMorganDeriv |> multiDeMorgan
+
+-- create new rule (draft)
+-- ruleDeMorganComplete = convertToRule "DeMorgan Complete" "demorgan.complete" deMorganComplete
+
+testlf, testlta, testlta2 :: Rule (Logic a) -> LabeledStrategy (Context (Logic a))
+--testlf = label "layered first" $  layerFirst (liftToContext ruleDoubleNot)
+testlf x = label description strategy
+    where
+        description = "Layered First " ++ showId x
+        strategy = layer (visit VisitFirst ruleRight (liftToContext x))
+
+testlta x = label description strategy
+    where
+        description = "Layered All " ++ showId x
+        strategy = liftToContext x .*. layer (visit VisitFirst ruleRight (liftToContext x))
+
+testlta2 x = label description strategy
+    where
+        description = "Layered All " ++ showId x
+        strategy = repeatS (liftToContext x .*. layer (visit VisitFirst ruleRight (liftToContext x)))
+
+testlta3, testlmo :: LabeledStrategy (Context (Logic a)) -> LabeledStrategy (Context (Logic a))
+testlta3 x = label description strategy
+    where
+        description = "Layered All " ++ showId x
+        strategy = x .*. layer (visit VisitAll ruleRight x)
+
+testlmo x = label description strategy
+    where
+        description = "Layered Left Most Only " ++ showId x
+        strategy = x .*. layer (visitm VisitLeftMost x)
+
 
 multiImplicationElimination = label "Multi Implication Elimination" $ repeatS (somewhere (liftToContext ruleImplicationElimination))
 mulitImplicationEliminationDeriv = label "Multi Implication Elimination Derivative" $  repeatS (somewhere implicationEliminationDeriv)
