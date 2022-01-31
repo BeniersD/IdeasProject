@@ -15,10 +15,7 @@ stratRuleMultiTerm, stratRuleMultiTerma, stratRuleMultiTerm1, stratRuleMultiTerm
 stratRuleMultiTerm r = label desc strat
     where
         desc = "Layered First " ++ showId r
-        rc = liftToContext r
-        --v s = s .*. l (v rc) |> (not.hasRight |> (next .*. a))
-        --l s = ruleDown .*. s .*. ruleUp
-        strat = rc .*. layer (visit VisitAll ruleRight (try strat) )
+        strat = fix $ \s -> liftToContext r .*. layerMany s
 
 strattst r = label desc strat
     where
@@ -59,8 +56,8 @@ visit v next s = fix $ \a ->
       VisitFirst     -> s  |> next .*. a
       VisitOne       -> s .|. next .*. a
       VisitSome      -> s .*. try (next .*. visit VisitMany next s) .|. next .*. a
-      VisitAll       -> s .*. (Combinators.not next |> (next .*. a))
-      VisitMany      -> try s .*. (Combinators.not next |> (next .*. a))
+      VisitAll       -> s .*. (notS next |> (next .*. a))
+      VisitMany      -> try s .*. (notS next |> (next .*. a))
 
 visitm :: (Navigator a, IsStrategy f) => Visit -> f a -> Strategy a
 visitm v s = fix $ \a ->
@@ -77,7 +74,7 @@ layerAll s       = layer (visit VisitAll ruleRight s)
 layerFirst s     = layer (visit VisitFirst ruleRight s)
 layerLeftMost s  = layer (visitm VisitLeftMost s)
 layerRightMost s = layer (visitm VisitRightMost s)
-layerTryAll s    = layer (visit VisitAll ruleRight s)
+layerMany s      = layer (visit VisitMany ruleRight s)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
@@ -193,7 +190,7 @@ stratCommutativeAbsorption = label "Rewrite Strategy Commutativity-Absortion" s
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Set of advanced logic Strategies, including:
--- - Derivative variants of rules DeMorgan (To be reviewed - needs extension?)
+-- - Derivative variants of rules DeMorgan (To be reviewed - needs extension)
 -------------------------------------------------------------------------------------------------------------------------------------
 deMorganComplete, multiDeMorgan, deMorganDeriv, deMorganDeriv1, deMorganDeriv2, deMorganDeriv3, deMorganDeriv4,
     negation, multiNegation, multiDoubleNot, implicationEliminationDeriv1, implicationEliminationDeriv2, implicationEliminationDeriv3,
