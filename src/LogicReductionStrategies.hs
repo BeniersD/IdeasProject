@@ -11,16 +11,16 @@ import qualified Ideas.Common.Strategy.Combinators as Combinators
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Strategies: under construction
 --------------------------------------------------------------------------------------------------------------------------------------
-stratRuleMultiTerm, stratRuleMultiTerma, stratRuleMultiTerm1, stratRuleMultiTerm2 :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
-stratRuleMultiTerm r = label desc strat
+stratMultiLayerMany, stratRuleMultiTerma, stratRuleMultiTerm1, stratRuleMultiTerm2 :: Eq a => Rule (Logic a) -> LabeledStrategy (Context (Logic a))
+stratMultiLayerMany r = label desc strat
     where
-        desc = "Layered First " ++ showId r
+        desc = "Layer Many - " ++ showId r
         strat = fix $ \s -> liftToContext r .*. layerMany s
 
 strattst r = label desc strat
     where
         desc = "Layered First " ++ showId r
-        strat = repeatS (oncetd (stratRuleMultiTerm r))      
+        strat = repeatS (oncetd (stratMultiLayerMany r))      
 
 
 stratRuleMultiTerma r = label d s
