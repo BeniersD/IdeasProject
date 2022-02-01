@@ -27,6 +27,26 @@ stratMultiLayerManyROtd lo r = label desc strat
         desc = "Layer Many Repeat Oncetd - " ++ showId r
         strat = repeatS (oncetd (stratMultiLayerMany lo r)) 
 
+{--
+multiStrategyChoice, multiStrategyRuleOrElse, multiStrategySeq :: [Strategy a] -> LabeledStrategy (Context (a))
+multiStrategyChoice xs = label d s
+    where
+        d = intercalate "-or-" (map showId xs)
+        s = choice (map liftToContext xs)
+
+-- Apply of a given list of rules (orelse)
+multiStrategyRuleOrElse xs = label d s
+    where
+        d = intercalate "-orelse-" (map showId xs)
+        s = orelse (map liftToContext xs)
+
+-- Apply of a given list of rules (sequence)
+multiStrategySeq xs = label d s
+    where
+        d = intercalate "-and-" (map showId xs)
+        s = Combinators.sequence (map xs)
+--}
+
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Visits -- from Traversal.sh
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -62,30 +82,30 @@ layerMany s      = layer (visit VisitMany ruleRight s)
 -- Generic Strategies
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Apply of a given list of rules (choice)
-stratMultiRuleChoice, stratMultiRuleOrElse, stratMultiRuleSeq :: [Rule (SLogic)] -> LabeledStrategy (Context (SLogic))
-stratMultiRuleChoice xs = label d s
+multiRuleChoice, multiRuleOrElse, multiRuleSeq :: [Rule (SLogic)] -> LabeledStrategy (Context (SLogic))
+multiRuleChoice xs = label d s
     where
         d = intercalate "-or-" (map showId xs)
         s = choice (map liftToContext xs)
 
 -- Apply of a given list of rules (orelse)
-stratMultiRuleOrElse xs = label d s
+multiRuleOrElse xs = label d s
     where
         d = intercalate "-orelse-" (map showId xs)
         s = orelse (map liftToContext xs)
 
 -- Apply of a given list of rules (sequence)
-stratMultiRuleSeq xs = label d s
+multiRuleSeq xs = label d s
     where
         d = intercalate "-and-" (map showId xs)
         s = Combinators.sequence (map liftToContext xs)
 
 -- Apply a rule once somewhere
-stratRuleOnce, stratRuleAll :: Rule (SLogic) -> LabeledStrategy (Context (SLogic))
-stratRuleOnce r = label ("rewrite.single." ++ showId r) (somewhere (liftToContext r))
+ruleOnce, ruleAll :: Rule (SLogic) -> LabeledStrategy (Context (SLogic))
+ruleOnce r = label ("rewrite.single." ++ showId r) (somewhere (liftToContext r))
 
 -- Apply a rule multiple times somewhere repeated
-stratRuleAll r = label ("rewrite.multi." ++ showId r) (repeatS (stratRuleOnce r))
+ruleAll r = label ("rewrite.multi." ++ showId r) (repeatS (ruleOnce r))
 
 -- Commutative version of a rule
 stratRuleC :: Rule (SLogic) -> LabeledStrategy (SLogic)
@@ -93,10 +113,10 @@ stratRuleC r = label ("rewrite.commutative." ++ showId r) (ruleCommutativity .*.
 
 stratRuleOnceC, stratRuleAllC :: Rule (SLogic) -> LabeledStrategy (Context (SLogic))
 -- Commutative version of a rule
-stratRuleOnceC r = label ("rewrite.commutative." ++ showId r) (stratRuleOnce ruleCommutativity .*. liftToContext r)
+stratRuleOnceC r = label ("rewrite.commutative." ++ showId r) (ruleOnce ruleCommutativity .*. liftToContext r)
 
 -- Commutative version of a rule
-stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (stratRuleAll ruleCommutativity .*. liftToContext r)
+stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (ruleAll ruleCommutativity .*. liftToContext r)
 
 isOr, isAnd, isOrdered :: SLogic -> Bool
 isOr (p :||: q) = True
@@ -141,7 +161,7 @@ ruleTRuleDisjunctionC  = convertToRule "Rewrite Commutative T-Rule Disjunction" 
 -- Set of advanced logic Strategies, including:
 -- - Commutative variants of rules absorption
 --------------------------------------------------------------------------------------------------------------------------------------
-isCommutativeAbsorption1, isCommutativeAbsorption2, isCommutativeAbsorption3, isCommutativeAbsorption4 :: SLogic -> Bool 
+isCommutativeAbsorption1, isCommutativeAbsorption2, isCommutativeAbsorption3 :: SLogic -> Bool 
 isCommutativeAbsorption1 ((p :&&: q) :||: r) | p == r = True
 isCommutativeAbsorption1 _                            = False
 
@@ -151,18 +171,17 @@ isCommutativeAbsorption2 ((p :||: q) :&&: r) | q == r = True
 isCommutativeAbsorption2 _                            = False
 
 isCommutativeAbsorption3 (p :||: (q :&&: r)) | p == r = True
+isCommutativeAbsorption3 (p :&&: (q :||: r)) | p == r = True
 isCommutativeAbsorption3 _                            = False
-
-isCommutativeAbsorption4 (p :&&: (q :||: r)) | p == r = True
-isCommutativeAbsorption4 _                            = False
 
 stratCommutativeAbsorption :: LabeledStrategy (Context (SLogic))
 stratCommutativeAbsorption = label "Rewrite Strategy Commutativity-Absortion" s
     where
-        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layer (visitm VisitLeftMost (liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption ) |>
-            (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> stratMultiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
-            (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> liftToContext ruleCommutativity .*. layer (layerRightMost(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption) |>
-            (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> liftToContext ruleCommutativity .*. layer (layerRightMost(liftToContext ruleCommutativity)) .*. liftToContext ruleAbsorption)
+        la = liftToContext ruleAbsorption
+        lc = liftToContext ruleCommutativity
+        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layerLeftMost (lc) .*. la ) |>
+            (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> multiRuleSeq [ruleCommutativity, ruleAbsorption]) |>
+            (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> lc .*. layerRightMost(lc) .*. la)
 
 ruleCommutativeAbsorption :: Rule (Context SLogic)
 ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
@@ -208,14 +227,14 @@ deMorganDeriv4 = label "DeMorgan Derivative" $  liftToContext ruleDeMorgan .*. o
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Legacy Code - to be reviewed
 --------------------------------------------------------------------------------------------------------------------------------------
-negation = label "Negate" $ stratMultiRuleChoice [ruleTRuleNotF, ruleFRuleNotT]
+negation = label "Negate" $ multiRuleChoice [ruleTRuleNotF, ruleFRuleNotT]
 multiDeMorgan = label "Multi DeMorgan" $ repeatS (somewhere (liftToContext ruleDeMorgan))
 
 --ruleDeMorgan :: Ord a => Eq a => LgcRule a
 --ruleDeMorgan = convertToRule "De Morgan" "single.demorgan" deMorgan
 
 multiNegation = label "Multi Negate" $ repeatS (somewhere negation)
-multiDoubleNot = stratRuleAll ruleDoubleNot
+multiDoubleNot = ruleAll ruleDoubleNot
 
 deMorganDeriv = label "DeMorgan Derivative" $ deMorganDeriv1 .|. deMorganDeriv2 .|. deMorganDeriv3 .|. deMorganDeriv4
 multiDeMorganDeriv = label "Multi DeMorgan Derivative" $ repeatS (somewhere deMorganDeriv)
