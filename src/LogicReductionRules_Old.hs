@@ -160,7 +160,7 @@ multiDeMorganAndMultiLogEq = multiDeMorgan . multiLogEq
 multiDeMorganAndMultiLogEqAndDoubleNot :: SLogic -> SLogic
 multiDeMorganAndMultiLogEqAndDoubleNot = multiDoubleNot . multiDeMorgan . multiLogEq  
 
-(~=) :: Eq a => (Logic a -> Logic a) -> Logic a -> Logic a -> Bool
+(~=) :: (SLogic -> SLogic) -> SLogic -> SLogic -> Bool
 --(~=) = \f -> (\p -> (\q -> f p == f q))
 (~=) f = (==) `on` f
 

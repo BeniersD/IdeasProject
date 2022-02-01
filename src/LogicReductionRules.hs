@@ -21,13 +21,13 @@ type SLogic = Logic String
 ------------------------------------------------------------------------------------------------------------
 -- Generic rewrite/reduction functions
 ------------------------------------------------------------------------------------------------------------
-hasRule :: Rule (Logic a) -> Logic a -> Bool
+hasRule :: Rule (SLogic) -> SLogic -> Bool
 hasRule x           = isJust . apply x
 
-createRule :: String -> String -> (Logic a -> Maybe (Logic a)) -> Rule (Logic a)
+createRule :: String -> String -> (SLogic -> Maybe (SLogic)) -> Rule (SLogic)
 createRule x y f    = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) f
 
-convertToRule :: String -> String -> LabeledStrategy (Logic a) -> Rule (Logic a)
+convertToRule :: Eq a => String -> String -> LabeledStrategy a -> Rule a
 convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) (apply f)
 
 ------------------------------------------------------------------------------------------------------------

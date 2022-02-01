@@ -1,7 +1,7 @@
 module LogicTestFunctions where
 
 import Data.Foldable as Foldable
-import Domain.Logic.Formula
+import Domain.Logic.Formula hiding (SLogic)
 import Ideas.Common.Library
 import Data.Function
 import LogicTestCases
@@ -28,7 +28,7 @@ pptest desc xs = putStr $ desc ++ ":\n" ++ result ++ "\n"
         resultset  = zipResults xs
         result     = resultToStr resultset
 
-tstRuleGeneric :: (Show a, IsTerm a) => Rule (Logic a) -> [Logic a] -> IO ()
+tstRuleGeneric :: Rule (SLogic) -> [SLogic] -> IO ()
 tstRuleGeneric r xs = do
     let desc = "Rule: " ++ description r ++ "\n"
     putStrLn desc

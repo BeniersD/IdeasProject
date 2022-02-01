@@ -3,12 +3,12 @@ module LogicExercices where
 import Data.Function
 import Ideas.Common.Library
 import Ideas.Main.Default
-import Domain.Logic.Formula  hiding (not)
+import Domain.Logic.Formula  hiding (not, SLogic)
 import Ideas.Utils.Prelude (splitsWithElem, readM)
 import LogicReductionRules
 import LogicReductionStrategies
 
-minimalExercise :: Show a => LabeledStrategy (Logic a) -> Exercise (Logic a)
+minimalExercise :: LabeledStrategy (SLogic) -> Exercise (SLogic)
 minimalExercise x = emptyExercise
    { 
       exerciseId    = describe "Evaluate an expression (minimal)" $ newId "eval.minimal", 
@@ -16,7 +16,7 @@ minimalExercise x = emptyExercise
       prettyPrinter = show
    }
 
-basicExercise :: (IsTerm a, Show a) => LabeledStrategy (Logic a) -> Exercise (Logic a)
+basicExercise :: LabeledStrategy (SLogic) -> Exercise (SLogic)
 basicExercise x = emptyExercise
    { 
       exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic", 
@@ -25,10 +25,10 @@ basicExercise x = emptyExercise
       prettyPrinter = show
    }
 
-eqExpr :: (Eq a) => Logic a -> Logic a -> Bool
+eqExpr :: SLogic -> SLogic -> Bool
 eqExpr x y = x == y
 
-isLogicTerm :: Logic a -> Bool
+isLogicTerm :: SLogic -> Bool
 isLogicTerm ( Var _ )     = True
 isLogicTerm ( _ :->:  _ ) = True
 isLogicTerm ( _ :<->: _ ) = True
@@ -45,12 +45,12 @@ indistinguishabilityS = makeService "basic.indistinguishability"
    indistinguishability ::: tExercise .-> tContext .-> tContext .-> tBool
 --}
 
---indExpr :: Eq a => LSExpr a -> Logic a -> Logic a -> Bool
+--indExpr :: Eq a => LSExpr a -> SLogic -> SLogic -> Bool
 --indExpr = \f -> (\p -> (\q -> f p == f q))
 --indExpr f = (==) `on` f
 
 
-evalExercise :: (Show a, IsTerm a, Eq a) => LabeledStrategy (Logic a) -> Exercise (Logic a)
+evalExercise :: LabeledStrategy (SLogic) -> Exercise (SLogic)
 evalExercise x = emptyExercise
    { 
       exerciseId    = describe "Evaluate an expression (full)" $ newId "eval.full", 
