@@ -1,12 +1,13 @@
-module LogicExercices where
+module LogicExercices (minimalExercise, basicExercise, basicExercise') where
 
 import Data.Function
 import Ideas.Common.Library
+import Domain.Logic.Formula  hiding (not)
 import Ideas.Main.Default
-import Domain.Logic.Formula  hiding (not, SLogic)
 import Ideas.Utils.Prelude (splitsWithElem, readM)
 import LogicReductionRules
 import LogicReductionStrategies
+import LogicFunctions
 
 minimalExercise :: LabeledStrategy (SLogic) -> Exercise (SLogic)
 minimalExercise x = emptyExercise
@@ -15,6 +16,7 @@ minimalExercise x = emptyExercise
       strategy      = liftToContext x, 
       prettyPrinter = show
    }
+
 
 basicExercise :: LabeledStrategy (SLogic) -> Exercise (SLogic)
 basicExercise x = emptyExercise
@@ -25,18 +27,17 @@ basicExercise x = emptyExercise
       prettyPrinter = show
    }
 
+basicExercise' :: LabeledStrategy (Context SLogic) -> Exercise (SLogic)
+basicExercise' x = emptyExercise
+   { 
+      exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic", 
+      strategy      = x, 
+      navigation    = termNavigator, 
+      prettyPrinter = show
+   }
+
 eqExpr :: SLogic -> SLogic -> Bool
 eqExpr x y = x == y
-
-isLogicTerm :: SLogic -> Bool
-isLogicTerm ( Var _ )     = True
-isLogicTerm ( _ :->:  _ ) = True
-isLogicTerm ( _ :<->: _ ) = True
-isLogicTerm ( _ :&&:  _ ) = True
-isLogicTerm ( _ :||:  _ ) = True
-isLogicTerm ( Not _ ) = True
-isLogicTerm T             = True
-isLogicTerm F             = True
 
 {--
 indistinguishabilityS :: Service
@@ -63,6 +64,6 @@ evalExercise x = emptyExercise
       -- properties    = setProperty "indistinguishability" withoutContext (indExpr x),
       -- ->? 
       similarity    = withoutContext (==), 
-      ready         = predicate isLogicTerm, 
+      ready         = predicate isWff, 
       examples      = examplesFor Easy []
    }

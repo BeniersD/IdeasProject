@@ -1,21 +1,8 @@
-module LogicTestCases
+module LogicTestCases 
      where
 
-import Domain.Logic.Formula hiding (SLogic)
-import LogicReductionRules
-import Ideas.Common.Library
-import Ideas.Main.Default
-import Ideas.Utils.Prelude (ShowString, subsets)
-
---------------------------------------------------------------------------------------------------------------------------------------
--- Constants
---------------------------------------------------------------------------------------------------------------------------------------
-o = Var "o"
-p = Var "p"
-q = Var "q"
-r = Var "r"
-s = Var "s"
-t = Var "t"
+import Domain.Logic.Formula
+import LogicConstants
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test sets to evaluate rules and/or strategies
@@ -249,27 +236,30 @@ equivalenceEliminationTestSet =
 
 absorptionTestSet =
                 [
-                 (p :&&: q) :||: r,
-                 p :&&: Not q :||: r,
-                 (p :&&: q) :||: q,
-                 (p :&&: Not q) :||: Not q,
-                 r :||: (p :&&: q),
-                 Not (Not r) :||: (p :&&: q),
-                 p :||: (p :&&: q),
-                 Not (Not p) :||: (p :&&: q),
-                 q :||: (p :&&: q),
-                 q :||: (p :&&: Not( Not q)),
-                 p :&&: (p :||: q),
-                 p :&&: (p :||: q),
-                 q :&&: (p :||: q),
-                 Not (Not q) :&&: (Not (Not p) :||: Not( Not q)),
-                 (p :||: q) :&&: p,
-                 (p :||: q) :&&: Not (Not p),
-                 (p :||: q) :&&: q,
-                 (Not (Not p) :||: Not (Not q)) :&&: Not (Not q),
-                 ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: q),
-                 ((p :&&: q) :||: q) :&&: ((p :&&: q) :||: q),
-                 (((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q
+                  (p :&&: q) :||: r,                                        -- 0. No Absorption     
+                  p :&&: Not q :||: r,                                      -- 1. No Absorption
+                  q :||: (p :&&: Not( Not q)),                              -- 2. No Absorption                
+                  r :||: (p :&&: q),                                        -- 3. No Absorption
+                  Not (Not r) :||: (p :&&: q),                              -- 4. No Absorption
+                  Not (Not p) :||: (p :&&: q),                              -- 5. No Absorption
+                  (p :||: q) :&&: Not (Not p),                              -- 6. No Absorption
+                  (p :&&: q) :||: q,                                        -- 7. Absorption
+                  (p :&&: Not q) :||: Not q,                                -- 8. Absorption
+                  p :&&: (p :||: q),                                        -- 9. Absorption                  
+                  q :||: (p :&&: q),                                        -- 10. Commutative Absorption 1 
+                  ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: q),             -- 11. Commutative Absorption 1
+                  (p :&&: q) :||: p,                                        -- 12. Commutative Absorption 1         
+                  (p :||: q) :&&: p,                                        -- 13. Commutative Absorption 2
+                  (q :||: p) :&&: p,                                        -- 14. Commutative Absorption 2
+                  (p :||: (q :&&: p)),                                      -- 15. Commutative Absorption 2
+                  p :&&: (q :||: p),                                        -- 16. Commutative Absorption 3
+                  q :&&: (p :||: q),                                        -- 17. Commutative Absorption 3
+                  Not (Not q) :&&: (Not (Not p) :||: Not( Not q)),          -- 18. Commutative Absorption 3
+                  (p :||: q) :&&: q,                                        -- 19. Commutative Absorption 4
+                  (Not (Not p) :||: Not (Not q)) :&&: Not (Not q),          -- 20. Commutative Absorption 4
+                  p :||: (p :&&: q),                                        -- 21. Commutative Absorption 4
+                  ((p :&&: q) :||: q) :&&: ((p :&&: q) :||: q),             -- 22. Absorption, somewhere, repeat
+                  (((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q     -- 23. Commutative Absorption 4, Absorption, somewhere, repeat
                 ]
 
 idempotencyTestSet =

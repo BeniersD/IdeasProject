@@ -1,13 +1,16 @@
-module TestLogicReductions (main) where
+module TestLogicReductions (main) 
+    where
+
+import Domain.Logic.Formula
+import LogicConstants
+import LogicReductionRules
+import LogicTestCases
+import LogicReductionStrategies
+import LogicTestFunctions
+import Ideas.Common.Exercise
+import LogicExercices
 
 import Ideas.Common.Library
-import Ideas.Main.Default
-import Domain.Logic.Formula hiding (SLogic)
-import LogicReductionRules
-import LogicReductionStrategies
-import LogicExercices
-import LogicTestCases
-import LogicTestFunctions
 
 quickTestSet :: [SLogic]
 quickTestSet = [
@@ -27,7 +30,7 @@ quickTestSet = [
                 Not (Not (Not p) :&&: Not p :&&: T)           -- ¬(¬¬p ˄ ¬p ˄ T)
                ]
 
-quickTestSet2 :: [Logic String]
+quickTestSet2 :: [SLogic]
 quickTestSet2 = [
                 p :&&: Not (p :&&: q),                             
                 p :&&: Not (q :&&: p),                               
@@ -41,6 +44,7 @@ quickTestSet2 = [
 --------------------------------------------------------------------------------------------------------------------------------------
 main :: IO ()
 main = do
+    
     --tstRuleDeMorganOrSimple
     --tstRuleDeMorganOrComplex
     --tstRuleDeMorganAndSimple
@@ -66,15 +70,46 @@ main = do
     --tstRuleFRuleConjunctionC
     --tstRuleTRuleConjunctionC
     --tstRuleFRuleComplementC
+    printDerivation (minimalExercise stratFRuleComplementC) (boolRuleComplementTestSet!!2)
+    printDerivation (basicExercise stratFRuleComplementC) (boolRuleComplementTestSet!!2)
+
+
+    tstRuleAbsorption 
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!1)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!2)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!3)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!4)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!5)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!6)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!7)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!8)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!9)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!10)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!11)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!12)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!13)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!14)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!15)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!16)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!17)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!18)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!19)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!20)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!21)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!22)
+    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!23)
+
+    printDerivation  [(basicExercise' stratCommutativeAbsorption) x | x <-absorptionTestSet]
+    
     --tstRuleTRuleComplementC
     --tstRuleFRuleDisjunctionC
     --tstRuleTRuleDisjunctionC
-    mapM_ print quickTestSet
-    mapM_ print quickTestSet2
+    --mapM_ print quickTestSet
+    --mapM_ print quickTestSet2
     --pptest "Test Layer Top All" [applyD (stratMultiLayerMany ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
     --pptest "Test Layer Top All" [applyD (stratMultiLayerMany ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
     --pptest "Test Layer Top All" [applyD (stratMultiLayerMany ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
-    pptest "Test Layer Top All" [applyD (strattst ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
+    --pptest "Test Layer Top All" [applyD (strattst ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
     
 
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -84,36 +119,40 @@ tstRuleAbsorption, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativ
     tstRuleDeMorganAndSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganOrSimple, tstRuleDeMorganComplex, 
     tstRuleDeMorganSimple, tstRuleEquivalenceElimination, tstRuleIdempotency, tstRuleFRuleConjunctionC,
     tstRuleTRuleConjunctionC, tstRuleFRuleComplementC, tstRuleTRuleComplementC, tstRuleFRuleDisjunctionC,
-    tstRuleTRuleDisjunctionC  :: IO ()
-tstRuleAbsorption = tstRuleGeneric ruleAbsorption absorptionTestSet 
-tstRuleAssociativity = tstRuleGeneric ruleAssociativity associativityTestSet 
-tstRuleCommutativity = tstRuleGeneric ruleCommutativity commutativityTestSet 
-tstRuleCommutativityOrd = tstRuleGeneric ruleCommutativityOrd commutativityTestSet 
-tstRuleDeMorganAndComplex = tstRuleGeneric ruleDeMorganAnd deMorganAndTestSetComplex 
-tstRuleDeMorganAndSimple = tstRuleGeneric ruleDeMorganAnd deMorganAndTestSetSimple 
-tstRuleDeMorganOrComplex = tstRuleGeneric ruleDeMorganOr deMorganOrTestSetComplex 
-tstRuleDeMorganOrSimple = tstRuleGeneric ruleDeMorganOr deMorganOrTestSetSimple 
-tstRuleDeMorganComplex = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
-tstRuleDeMorganSimple = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
-tstRuleDoubleNot = tstRuleGeneric ruleDoubleNot doubleNotTestSet 
+    tstRuleTRuleDisjunctionC :: IO ()
+tstRuleAbsorption             = tstRuleGeneric ruleAbsorption absorptionTestSet 
+tstRuleAssociativity          = tstRuleGeneric ruleAssociativity associativityTestSet 
+tstRuleCommutativity          = tstRuleGeneric ruleCommutativity commutativityTestSet 
+tstRuleCommutativityOrd       = tstRuleGeneric ruleCommutativityOrd commutativityTestSet 
+tstRuleDeMorganAndComplex     = tstRuleGeneric ruleDeMorganAnd deMorganAndTestSetComplex 
+tstRuleDeMorganAndSimple      = tstRuleGeneric ruleDeMorganAnd deMorganAndTestSetSimple 
+tstRuleDeMorganOrComplex      = tstRuleGeneric ruleDeMorganOr deMorganOrTestSetComplex 
+tstRuleDeMorganOrSimple       = tstRuleGeneric ruleDeMorganOr deMorganOrTestSetSimple 
+tstRuleDeMorganComplex        = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstRuleDeMorganSimple         = tstRuleGeneric ruleDeMorgan (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
+tstRuleDoubleNot              = tstRuleGeneric ruleDoubleNot doubleNotTestSet 
 tstRuleEquivalenceElimination = tstRuleGeneric ruleEquivalenceElimination equivalenceEliminationTestSet 
-tstRuleIdempotency = tstRuleGeneric ruleIdempotency idempotencyTestSet 
+tstRuleIdempotency            = tstRuleGeneric ruleIdempotency idempotencyTestSet 
 tstRuleImplicationElimination = tstRuleGeneric ruleImplicationElimination implicationEliminationTestSet 
-tstRuleFRuleComplement = tstRuleGeneric ruleFRuleComplement boolRuleComplementTestSet 
-tstRuleTRuleComplement = tstRuleGeneric ruleTRuleComplement boolRuleComplementTestSet 
-tstRuleFRuleConjunction = tstRuleGeneric ruleFRuleConjunction boolRuleConjunctionTestSet 
-tstRuleTRuleConjunction = tstRuleGeneric ruleTRuleConjunction boolRuleConjunctionTestSet 
-tstRuleFRuleDisjunction = tstRuleGeneric ruleFRuleDisjunction boolRuleDisjunctionTestSet 
-tstRuleTRuleDisjunction = tstRuleGeneric ruleTRuleDisjunction boolRuleDisjunctionTestSet 
-tstRuleFRuleNotT = tstRuleGeneric ruleFRuleNotT boolRuleNotTestSet 
-tstRuleTRuleNotF = tstRuleGeneric ruleTRuleNotF boolRuleNotTestSet 
-tstRuleDistributivity = tstRuleGeneric ruleDistributivity distributivityTestSet 
-tstRuleFRuleConjunctionC = tstRuleGeneric ruleFRuleConjunctionC boolRuleConjunctionTestSet 
-tstRuleTRuleConjunctionC = tstRuleGeneric ruleTRuleConjunctionC boolRuleConjunctionTestSet 
-tstRuleFRuleComplementC = tstRuleGeneric ruleFRuleComplementC boolRuleComplementTestSet 
-tstRuleTRuleComplementC = tstRuleGeneric ruleTRuleComplementC boolRuleComplementTestSet 
-tstRuleFRuleDisjunctionC = tstRuleGeneric ruleFRuleDisjunctionC boolRuleDisjunctionTestSet 
-tstRuleTRuleDisjunctionC = tstRuleGeneric ruleTRuleDisjunctionC boolRuleDisjunctionTestSet 
+tstRuleFRuleComplement        = tstRuleGeneric ruleFRuleComplement boolRuleComplementTestSet 
+tstRuleTRuleComplement        = tstRuleGeneric ruleTRuleComplement boolRuleComplementTestSet 
+tstRuleFRuleConjunction       = tstRuleGeneric ruleFRuleConjunction boolRuleConjunctionTestSet 
+tstRuleTRuleConjunction       = tstRuleGeneric ruleTRuleConjunction boolRuleConjunctionTestSet 
+tstRuleFRuleDisjunction       = tstRuleGeneric ruleFRuleDisjunction boolRuleDisjunctionTestSet 
+tstRuleTRuleDisjunction       = tstRuleGeneric ruleTRuleDisjunction boolRuleDisjunctionTestSet 
+tstRuleFRuleNotT              = tstRuleGeneric ruleFRuleNotT boolRuleNotTestSet 
+tstRuleTRuleNotF              = tstRuleGeneric ruleTRuleNotF boolRuleNotTestSet 
+tstRuleDistributivity         = tstRuleGeneric ruleDistributivity distributivityTestSet 
+tstRuleFRuleConjunctionC      = tstRuleGeneric ruleFRuleConjunctionC boolRuleConjunctionTestSet 
+tstRuleTRuleConjunctionC      = tstRuleGeneric ruleTRuleConjunctionC boolRuleConjunctionTestSet 
+tstRuleFRuleComplementC       = tstRuleGeneric ruleFRuleComplementC boolRuleComplementTestSet 
+tstRuleTRuleComplementC       = tstRuleGeneric ruleTRuleComplementC boolRuleComplementTestSet 
+tstRuleFRuleDisjunctionC      = tstRuleGeneric ruleFRuleDisjunctionC boolRuleDisjunctionTestSet 
+tstRuleTRuleDisjunctionC      = tstRuleGeneric ruleTRuleDisjunctionC boolRuleDisjunctionTestSet
+
+
+tstRuleTRuleAbsorptionC       = applyD ruleCommutativeAbsorption 
+
 
 --tstRuleTRuleDisjunctionC2 = tstRuleGeneric stratRuleAllC(ruleTRuleDisjunctionC) boolRuleDisjunctionTestSet
 

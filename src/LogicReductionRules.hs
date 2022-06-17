@@ -1,5 +1,5 @@
 module LogicReductionRules 
-   ( SLogic, hasRule,  createRule, convertToRule,
+   ( hasRule,  createRule, convertToRule,
      ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, 
      ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, ruleIdempotency, ruleImplicationElimination, 
      ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT, ruleTRuleComplement, 
@@ -8,15 +8,10 @@ module LogicReductionRules
 
 import Ideas.Common.Library hiding (description)
 import Ideas.Main.Default
-import Domain.Logic.Formula hiding (SLogic)
+import Domain.Logic.Formula
 import Ideas.Utils.Prelude
 import Data.Maybe
 import Data.List
-
-------------------------------------------------------------------------------------------------------------
--- We assume the logic propositions to be strings
-------------------------------------------------------------------------------------------------------------
-type SLogic = Logic String
 
 ------------------------------------------------------------------------------------------------------------
 -- Generic rewrite/reduction functions
@@ -84,8 +79,10 @@ deMorganOr  _                           = Nothing
 
 -- Left distributivity
 distributivity (p :||: (q :&&: r))      = Just ((p :||: q) :&&: (p :||: r))
+distributivity (p :&&: (q :||: r))      = Just ((p :&&: q) :||: (p :&&: r))
 -- Right distributivity
 distributivity ((p :&&: q) :||: r)      = Just ((p :||: r) :&&: (q :||: r))
+distributivity ((p :||: q) :&&: r)      = Just ((p :&&: r) :||: (q :&&: r))
 distributivity _                        = Nothing 
 
 doubleNot (Not (Not p))                 = Just p
