@@ -16,10 +16,10 @@ import Data.List
 ------------------------------------------------------------------------------------------------------------
 -- Generic rewrite/reduction functions
 ------------------------------------------------------------------------------------------------------------
-hasRule :: Rule (SLogic) -> SLogic -> Bool
+hasRule :: Rule SLogic -> SLogic -> Bool
 hasRule x           = isJust . apply x
 
-createRule :: String -> String -> (SLogic -> Maybe (SLogic)) -> Rule (SLogic)
+createRule :: String -> String -> (SLogic -> Maybe (SLogic)) -> Rule SLogic
 createRule x y f    = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) f
 
 convertToRule :: Eq a => String -> String -> LabeledStrategy a -> Rule a
@@ -30,7 +30,7 @@ convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y 
 ------------------------------------------------------------------------------------------------------------
 ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, 
    ruleIdempotency, ruleImplicationElimination, ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT,
-   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: Rule (SLogic)
+   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: Rule SLogic
 
 ruleAbsorption             = createRule "Absorption" "single.absorption" absorption
 ruleAssociativity          = createRule "Associativity" "single.associativity" associativity

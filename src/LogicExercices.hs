@@ -1,6 +1,12 @@
-module LogicExercices (minimalExercise, basicExercise, basicExercise') where
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE TypeFamilies #-}
+
+module LogicExercices (minimalExercise, minimalExercise', basicExercise, basicExercise'--, evalExercise
+   ) where
 
 import Data.Function
+import Data.Typeable
 import Ideas.Common.Library
 import Domain.Logic.Formula  hiding (not)
 import Ideas.Main.Default
@@ -9,32 +15,54 @@ import LogicReductionRules
 import LogicReductionStrategies
 import LogicFunctions
 
-minimalExercise :: LabeledStrategy (SLogic) -> Exercise (SLogic)
+
+class LogicExercise a where
+    type Out a :: * 
+    evalStrategy :: a -> Out a
+
+instance LogicExercise (LabeledStrategy SLogic) where  
+    type Out (LabeledStrategy SLogic) = (LabeledStrategy (Context SLogic))
+    evalStrategy = \x -> liftToContext x
+
+instance LogicExercise (LabeledStrategy (Context SLogic)) where 
+    type Out (LabeledStrategy (Context SLogic)) = (LabeledStrategy (Context SLogic)) 
+    evalStrategy = \x -> x
+
+
+minimalExercise :: LabeledStrategy (Context SLogic) -> Exercise SLogic
 minimalExercise x = emptyExercise
    { 
       exerciseId    = describe "Evaluate an expression (minimal)" $ newId "eval.minimal", 
-      strategy      = liftToContext x, 
+      strategy      = evalStrategy x, 
       prettyPrinter = show
    }
 
+minimalExercise' :: LabeledStrategy SLogic -> Exercise SLogic
+minimalExercise' x = emptyExercise
+   { 
+      exerciseId    = describe "Evaluate an expression (minimal)" $ newId "eval.minimal", 
+      strategy      = evalStrategy x, 
+      prettyPrinter = show
+   }
 
-basicExercise :: LabeledStrategy (SLogic) -> Exercise (SLogic)
+basicExercise ::  LabeledStrategy (Context SLogic) -> Exercise (SLogic)
 basicExercise x = emptyExercise
    { 
-      exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic", 
+      exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic",
       strategy      = evalStrategy x, 
       navigation    = termNavigator, 
       prettyPrinter = show
    }
 
-basicExercise' :: LabeledStrategy (Context SLogic) -> Exercise (SLogic)
+basicExercise' ::  LabeledStrategy SLogic -> Exercise (SLogic)
 basicExercise' x = emptyExercise
    { 
-      exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic", 
-      strategy      = x, 
+      exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic",
+      strategy      = evalStrategy x, 
       navigation    = termNavigator, 
       prettyPrinter = show
    }
+
 
 eqExpr :: SLogic -> SLogic -> Bool
 eqExpr x y = x == y
@@ -51,19 +79,19 @@ indistinguishabilityS = makeService "basic.indistinguishability"
 --indExpr f = (==) `on` f
 
 
-evalExercise :: LabeledStrategy (SLogic) -> Exercise (SLogic)
-evalExercise x = emptyExercise
-   { 
-      exerciseId    = describe "Evaluate an expression (full)" $ newId "eval.full", 
-      status        = Experimental, 
-      strategy      = evalStrategy x, 
-      prettyPrinter = show, 
-      navigation    = termNavigator, 
-      --parser        = readM, 
-      equivalence   = withoutContext eqExpr,
-      -- properties    = setProperty "indistinguishability" withoutContext (indExpr x),
-      -- ->? 
-      similarity    = withoutContext (==), 
-      ready         = predicate isWff, 
-      examples      = examplesFor Easy []
-   }
+--evalExercise :: LabeledStrategy a -> Exercise (SLogic)
+--evalExercise x = emptyExercise
+--   { 
+--      exerciseId    = describe "Evaluate an expression (full)" $ newId "eval.full", 
+--      status        = Experimental, 
+--      strategy      = evalStrategy x, 
+--      prettyPrinter = show, 
+--      navigation    = termNavigator, 
+--      --parser        = readM, 
+--      equivalence   = withoutContext eqExpr,
+--      -- properties    = setProperty "indistinguishability" withoutContext (indExpr x),
+      -- ->? -
+--      similarity    = withoutContext (==), 
+--      ready         = predicate isWff, 
+--      examples      = examplesFor Easy []
+--   }

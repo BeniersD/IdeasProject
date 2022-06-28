@@ -1,15 +1,10 @@
-module LogicTestFunctions (tstRuleGeneric)
+module LogicTestFunctions (tstRuleGeneric, clean)
     where
 
 import Data.Foldable as Foldable
 import Domain.Logic.Formula
 import Ideas.Common.Library
 import LogicFunctions
-
---import Data.Function
---import LogicTestCases
---import LogicReductionRules
---import Ideas.Utils.Prelude
 
 tupleToStr :: (Show a) => (Int, a) -> String
 tupleToStr x = numbers ++ ". " ++ formula ++ "\n"
@@ -32,7 +27,15 @@ pptest desc xs = putStr $ desc ++ ":\n" ++ result ++ "\n"
         resultset  = zipResults xs
         result     = resultToStr resultset
 
-tstRuleGeneric :: Rule (SLogic) -> [SLogic] -> IO ()
+clean :: String -> String
+clean []        = []
+clean ('\n':[]) = []
+clean ('\n':' ':' ':xs) = clean xs
+clean ('\n':xs) = ' ':'=':'>':' ':clean xs
+clean (x:xs)    = x:clean xs
+
+
+tstRuleGeneric :: Rule SLogic -> [SLogic] -> IO ()
 tstRuleGeneric r xs = do
     let desc = "Rule: " ++ description r ++ "\n"
     putStrLn desc

@@ -9,7 +9,6 @@ import LogicReductionStrategies
 import LogicTestFunctions
 import Ideas.Common.Exercise
 import LogicExercices
-
 import Ideas.Common.Library
 
 quickTestSet :: [SLogic]
@@ -59,49 +58,37 @@ main = do
     --tstRuleIdempotency
     --tstRuleImplicationElimination
     --tstRuleFRuleComplement
+    --tstRuleFRuleComplementC
     --tstRuleTRuleComplement
-    --tstRuleFRuleConjunction
+    --tstRuleTRuleComplementC
+    --tstRuleFRuleNotT
+    --tstRuleTRuleNotF
+ 
+    tstRuleFRuleConjunction
+    --tstRuleFRuleConjunctionC
+    
     --tstRuleTRuleConjunction
     --tstRuleFRuleDisjunction
     --tstRuleTRuleDisjunction
-    --tstRuleFRuleNotT
-    --tstRuleTRuleNotF
     --tstRuleDistributivity
-    --tstRuleFRuleConjunctionC
-    --tstRuleTRuleConjunctionC
-    --tstRuleFRuleComplementC
-    printDerivation (minimalExercise stratFRuleComplementC) (boolRuleComplementTestSet!!2)
-    printDerivation (basicExercise stratFRuleComplementC) (boolRuleComplementTestSet!!2)
-
-
-    tstRuleAbsorption 
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!1)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!2)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!3)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!4)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!5)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!6)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!7)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!8)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!9)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!10)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!11)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!12)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!13)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!14)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!15)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!16)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!17)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!18)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!19)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!20)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!21)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!22)
-    printDerivation (basicExercise' stratCommutativeAbsorption) (absorptionTestSet!!23)
-
-    printDerivation  [(basicExercise' stratCommutativeAbsorption) x | x <-absorptionTestSet]
     
-    --tstRuleTRuleComplementC
+    --tstRuleTRuleConjunctionC
+    
+    
+    --mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ clean y) [(y, show x ++ " :\t" ++ (showDerivation (minimalExercise stratFRuleComplementC) x)) | (x, y) <- zip boolRuleComplementTestSet [0..]]
+    --mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ clean y) [(y, show x ++ " :\t" ++ (showDerivation (basicExercise stratFRuleComplementC) x)) | (x, y) <- zip boolRuleComplementTestSet [0..]]
+    --tstRuleAbsorption 
+     --mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ clean y) [(y, show x ++ " :\t" ++ (showDerivations (basicExercise stratCommutativeAbsorption) x)) | (x, y) <- zip absorptionTestSet [0..]]
+     --putStrLn "----------"
+     --putStrLn $ show (absorptionTestSet!!18)
+     --putStr $ show (applyD tstLayer $ newContext $ termNavigator (absorptionTestSet!!18))
+     --putStrLn $ showDerivations (basicExercise tstLayer) (absorptionTestSet!!18) 
+     --putStrLn "----------"
+     --putStrLn $ show (absorptionTestSet!!7)
+     --putStr $ show (applyD tstLayer $ newContext $ termNavigator (absorptionTestSet!!7))
+     --putStrLn $ showDerivations (minimalExercise tstLayer) (absorptionTestSet!!7) 
+
+     --tstRuleTRuleComplementC
     --tstRuleFRuleDisjunctionC
     --tstRuleTRuleDisjunctionC
     --mapM_ print quickTestSet
@@ -141,6 +128,8 @@ tstRuleTRuleConjunction       = tstRuleGeneric ruleTRuleConjunction boolRuleConj
 tstRuleFRuleDisjunction       = tstRuleGeneric ruleFRuleDisjunction boolRuleDisjunctionTestSet 
 tstRuleTRuleDisjunction       = tstRuleGeneric ruleTRuleDisjunction boolRuleDisjunctionTestSet 
 tstRuleFRuleNotT              = tstRuleGeneric ruleFRuleNotT boolRuleNotTestSet 
+ 
+
 tstRuleTRuleNotF              = tstRuleGeneric ruleTRuleNotF boolRuleNotTestSet 
 tstRuleDistributivity         = tstRuleGeneric ruleDistributivity distributivityTestSet 
 tstRuleFRuleConjunctionC      = tstRuleGeneric ruleFRuleConjunctionC boolRuleConjunctionTestSet 
