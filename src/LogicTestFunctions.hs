@@ -1,3 +1,7 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE TypeFamilies #-}
+
 module LogicTestFunctions (tstRuleGeneric, clean)
     where
 
@@ -34,11 +38,18 @@ clean ('\n':' ':' ':xs) = clean xs
 clean ('\n':xs) = ' ':'=':'>':' ':clean xs
 clean (x:xs)    = x:clean xs
 
+class TestRuleGeneric a where
+   type Out a:: *
+   tstRuleGeneric :: a -> Out a
 
-tstRuleGeneric :: Rule SLogic -> [SLogic] -> IO ()
-tstRuleGeneric r xs = do
+instance TestRuleGeneric (Rule SLogic) where
+   type Out (Rule SLogic) = [SLogic] -> IO ()
+   tstRuleGeneric r = tstRuleGeneric (liftToContext r) 
+
+instance TestRuleGeneric (Rule (Context SLogic)) where
+   type Out (Rule (Context SLogic)) = [SLogic] -> IO ()
+   tstRuleGeneric  r xs = do
     let desc = "Rule: " ++ description r ++ "\n"
     putStrLn desc
     pptest "Input  (Simple testset): " xs
-    pptest "Output (Simple testset): " [applyD (liftToContext r) $ newContext $ termNavigator x | x <- xs ]
-
+    pptest "Output (Simple testset): " [applyD r $ newContext $ termNavigator x | x <- xs ]

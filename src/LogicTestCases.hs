@@ -12,11 +12,11 @@ commutativityTestSet, doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTest
   boolRuleComplementTestSet, boolRuleNotTestSet, deMorganAndImplicationEliminationTestSet, deMorganAndEquivalenceEliminationTestSet,
   equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet :: [SLogic]
 commutativityTestSet =
-                [ p :&&: q,
-                  q :&&: p,
-                  p :&&: Not p,
-                  q :&&: Not p,
-                  p :&&: Not q,
+                [ p :&&: q,                        -- 0. (p ˄ q)  
+                  q :&&: p,                        -- 1. (q ˄ p)  
+                  p :&&: Not p,                    -- 2. (p ˄ ¬p)
+                  q :&&: Not p,                    -- 3. (q ˄ ¬p)  
+                  p :&&: Not q,                    -- 4. (p ˄ ¬q)
                   Not q :&&: p,                  
                   Not p :&&: q,                  
                   Not p :&&: Not q,                  
@@ -130,6 +130,7 @@ deMorganDerivTestSet =
 doubleNotTestSet =
                 [ Not p, 
                   Not (Not p),
+                  Not (Not (p :&&: q)),
                   Not (Not p) :&&: Not( Not p),
                   Not (Not p) :&&: Not( Not p) :||: Not( Not( Not( Not p))),
                   Not (Not p) :||: Not( Not p) :||: Not( Not( Not( Not p))),
@@ -284,36 +285,38 @@ idempotencyTestSet =
 
 boolRuleConjunctionTestSet =
                 [
-                 p :&&: F,                             -- 0. Conjunction
-                 (p :||: q) :&&: F,                    -- 1. Conjunction
-                 p :&&: T,                             -- 2. No derivation
-                 F :&&: p,                             -- 3. Commutative conjunction
-                 F :&&: (p :||: q),                    -- 4. Commutative conjunction
-                 T :&&: p,                             -- 5. No derivation
-                 (F :&&: p) :&&: (p :&&: F),           -- 6. Somewhere, repeat, conjunction and commutative conjunction 
-                 (T :&&: p) :&&: (p :&&: T),           -- 7. No derivation
-                 (F :&&: p) :&&: p,                    -- 8. Somewhere, commutative conjunction 
-                 (T :&&: p) :&&: p,                    -- 9. No derivation
-                 p :&&: (F :&&: p),                    -- 10. Somewhere, commutative conjunction
-                 p :&&: (T :&&: p),                    -- 11. No derivation
-                 (F :&&: p) :&&: (p :&&: F) :&&: p,    -- 12. Somewhere, repeat, conjunction and commutative conjunction
-                 (T :&&: p) :&&: (p :&&: T) :&&: p     -- 13. No derivation
+                 p :&&: F,                             -- 0. F-rule Conjunction
+                 (p :||: q) :&&: F,                    -- 1. F-rule Conjunction
+                 p :&&: T,                             -- 2. T-rule Conjunction
+                 F :&&: p,                             -- 3. Commutative F-rule Conjunction
+                 F :&&: (p :||: q),                    -- 4. Commutative F-rule Conjunction
+                 T :&&: p,                             -- 5. Commutative T-rule Conjunction
+                 (F :&&: p) :&&: p,                    -- 6. Somewhere, commutative F-rule Conjunction 
+                 p :&&: (F :&&: p),                    -- 7. Somewhere, commutative F-rule Conjunction
+                 (T :&&: p) :&&: p,                    -- 8. Somewhere, commutative T-rule Conjunction                 
+                 p :&&: (T :&&: p),                    -- 9. Somewhere commutative T-rule Conjunction
+                 (F :&&: p) :&&: (p :&&: F) :&&: p,    -- 10. Somewhere, repeat, F-rule Conjunction and commutative F-rule Conjunction
+                 (F :&&: p) :&&: (p :&&: F),           -- 11. Somewhere, repeat, F-rule Conjunction and commutative F-rule Conjunction 
+                 (T :&&: p) :&&: (p :&&: T) :&&: p,    -- 12. Somewhere, repeat, T-rule Conjunction and commutative T-rule Conjunction
+                 (T :&&: p) :&&: (p :&&: T)            -- 13. Somewhere, repeat, T-rule Conjunction and commutative T-rule Conjunction
                 ]
 
 boolRuleDisjunctionTestSet =
                 [
-                 p :||: F,
-                 p :||: T,
-                 F :||: p,
-                 T :||: p,
-                 (F :||: p) :||: (p :||: F),
-                 (T :||: p) :||: (p :||: T),
-                 (F :||: p) :||: p,
-                 (T :||: p) :||: p,
-                 p :&&: (F :||: p),
-                 p :||: (T :||: p), 
-                 (F :||: p) :||: (p :||: F) :||: p,
-                 (T :||: p) :||: (p :||: T) :||: p
+                 p :||: F,                             -- 0. F-rule disjunction
+                 p :||: T,                             -- 1. T-rule disjunction
+                 (p :&&: q) :||: T,                    -- 2. T-rule disjunction
+                 F :||: p,                             -- 3. Commutative F-rule disjunction 
+                 T :||: p,                             -- 4. Commutative T-rule disjunction
+                 T :||: (p :&&: q),                    -- 5. Commutative T-rule disjunction
+                 (F :||: p) :||: (p :||: F),           -- 6. Somewhere, repeat, F-rule disjunction and commutative F-rule disjunction
+                 (T :||: p) :||: (p :||: T),           -- 7. Somewhere, repeat, T-rule disjunction and commutative T-rule disjunction
+                 (F :||: p) :||: p,                    -- 8. Somewhere, commutative f-rule disjunction 
+                 (T :||: p) :||: p,                    -- 9. Somewhere, commutative T-rule disjunction 
+                 p :&&: (F :||: p),                    -- 10. Somewehere, commutative F-rule disjunction
+                 p :||: (T :||: p),                    -- 11. Somewhere, commutative T-rule disjunction
+                 (F :||: p) :||: (p :||: F) :||: p,    -- 12. Somewhere, repeat, F-rule disjunction and commutative F-rule disjunction
+                 (T :||: p) :||: (p :||: T) :||: p     -- 13. Somewhere, repeat, T-rule disjunction and commutative T-rule disjunction
                 ]
 
 boolRuleComplementTestSet =
@@ -374,14 +377,18 @@ associativityTestSet =
 
 distributivityTestSet =
                 [ 
-                  p :||: (q :&&: r),                    -- p ˅ (q ˄ r)
-                  (p :&&: q) :||: r,                    -- (p ˄ q) ˅ r)
-                  Not (p :||: (q :&&: r)),              -- ¬(p ˅ (q ˄ r))
-                  Not ((p :&&: q) :||: r),              -- ¬((p ˄ q) ˅ r)
-                  ((p :&&: q) :||: r) :||: s,           -- ((p ˄ q) ˅ r) ˅ s
-                  o :&&: ((p :&&: q) :||: r),           -- o ˄ ((p ˄ q) ˅ r)
-                  o :||: ((p :&&: q) :||: r),           -- o ˅ ((p ˄ q) ˅ r)
-                  o :||: (((p :&&: q) :||: r) :&&: s),  -- o ˅ ((p ˄ q) ˅ r) ˄ s
-                  o :&&: (((p :&&: q) :||: r) :||: s),  -- o ˄ ((p ˄ q) ˅ r) ˅ s
-                  o :||: (((p :&&: q) :||: r) :||: s)   -- o ˅ ((p ˄ q) ˅ r) ˅ s
+                  p :||: (q :||: r),                    -- No derivation - p ˅ (q ˅ r)
+                  p :||: (q :&&: r),                    -- Left distributivity - p ˅ (q ˄ r)
+                  p :&&: (q :||: r),                    -- Left distributivity - p ˄ (q ˅ r)
+                  o :&&: ((p :&&: q) :||: r),           -- Left distributivity - o ˄ ((p ˄ q) ˅ r)
+                  o :||: ((p :&&: q) :||: r),           -- Left distributivity - o ˅ ((p ˄ q) ˅ r)
+                  o :||: (((p :&&: q) :||: r) :&&: s),  -- Left distributivity - o ˅ ((p ˄ q) ˅ r) ˄ s
+                  o :&&: (((p :&&: q) :||: r) :||: s),  -- Left distributivity - o ˄ ((p ˄ q) ˅ r) ˅ s
+                  o :||: (((p :&&: q) :||: r) :||: s),  -- Left distributivity - o ˅ ((p ˄ q) ˅ r) ˅ s
+                  (p :&&: q) :||: r,                    -- Right distributivity - (p ˄ q) ˅ r)
+                  (p :||: q) :&&: r,                    -- Right distributivity - (p ˅ q) ˄ r)
+                  ((p :&&: q) :||: r) :||: s,           -- Right distributivity - ((p ˄ q) ˅ r) ˅ s
+                  Not (p :||: (q :&&: r)),              -- Somewhere, left distributivity - ¬(p ˅ (q ˄ r))
+                  Not ((p :&&: q) :||: r)               -- Somewhere, right distributivity - ¬((p ˄ q) ˅ r)
+
                 ]

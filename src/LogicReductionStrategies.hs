@@ -1,4 +1,7 @@
-
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module LogicReductionStrategies where
 
@@ -13,25 +16,66 @@ import qualified Ideas.Common.Strategy.Combinators as Combinators
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Strategies: under construction
 --------------------------------------------------------------------------------------------------------------------------------------
-data LayerOrd = ParentFirst | ChildFirst
+data LayerOrd = TopFirst | LayerFirst
+data EvaluationType = Single | SomeWhere | SomeWhereRepeat | Repeat 
 
-stratRule :: Rule SLogic -> LabeledStrategy (Context SLogic)
-stratRule r = label (showId r) $ liftToContext r
+class LogicRuleConversion a where
+    type Out a   :: * 
+    ruleToStrategy :: a -> Out a
 
-stratMultiLayerMany, stratMultiLayerManyROtd :: LayerOrd -> Rule SLogic -> LabeledStrategy (Context (SLogic))
-stratMultiLayerMany lo r = label desc strat
+instance LogicRuleConversion (Rule SLogic) where  
+    type Out (Rule SLogic) = (LabeledStrategy (Context SLogic))
+    ruleToStrategy x = ruleToStrategy (liftToContext x)
+
+instance LogicRuleConversion (Rule (Context SLogic)) where 
+    type Out (Rule (Context SLogic)) = (LabeledStrategy (Context SLogic))
+    ruleToStrategy x = label (showId x) $ x
+
+
+class LogicEvaluationStrategy a where
+    type Out2 a   :: * 
+    evalStrategy :: a -> Out2 a
+    
+instance LogicEvaluationStrategy (Rule SLogic) where  
+    type Out2 (Rule SLogic) = (EvaluationType -> LabeledStrategy (Context SLogic))
+    evalStrategy r = evalStrategy (ruleToStrategy r) 
+
+instance LogicEvaluationStrategy (Rule (Context SLogic)) where  
+    type Out2 (Rule (Context SLogic)) = (EvaluationType -> LabeledStrategy (Context SLogic))
+    evalStrategy r = evalStrategy (ruleToStrategy r)
+    
+instance LogicEvaluationStrategy (LabeledStrategy SLogic) where  
+    type Out2 (LabeledStrategy SLogic) = (EvaluationType -> LabeledStrategy (Context SLogic))
+    evalStrategy r = evalStrategy (liftToContext r)
+
+instance LogicEvaluationStrategy (LabeledStrategy (Context SLogic)) where  
+    type Out2 (LabeledStrategy (Context SLogic)) = (EvaluationType -> LabeledStrategy (Context SLogic))
+    evalStrategy r Single          = evalStrategyG ("Evaluate - " ++ showId r)                     r 
+    evalStrategy r SomeWhere       = evalStrategyG ("Evaluate somewhere - " ++ showId r)           (somewhere r)
+    evalStrategy r Repeat          = evalStrategyG ("Evaluate repeat - " ++ showId r)              (repeatS   r)  
+    evalStrategy r SomeWhereRepeat = evalStrategyG ("Evaluate repeat somewhere - " ++ showId r)    (repeatS   (somewhere r))
+
+
+evalStrategyG :: (IsId l, IsStrategy f) => l -> f a -> LabeledStrategy a
+evalStrategyG l s = label l $ s
+
+stratRuleTopLayerMany, stratMultiLayerManyROtd :: Rule SLogic -> LabeledStrategy (Context (SLogic))
+stratRuleTopLayerMany r = label desc strat
     where
         desc = "Multilayer Many - " ++ showId r
-        strat = fix $ \s -> 
-            case lo of
-                ParentFirst -> liftToContext r .*. layerMany s
-                ChildFirst  -> layerMany s .*. liftToContext r  
+        strat = fix $ \s -> hierarchical TopFirst (ruleToStrategy r) (layerMany s)
 
-stratMultiLayerManyROtd lo r = label desc strat
+stratMultiLayerManyROtd r = label desc strat
     where
         desc = "Layer Many Repeat Oncetd - " ++ showId r
-        strat = repeatS (oncetd (stratMultiLayerMany lo r)) 
+        strat = repeatS (oncetd (stratRuleTopLayerMany r)) 
 
+stratNegateRules :: (Navigator SLogic) => Strategy SLogic
+stratNegateRules = hierarchical LayerFirst ls ts
+    where 
+        ts = layerFirst (stratFRuleComplementA .|. stratTRuleComplementA .|. stratFRuleConjunctionA .|. stratTRuleConjunctionA .|. 
+             stratFRuleDisjunctionA .|. stratTRuleDisjunctionA .|. ruleIdempotency .|. ruleImplicationElimination .|. ruleEquivalenceElimination)
+        ls = layerAll (ruleDoubleNot)
 {--
 multiStrategyChoice, multiStrategyRuleOrElse, multiStrategySeq :: [Strategy a] -> LabeledStrategy (Context (a))
 multiStrategyChoice xs = label d s
@@ -85,6 +129,11 @@ layerLeftMost s  = layer (visitm VisitLeftMost s)
 layerRightMost s = layer (visitm VisitRightMost s)
 layerMany s      = layer (visit VisitMany ruleRight s)
 
+hierarchical :: (IsStrategy f, IsStrategy g, Navigator a) => LayerOrd -> f a -> g a -> Strategy a
+hierarchical lo t l = case lo of
+                TopFirst -> t .*. l
+                LayerFirst  -> l .*. t 
+
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -109,14 +158,14 @@ multiRuleSeq xs = label d s
 
 -- Apply a rule once somewhere
 ruleOnce, ruleAll :: Rule SLogic -> LabeledStrategy (Context SLogic)
-ruleOnce r = label ("rewrite.single." ++ showId r) (somewhere (liftToContext r))
+ruleOnce r = label ("Rewrite Strategy Single Rule" ++ showId r) (somewhere (liftToContext r))
 
 -- Apply a rule multiple times somewhere repeated
-ruleAll r = label ("rewrite.multi." ++ showId r) (repeatS (ruleOnce r))
+ruleAll r = label ("Rewrite Strategy Multiple Rule" ++ showId r) (repeatS (ruleOnce r))
 
 -- Commutative version of a rule
 stratRuleC :: Rule SLogic -> LabeledStrategy (SLogic)
-stratRuleC r = label ("rewrite.commutative." ++ showId r) (ruleCommutativity .*. r)
+stratRuleC r = label ("Rewrite Strategy Commutative Rule" ++ showId r) (ruleCommutativity .*. r)
 
 stratRuleOnceC, stratRuleAllC :: Rule SLogic -> LabeledStrategy (Context SLogic)
 -- Commutative version of a rule
@@ -125,6 +174,9 @@ stratRuleOnceC r = label ("rewrite.commutative." ++ showId r) (ruleOnce ruleComm
 -- Commutative version of a rule
 stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (ruleAll ruleCommutativity .*. liftToContext r)
 
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Generic checker functions
+--------------------------------------------------------------------------------------------------------------------------------------
 isOr, isAnd, isOrdered :: SLogic -> Bool
 isOr (p :||: q) = True
 isOr _          = False
@@ -137,36 +189,57 @@ isOrdered (p :||: q) | p < q = True
 isOrdered _                  = False
 
 --------------------------------------------------------------------------------------------------------------------------------------
--- Set of simple logic strategies, including
+-- Set of simple logic strategies and rules, including
 -- - Ordered commutativity
 -- - DeMorgan
 -- - Commutative variants of the rules complement, conjunction, disjunction, absorption and the TT and FF rules are also allowed.
 --------------------------------------------------------------------------------------------------------------------------------------
 stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
-    stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd, stratDeMorgan :: LabeledStrategy SLogic
-stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleFRuleComplement
-stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleFRuleConjunction
-stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check (not.isOrdered) .*. stratRuleC ruleTRuleConjunction
-stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not.isOrdered) .*. stratRuleC ruleTRuleComplement
-stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check (not.isOrdered) .*. stratRuleC ruleFRuleDisjunction
-stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check (not.isOrdered) .*. stratRuleC ruleTRuleDisjunction
-stratCommutativityOrd  = label "Rewrite Strategy Commutativity-Ordered" $ check (isOrdered) |> ruleCommutativity
-stratDeMorgan          = label "Rewrite Strategy DeMorgan" $ ruleDeMorganOr .|. ruleDeMorganAnd
+    stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd, stratDeMorgan, stratFRuleComplementA,
+    stratTRuleComplementA, stratFRuleConjunctionA, stratTRuleConjunctionA, stratFRuleDisjunctionA, stratTRuleDisjunctionA :: LabeledStrategy SLogic
+stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ check (not . isOrdered) .*. stratRuleC ruleFRuleComplement
+stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not . isOrdered) .*. stratRuleC ruleTRuleComplement
+stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ check (not . isOrdered) .*. stratRuleC ruleFRuleConjunction
+stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ check (not . isOrdered) .*. stratRuleC ruleTRuleConjunction
+
+
+stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ check (not . isOrdered) .*. stratRuleC ruleFRuleDisjunction
+stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ check (not . isOrdered) .*. stratRuleC ruleTRuleDisjunction
+
+stratCommutativityOrd  = label "Rewrite Strategy Commutativity-Ordered"              $ check (isOrdered)     |>  ruleCommutativity
+
+stratDeMorgan          = label "Rewrite Strategy DeMorgan"                           $ ruleDeMorganOr        .|. ruleDeMorganAnd
+stratFRuleComplementA  = label "Rewrite Strategy F-Rule Complement"                  $ ruleFRuleComplement   .|. ruleFRuleComplementC
+stratTRuleComplementA  = label "Rewrite Strategy T-Rule Complement"                  $ ruleTRuleComplement   .|. ruleTRuleComplementC
+stratFRuleConjunctionA = label "Rewrite Strategy F-Rule Conjunction"                 $ ruleFRuleConjunction  .|. ruleFRuleConjunctionC
+stratTRuleConjunctionA = label "Rewrite Strategy T-Rule Conjunction"                 $ ruleTRuleConjunction  .|. ruleTRuleConjunctionC
+stratFRuleDisjunctionA = label "Rewrite Strategy F-Rule Disjunction"                 $ ruleFRuleDisjunction  .|. ruleFRuleDisjunction
+stratTRuleDisjunctionA = label "Rewrite Strategy T-Rule Disjunction"                 $ ruleTRuleDisjunction  .|. ruleTRuleDisjunction
 
 ruleFRuleConjunctionC, ruleTRuleConjunctionC, ruleFRuleComplementC, ruleTRuleComplementC, ruleFRuleDisjunctionC, 
-    ruleTRuleDisjunctionC, ruleCommutativityOrd, ruleDeMorgan :: Rule SLogic
-ruleCommutativityOrd = convertToRule "Commutativity Ordered" "single.commutativity.ordered" stratCommutativityOrd
-ruleDeMorgan = convertToRule "Rewrite De Morgan" "single.demorgan" stratDeMorgan
-ruleFRuleConjunctionC  = convertToRule "Rewrite Commutative F-Rule Conjunction" "single.commutativity.and.fruleconjunction" stratFRuleConjunctionC
-ruleTRuleConjunctionC  = convertToRule "Rewrite Commutative T-Rule Conjunction" "single.commutativity.and.trulecomplement"  stratTRuleConjunctionC
-ruleFRuleComplementC   = convertToRule "Rewrite Commutative F-Rule Complement"  "single.commutativity.and.frulecomplement"  stratFRuleComplementC
-ruleTRuleComplementC   = convertToRule "Rewrite Commutative T-Rule Complement"  "single.commutativity.and.trulecomplement"  stratTRuleComplementC
-ruleFRuleDisjunctionC  = convertToRule "Rewrite Commutative F-Rule Disjunction" "single.commutativity.and.fruledisjunction" stratFRuleDisjunctionC
-ruleTRuleDisjunctionC  = convertToRule "Rewrite Commutative T-Rule Disjunction" "single.commutativity.and.truledisjunction" stratTRuleDisjunctionC
+    ruleTRuleDisjunctionC, ruleCommutativityOrd, ruleDeMorgan, ruleFComplementA, ruleTComplementA, ruleFConjunctionA, ruleTConjunctionA,
+    ruleFRuleDisjunctionA, ruleTRuleDisjunctionA  :: Rule SLogic
+ruleFRuleConjunctionC = convertToRule "Commutative F-Rule Conjunction"    "single.commutativity.and.fruleconjunction" stratFRuleConjunctionC
+ruleTRuleConjunctionC = convertToRule "Commutative T-Rule Conjunction"    "single.commutativity.and.trulecomplement"  stratTRuleConjunctionC
+ruleFRuleComplementC  = convertToRule "Commutative F-Rule Complement"     "single.commutativity.and.frulecomplement"  stratFRuleComplementC
+ruleTRuleComplementC  = convertToRule "Commutative T-Rule Complement"     "single.commutativity.and.trulecomplement"  stratTRuleComplementC
+ruleFRuleDisjunctionC = convertToRule "Commutative F-Rule Disjunction"    "single.commutativity.and.fruledisjunction" stratFRuleDisjunctionC
+ruleTRuleDisjunctionC = convertToRule "Commutative T-Rule Disjunction"    "single.commutativity.and.truledisjunction" stratTRuleDisjunctionC
+
+ruleCommutativityOrd  = convertToRule "Commutativity (Ordered variant)"   "single.commutativity.ordered"              stratCommutativityOrd
+
+ruleDeMorgan          = convertToRule "De Morgan (And / Or)"              "single.demorgan"                           stratDeMorgan
+ruleFComplementA      = convertToRule "F-Rule Complement (All variants)"  "fcomplement.all"                           stratFRuleComplementA
+ruleTComplementA      = convertToRule "T-Rule Complement (All variants)"  "tcomplement.all"                           stratTRuleComplementA
+ruleFConjunctionA     = convertToRule "F-Rule Conjunction (All variants)" "fconjunction.all"                          stratFRuleConjunctionA
+ruleTConjunctionA     = convertToRule "T-Rule Conjunction (All variants)" "tconjunction.all"                          stratTRuleConjunctionA
+ruleFRuleDisjunctionA = convertToRule "F-Rule Disjunction (All variants)" "fruledisjunction.all"                      stratFRuleDisjunctionA
+ruleTRuleDisjunctionA = convertToRule "T-Rule Disjunction (All variants)" "truledisjunction.all"                      stratTRuleDisjunctionA
 
 --------------------------------------------------------------------------------------------------------------------------------------
--- Set of advanced logic Strategies, including:
--- - Commutative variants of rules absorption
+-- Set of advanced logic Strategies and rules, including:
+-- - Commutative variant of rules absorption
+-- - Generalisations of the rules DeMorgan
 --------------------------------------------------------------------------------------------------------------------------------------
 isCommutativeAbsorption1, isCommutativeAbsorption2, isCommutativeAbsorption3 :: SLogic -> Bool 
 isCommutativeAbsorption1 ((p :&&: q) :||: r) | p == r = True
@@ -185,25 +258,29 @@ isCommutativeAbsorption4 _                            = False
 isCommutativeAbsorption5 ((p :||: q) :&&: r) | q == r = True
 isCommutativeAbsorption5 _                            = False
 
-stratCommutativeAbsorption :: LabeledStrategy (Context SLogic)
-stratCommutativeAbsorption = label "Rewrite Strategy Commutativity-Absortion" s
+stratAbsorptionC, stratDeMorganAndG, stratDeMorganOrG, stratDeMorganG :: LabeledStrategy (Context SLogic)
+stratAbsorptionC  = label "Rewrite Strategy Commutativity-Absortion"      $ s
     where
         la = liftToContext ruleAbsorption
         lc = liftToContext ruleCommutativity
-        s = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> layerLeftMost (lc) .*. la ) .*. 
-            (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> lc .*. la) .*.
-            (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> layerRightMost (lc) .*. la ) .*. 
-            (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> lc .*. layerLeftMost (lc) .*. la) .*. 
-            (check (maybe False (not . isCommutativeAbsorption5) . fromContext) |> lc .*. layerRightMost (lc) .*. la)
+        hlm = hierarchical LayerFirst la (layerLeftMost lc)
+        hrm = hierarchical LayerFirst la (layerRightMost lc)
+        s  = (check (maybe False (not . isCommutativeAbsorption1) . fromContext) |> hlm ) .*. 
+             (check (maybe False (not . isCommutativeAbsorption2) . fromContext) |> lc .*. la) .*.
+             (check (maybe False (not . isCommutativeAbsorption3) . fromContext) |> hrm ) .*. 
+             (check (maybe False (not . isCommutativeAbsorption4) . fromContext) |> hierarchical TopFirst lc hlm) .*. 
+             (check (maybe False (not . isCommutativeAbsorption5) . fromContext) |> hierarchical TopFirst lc hrm)
 
-ruleCommutativeAbsorption :: Rule (Context SLogic)
-ruleCommutativeAbsorption = convertToRule "Commutativity Absoption" "single.commutativity.absorption" stratCommutativeAbsorption
+stratDeMorganAndG = label "Rewrite Strategy DeMorgan And Generalisations" $ stratRuleTopLayerMany ruleDeMorganAnd
+stratDeMorganOrG  = label "Rewrite Strategy DeMorgan Or Generalisations"  $ stratRuleTopLayerMany ruleDeMorganOr
+stratDeMorganG    = label "Rewrite Strategy DeMorgan Generalisations"     $ stratRuleTopLayerMany ruleDeMorgan
 
-tstLayer :: LabeledStrategy (Context SLogic)
-tstLayer = label "Rewrite Strategy Commutativity-Absortion" s
-    where
-        lc = stratRule ruleCommutativity
-        s = lc --ruleDown .*. (visitm VisitRightMost lc)-- .*. lc -- .*. ruleUp
+ruleAbsorptionC, ruleAbsorptionA, ruleDeMorganAndG, ruleDeMorganOrG, ruleDeMorganG :: Rule (Context SLogic)
+ruleAbsorptionC  = convertToRule "Commutative Absorption"                "single.commutativity.absorption" stratAbsorptionC
+ruleAbsorptionA  = convertToRule "Commutative Absorption (All variants)" "absorption.all" stratAbsorptionC
+ruleDeMorganAndG = convertToRule "DeMorgan And Generalisations"          "generalisations.DeMorgan.And"    stratDeMorganAndG
+ruleDeMorganOrG  = convertToRule "DeMorgan Or Generalisations"           "generalisations.DeMorgan.Or"     stratDeMorganOrG
+ruleDeMorganG    = convertToRule "DeMorgan Generalisations"              "generalisations.DeMorgan"        stratDeMorganG
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Set of advanced logic Strategies, including:

@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module LogicExercices (minimalExercise, minimalExercise', basicExercise, basicExercise'--, evalExercise
+module LogicExercices (minimalExercise, basicExercise --, evalExercise
    ) where
 
 import Data.Function
@@ -15,54 +15,60 @@ import LogicReductionRules
 import LogicReductionStrategies
 import LogicFunctions
 
-
 class LogicExercise a where
-    type Out a :: * 
-    evalStrategy :: a -> Out a
+   type Out3 a      :: *
+   minimalExercise :: a -> Out3 a
+   basicExercise   :: a -> Out3 a
+   evalExercise    :: a -> Out3 a
 
-instance LogicExercise (LabeledStrategy SLogic) where  
-    type Out (LabeledStrategy SLogic) = (LabeledStrategy (Context SLogic))
-    evalStrategy = \x -> liftToContext x
+instance LogicExercise (Rule SLogic) where
+   type Out3 (Rule SLogic) = Exercise SLogic
+   minimalExercise x = minimalExercise (ruleToStrategy x)
+   basicExercise   x = basicExercise   (ruleToStrategy x)
+   evalExercise    x = evalExercise    (ruleToStrategy x)
 
-instance LogicExercise (LabeledStrategy (Context SLogic)) where 
-    type Out (LabeledStrategy (Context SLogic)) = (LabeledStrategy (Context SLogic)) 
-    evalStrategy = \x -> x
+instance LogicExercise (Rule (Context SLogic)) where
+   type Out3 (Rule (Context SLogic)) = Exercise SLogic
+   minimalExercise x = minimalExercise (ruleToStrategy x)
+   basicExercise   x = basicExercise   (ruleToStrategy x)
+   evalExercise    x = evalExercise    (ruleToStrategy x)
 
+instance LogicExercise (LabeledStrategy SLogic) where
+   type Out3 (LabeledStrategy SLogic) = Exercise SLogic
+   minimalExercise x = minimalExercise (liftToContext x)
+   basicExercise   x = basicExercise   (liftToContext x)
+   evalExercise    x = evalExercise    (liftToContext x)
 
-minimalExercise :: LabeledStrategy (Context SLogic) -> Exercise SLogic
-minimalExercise x = emptyExercise
-   { 
-      exerciseId    = describe "Evaluate an expression (minimal)" $ newId "eval.minimal", 
-      strategy      = evalStrategy x, 
-      prettyPrinter = show
-   }
-
-minimalExercise' :: LabeledStrategy SLogic -> Exercise SLogic
-minimalExercise' x = emptyExercise
-   { 
-      exerciseId    = describe "Evaluate an expression (minimal)" $ newId "eval.minimal", 
-      strategy      = evalStrategy x, 
-      prettyPrinter = show
-   }
-
-basicExercise ::  LabeledStrategy (Context SLogic) -> Exercise (SLogic)
-basicExercise x = emptyExercise
-   { 
-      exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic",
-      strategy      = evalStrategy x, 
-      navigation    = termNavigator, 
-      prettyPrinter = show
-   }
-
-basicExercise' ::  LabeledStrategy SLogic -> Exercise (SLogic)
-basicExercise' x = emptyExercise
-   { 
-      exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic",
-      strategy      = evalStrategy x, 
-      navigation    = termNavigator, 
-      prettyPrinter = show
-   }
-
+instance LogicExercise (LabeledStrategy (Context SLogic)) where
+   type Out3 (LabeledStrategy (Context SLogic)) = Exercise SLogic
+   minimalExercise x = emptyExercise
+                        { 
+                           exerciseId    = describe "Evaluate an expression (minimal)" $ newId "eval.minimal", 
+                           strategy      = x, 
+                           prettyPrinter = show
+                        }
+   basicExercise   x = emptyExercise
+                        { 
+                           exerciseId    = describe "Evaluate an expression (basic)" $ newId "eval.basic",
+                           strategy      = x, 
+                           navigation    = termNavigator, 
+                           prettyPrinter = show
+                        }
+   evalExercise    x = emptyExercise
+                        { 
+                           exerciseId    = describe "Evaluate an expression (full)" $ newId "eval.full", 
+                           status        = Experimental, 
+                           strategy      = x, 
+                           prettyPrinter = show, 
+                           navigation    = termNavigator, 
+                           --parser        = readM, 
+                           equivalence   = withoutContext eqExpr,
+                           -- properties    = setProperty "indistinguishability" withoutContext (indExpr x),
+                           -- ->? -
+                           similarity    = withoutContext (==), 
+                           ready         = predicate isWff, 
+                           examples      = examplesFor Easy []
+                        }
 
 eqExpr :: SLogic -> SLogic -> Bool
 eqExpr x y = x == y
@@ -77,21 +83,3 @@ indistinguishabilityS = makeService "basic.indistinguishability"
 --indExpr :: Eq a => LSExpr a -> SLogic -> SLogic -> Bool
 --indExpr = \f -> (\p -> (\q -> f p == f q))
 --indExpr f = (==) `on` f
-
-
---evalExercise :: LabeledStrategy a -> Exercise (SLogic)
---evalExercise x = emptyExercise
---   { 
---      exerciseId    = describe "Evaluate an expression (full)" $ newId "eval.full", 
---      status        = Experimental, 
---      strategy      = evalStrategy x, 
---      prettyPrinter = show, 
---      navigation    = termNavigator, 
---      --parser        = readM, 
---      equivalence   = withoutContext eqExpr,
---      -- properties    = setProperty "indistinguishability" withoutContext (indExpr x),
-      -- ->? -
---      similarity    = withoutContext (==), 
---      ready         = predicate isWff, 
---      examples      = examplesFor Easy []
---   }

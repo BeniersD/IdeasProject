@@ -32,24 +32,24 @@ ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMor
    ruleIdempotency, ruleImplicationElimination, ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT,
    ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: Rule SLogic
 
-ruleAbsorption             = createRule "Absorption" "single.absorption" absorption
-ruleAssociativity          = createRule "Associativity" "single.associativity" associativity
-ruleCommutativity          = createRule "Commutativity" "single.commutativity" commutativity
-ruleDeMorganAnd            = createRule "De Morgan And" "single.demorgan.and" deMorganAnd
-ruleDeMorganOr             = createRule "De Morgan Or" "single.demorgan.or" deMorganOr
-ruleDistributivity         = createRule "Distributivity" "single.distributivity" distributivity
-ruleDoubleNot              = createRule "Double Not" "single.doublenot" doubleNot
+ruleAbsorption             = createRule "Absorption"              "single.absorption"             absorption
+ruleAssociativity          = createRule "Associativity"           "single.associativity"          associativity
+ruleCommutativity          = createRule "Commutativity"           "single.commutativity"          commutativity
+ruleDeMorganAnd            = createRule "DeMorgan And"            "single.demorgan.and"           deMorganAnd
+ruleDeMorganOr             = createRule "DeMorgan Or"             "single.demorgan.or"            deMorganOr
+ruleDistributivity         = createRule "Distributivity"          "single.distributivity"         distributivity
+ruleDoubleNot              = createRule "Double Not"              "single.doublenot"              doubleNot
 ruleEquivalenceElimination = createRule "Equivalence Elimination" "single.equivalenceelimination" equivalenceElimination
-ruleIdempotency            = createRule "Idempotency" "single.idempotency" idempotency
+ruleIdempotency            = createRule "Idempotency"             "single.idempotency"            idempotency
 ruleImplicationElimination = createRule "Implication Elimination" "single.implicationelimination" implicationElimination
-ruleFRuleComplement        = createRule "F-Rule Complement" "single.frulecomplement" fRuleComplement
-ruleFRuleConjunction       = createRule "F-Rule Conjunction" "single.fruleconjunction" fRuleConjunction
-ruleFRuleDisjunction       = createRule "F-Rule Disjunction" "single.fruledisjunction" fRuleDisjunction
-ruleFRuleNotT              = createRule "F-Rule Not T" "single.frulenott" fRuleNotT
-ruleTRuleComplement        = createRule "T-Rule Complement" "single.trulecomplement" tRuleComplement
-ruleTRuleConjunction       = createRule "T-Rule Conjunction" "single.truleconjunction" tRuleConjunction
-ruleTRuleDisjunction       = createRule "T-Rule Disjunction" "single.truledisjunction" tRuleDisjunction
-ruleTRuleNotF              = createRule "T-Rule Not F" "single.trulenotf" tRuleNotF
+ruleFRuleComplement        = createRule "F-Rule Complement"       "single.frulecomplement"        fRuleComplement
+ruleFRuleConjunction       = createRule "F-Rule Conjunction"      "single.fruleconjunction"       fRuleConjunction
+ruleFRuleDisjunction       = createRule "F-Rule Disjunction"      "single.fruledisjunction"       fRuleDisjunction
+ruleFRuleNotT              = createRule "F-Rule Not T"            "single.frulenott"              fRuleNotT
+ruleTRuleComplement        = createRule "T-Rule Complement"       "single.trulecomplement"        tRuleComplement
+ruleTRuleConjunction       = createRule "T-Rule Conjunction"      "single.truleconjunction"       tRuleConjunction
+ruleTRuleDisjunction       = createRule "T-Rule Disjunction"      "single.truledisjunction"       tRuleDisjunction
+ruleTRuleNotF              = createRule "T-Rule Not F"            "single.trulenotf"              tRuleNotF
 
 ------------------------------------------------------------------------------------------------------------
 -- Set of laws of Equivalence
