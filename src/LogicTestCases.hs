@@ -179,7 +179,8 @@ deMorganAndTestSetComplex =
                   Not (Not (Not p) :&&: T :&&: Not (Not p)),                            -- ¬(¬¬p ˄ T ˄ ¬¬p)    
                   Not (Not (Not p) :&&: T :&&: Not (Not q)),                            -- ¬(¬¬p ˄ T ˄ ¬¬q)        
                   Not (Not (Not p) :&&: Not p :&&: T),                                  -- ¬(¬¬p ˄ ¬p ˄ T)
-                  (p :->: Not (Not p)) :<->: (Not p :<->: Not p)                        -- ¬(¬¬p ˄ ¬p ˄ T)
+                  (p :->: Not (Not p)) :<->: (Not p :<->: Not p),                        -- ¬(¬¬p ˄ ¬p ˄ T)
+                  Not (Not (Not p) :&&: Not p :&&: T) :<->: (Not p :<->: Not p)         -- ¬(¬¬p ˄ ¬p ˄ T) ↔ (¬p ↔ ¬p)
                 ]
 
 deMorganOrTestSetComplex = 
@@ -202,7 +203,9 @@ deMorganOrTestSetComplex =
                   Not (Not (Not p) :||: T :||: Not (Not p)),                            -- ¬(¬¬p ˄ T ˄ ¬¬p)    
                   Not (Not (Not p) :||: T :||: Not (Not q)),                            -- ¬(¬¬p ˄ T ˄ ¬¬q)        
                   Not (Not (Not p) :||: Not p :&&: T),                                  -- ¬(¬¬p ˄ ¬p ˄ T)
-                  (p :->: Not (Not p)) :<->: (Not p :<->: Not p)                        -- ¬(¬¬p ˄ ¬p ˄ T)
+                  (p :->: Not (Not p)) :<->: (Not p :<->: Not p),                       -- ¬(¬¬p ˄ ¬p ˄ T)
+                  (Not p :<->: Not p) :<->: Not (Not (Not p) :||: Not p :&&: T),        -- (¬p ↔ ¬p) ↔ ¬(¬¬p ˅ ¬p ˄ T)
+                  Not (Not (Not p) :&&: Not p :&&: T :||: Not p) :<->: Not p            -- ¬(¬¬p ˄ ¬p ˄ T ˅ ¬p) ↔ ¬p
                 ]
 
 deMorganAndDoubleNotTestSet =

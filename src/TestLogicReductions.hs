@@ -43,108 +43,135 @@ quickTestSet2 = [
 --------------------------------------------------------------------------------------------------------------------------------------
 main :: IO ()
 main = do    
-    -- Absorption rule testing -- needs attention!!
+-- Absorption rule testing -- needs attention!!
     --tstRuleAbsorption
+    --tstApplyAbsorption
     --tstDerivAbsorption
     --tstRuleAbsorptionC
+    --tstApplyAbsorptionC
     --tstDerivAbsorptionC
     --tstRuleAbsorptionA
+    --tstApplyAbsorptionA
     --tstDerivAbsorptionA
     
-    
-    
-    -- Associativity rule testing
+-- Associativity rule testing
     --tstRuleAssociativity
-    tstApplyAssociativity
+    --tstApplyAssociativity
     --tstDerivAssociativity
     
-    
-
-    -- Commutativity rule testing
+-- Commutativity rule testing
     --tstRuleCommutativity
-
-
+    --tstApplyCommutativity
+    --tstDerivCommutativity
     --tstRuleCommutativityOrd
+    --tstApplyCommutativityOrd
+    --tstDerivCommutativityOrd
 
-   
-    -- DeMorgan rule testing
+-- DeMorgan rule testing
     --tstRuleDeMorganOrSimple
+    --tstApplyDeMorganOrSimple
+    --tstDerivDeMorganOrSimple
     --tstRuleDeMorganOrComplex
+    --tstApplyDeMorganOrComplex
+    --tstDerivDeMorganOrComplex
     --tstRuleDeMorganAndSimple
+    --tstApplyDeMorganAndSimple
+    --tstDerivDeMorganAndSimple
     --tstRuleDeMorganAndComplex
+    --tstApplyDeMorganAndComplex
+    --tstDerivDeMorganAndComplex
     --tstRuleDeMorganSimple
+    --tstApplyDeMorganSimple
+    --tstDerivDeMorganSimple
     --tstRuleDeMorganComplex
+    --tstApplyDeMorganComplex
+    --tstDerivDeMorganComplex
     --tstRuleDeMorganAndGSimple
+    --tstApplyDeMorganAndGSimple
+    --tstDerivDeMorganAndGSimple
     --tstRuleDeMorganAndGComplex 
+    --tstApplyDeMorganAndGComplex
+    --tstDerivDeMorganAndGComplex
     --tstRuleDeMorganOrGSimple
+    --tstApplyDeMorganOrGSimple
+    --tstDerivDeMorganOrGSimple
     --tstRuleDeMorganOrGComplex 
+    --tstApplyDeMorganOrGComplex
+    --tstDerivDeMorganOrGComplex
     --tstRuleDeMorganG
+    --tstApplyDeMorganG
+    --tstDerivDeMorganG
 
-    -- Distributivity rule testing
+-- Distributivity rule testing
     --tstRuleDistributivity
 
-    -- Double Not rule testing
+-- Double Not rule testing
     --tstRuleDoubleNot
 
-    -- Equivalence Elimination rule testing
+-- Equivalence Elimination rule testing
     --tstRuleEquivalenceElimination
 
-    -- Idempotency rule testing
+-- Idempotency rule testing
     --tstRuleIdempotency
 
-    -- Implication Elimination rule testing
+-- Implication Elimination rule testing
     --tstRuleImplicationElimination
 
-    -- FRuleConjunction rule testing
+-- FRuleConjunction rule testing
     --tstRuleFRuleConjunction
     --tstRuleFRuleConjunctionC
     --tstRuleFRuleConjunctionA
 
-    -- FRuleComplement rule testing
+-- FRuleComplement rule testing
     --tstRuleFRuleComplement
     --tstRuleFRuleComplementC
     --tstRuleFRuleComplementA
 
-    -- FRuleDisjunction rule testing
+-- FRuleDisjunction rule testing
     --tstRuleFRuleDisjunction
     --tstRuleFRuleDisjunctionC
     --tstRuleFRuleDisjunctionA
 
-    -- FRuleNotT rule testing
+-- FRuleNotT rule testing
     --tstRuleFRuleNotT
 
-    -- TRuleConjunction rule testing
+-- TRuleConjunction rule testing
     --tstRuleTRuleConjunction
     --tstRuleTRuleConjunctionC
     --tstRuleTRuleConjunctionA
 
-    -- TRuleComplement rule testing
+-- TRuleComplement rule testing
     --tstRuleTRuleComplement
     --tstRuleTRuleComplementC
     --tstRuleTRuleComplementA
 
-    -- TRuleDisjunction rule testing
+-- TRuleDisjunction rule testing
     --tstRuleTRuleDisjunction
     --tstRuleTRuleDisjunctionC
     --tstRuleTRuleDisjunctionA
 
-    -- TRuleNotF rule testing
-    --tstRuleTRuleNotF   
+-- TRuleNotF rule testing
+    tstRuleTRuleNotF   
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test functions for rules
 --------------------------------------------------------------------------------------------------------------------------------------
-tstRuleAbsorption, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativityOrd, tstRuleDeMorganAndComplex, 
-    tstRuleDeMorganAndSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganOrSimple, tstRuleDeMorganComplex, 
-    tstRuleDeMorganSimple, tstRuleDoubleNot, tstRuleEquivalenceElimination, tstRuleIdempotency, tstRuleImplicationElimination, 
-    tstRuleFRuleComplement, tstRuleTRuleComplement, tstRuleFRuleConjunctionC, tstRuleFRuleConjunction, tstRuleTRuleConjunction,
-    tstRuleTRuleConjunctionC, tstRuleFRuleComplementC, tstRuleTRuleComplementC, tstRuleFRuleDisjunctionC,
-    tstRuleTRuleDisjunctionC, tstRuleFRuleDisjunction, tstRuleTRuleDisjunction, tstRuleFRuleNotT, tstRuleTRuleNotF,
-    tstRuleDistributivity, tstRuleAbsorptionC, tstRuleAbsorptionA :: IO ()
+tstRuleAbsorption,  tstRuleAbsorptionC, tstRuleAbsorptionA, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativityOrd,  
+    tstRuleDeMorganAndComplex, tstRuleDeMorganAndSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganOrSimple, tstRuleDeMorganComplex, 
+    tstRuleDeMorganSimple, tstRuleDeMorganAndGSimple, tstRuleDeMorganAndGComplex, tstRuleDeMorganOrGSimple, tstRuleDeMorganOrGComplex,
+    tstRuleDeMorganG, tstRuleDistributivity, tstRuleDoubleNot, tstRuleEquivalenceElimination, tstRuleIdempotency, 
+    tstRuleImplicationElimination, tstRuleFRuleConjunction, tstRuleFRuleConjunctionC, tstRuleFRuleConjunctionA, 
+    tstRuleFRuleComplement, tstRuleFRuleComplementC, tstRuleFRuleComplementA, tstRuleFRuleDisjunction, tstRuleFRuleDisjunctionC, 
+    tstRuleFRuleDisjunctionA, tstRuleFRuleNotT, tstRuleTRuleConjunction, tstRuleTRuleConjunctionC, tstRuleTRuleConjunctionA, 
+    tstRuleTRuleComplement, tstRuleTRuleComplementC, tstRuleTRuleComplementA, tstRuleTRuleDisjunction, tstRuleTRuleDisjunctionC, 
+    tstRuleTRuleDisjunctionA, tstRuleTRuleNotF :: IO ()
+
 -- Absorption rule testing
 tstRuleAbsorption             = tstRuleGeneric     ruleAbsorption             absorptionTestSet 
 tstRuleAbsorptionC            = tstStrategyGeneric stratAbsorptionC           absorptionTestSet
+--tstRuleAbsorptionC            = tstStrategyGeneric ruleAbsorptionC            absorptionTestSet
 tstRuleAbsorptionA            = tstStrategyGeneric stratAbsorptionA           absorptionTestSet
+--tstRuleAbsorptionA            = tstStrategyGeneric ruleAbsorptionA            absorptionTestSet
 
 -- Associativity rule testing
 tstRuleAssociativity          = tstRuleGeneric     ruleAssociativity          associativityTestSet 
@@ -220,7 +247,15 @@ tstRuleTRuleNotF              = tstRuleGeneric     ruleTRuleNotF              bo
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test functions for apply
 --------------------------------------------------------------------------------------------------------------------------------------
-tstApplyAbsorptionA :: IO ()
+tstApplyAbsorption, tstApplyAbsorptionC, tstApplyAbsorptionA, tstApplyAssociativity, tstApplyCommutativity, tstApplyCommutativityOrd,  
+    tstApplyDeMorganAndComplex, tstApplyDeMorganAndSimple, tstApplyDeMorganOrComplex, tstApplyDeMorganOrSimple,
+    tstApplyDeMorganComplex, tstApplyDeMorganSimple, tstApplyDeMorganAndGSimple, tstApplyDeMorganAndGComplex,
+    tstApplyDeMorganOrGSimple, tstApplyDeMorganOrGComplex, tstApplyDeMorganG, tstApplyDistributivity, tstApplyDoubleNot, 
+    tstApplyEquivalenceElimination, tstApplyIdempotency, tstApplyImplicationElimination, tstApplyFRuleConjunction,  
+    tstApplyFRuleConjunctionC, tstApplyFRuleConjunctionA, tstApplyFRuleComplement, tstApplyFRuleComplementC, tstApplyFRuleComplementA, 
+    tstApplyFRuleDisjunction, tstApplyFRuleDisjunctionC, tstApplyFRuleDisjunctionA, tstApplyFRuleNotT, tstApplyTRuleConjunction, 
+    tstApplyTRuleConjunctionC, tstApplyTRuleConjunctionA, tstApplyTRuleComplement, tstApplyTRuleComplementC, tstApplyTRuleComplementA,  
+    tstApplyTRuleDisjunction, tstApplyTRuleDisjunctionC, tstApplyTRuleDisjunctionA, tstApplyTRuleNotF :: IO ()
 
 -- Absorption rule testing
 tstApplyAbsorption             = tstApply ruleAbsorption             SomeWhereRepeat absorptionTestSet
@@ -303,7 +338,16 @@ tstApplyTRuleNotF              = tstApply ruleTRuleNotF              SomeWhereRe
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test functions for derivations
 --------------------------------------------------------------------------------------------------------------------------------------
-tstDerivAbsorption, tstDerivAbsorptionC, tstDerivAbsorptionA :: IO ()
+tstDerivAbsorption, tstDerivAbsorptionC, tstDerivAbsorptionA, tstDerivAssociativity, tstDerivCommutativity, tstDerivCommutativityOrd,  
+    tstDerivDeMorganAndComplex, tstDerivDeMorganAndSimple, tstDerivDeMorganOrComplex, tstDerivDeMorganOrSimple,
+    tstDerivDeMorganComplex, tstDerivDeMorganSimple, tstDerivDeMorganAndGSimple, tstDerivDeMorganAndGComplex,
+    tstDerivDeMorganOrGSimple, tstDerivDeMorganOrGComplex, tstDerivDeMorganG, tstDerivDistributivity, tstDerivDoubleNot, 
+    tstDerivEquivalenceElimination, tstDerivIdempotency, tstDerivImplicationElimination, tstDerivFRuleConjunction,  
+    tstDerivFRuleConjunctionC, tstDerivFRuleConjunctionA, tstDerivFRuleComplement, tstDerivFRuleComplementC, tstDerivFRuleComplementA, 
+    tstDerivFRuleDisjunction, tstDerivFRuleDisjunctionC, tstDerivFRuleDisjunctionA, tstDerivFRuleNotT, tstDerivTRuleConjunction, 
+    tstDerivTRuleConjunctionC, tstDerivTRuleConjunctionA, tstDerivTRuleComplement, tstDerivTRuleComplementC, tstDerivTRuleComplementA,  
+    tstDerivTRuleDisjunction, tstDerivTRuleDisjunctionC, tstDerivTRuleDisjunctionA, tstDerivTRuleNotF :: IO ()
+
 
 -- Absorption rule testing
 tstDerivAbsorption             = tstDerivation ruleAbsorption             SomeWhereRepeat absorptionTestSet
@@ -319,6 +363,7 @@ tstDerivAssociativity          = tstDerivation (ruleToStrategy ruleAssociativity
 tstDerivCommutativity          = tstDerivation ruleCommutativity          SomeWhereRepeat commutativityTestSet 
 tstDerivCommutativityOrd       = tstDerivation ruleCommutativityOrd       SomeWhereRepeat commutativityTestSet 
 
+-- DeMorgan rule testing
 tstDerivDeMorganAndComplex     = tstDerivation ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetComplex 
 tstDerivDeMorganAndSimple      = tstDerivation ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetSimple 
 tstDerivDeMorganOrComplex      = tstDerivation ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetComplex 
