@@ -1,42 +1,11 @@
 module TestLogicReductions (main) 
     where
 
-import Domain.Logic.Formula
-import LogicConstants
 import LogicReductionRules
 import LogicTestCases
 import LogicReductionStrategies
 import LogicTestFunctions
-import Ideas.Common.Exercise
-import Ideas.Common.Library
 import LogicExercices
-
-quickTestSet :: [SLogic]
-quickTestSet = [
-                Not (p :&&: q),                                   -- ¬(p ˄ q)
-                Not (q :&&: p :&&: r),                            -- ¬(p ˄ q ˄ r)
-                Not (q :&&: p :&&: r :&&: s),                     -- ¬(p ˄ q ˄ r ˄ s)
-                Not (q :&&: r :&&: s :&&: p),                     -- ¬(p ˄ r ˄ s ˄ p)                
-                Not (q :&&: p :&&: r :&&: s :&&: t),              -- ¬(p ˄ q ˄ r ˄ s ˄ t)
-                --Not (Not (p :&&: q))                             -- ¬¬(p ˄ q)
-                --Not (Not (q :&&: p)),                             -- ¬¬(q ˄ p)  
-                --Not (Not (q :&&: r :&&: p)),                      -- ¬¬(q ˄ r ˄ p)                
-                Not (Not (Not p) :&&: T),                       -- ¬(¬¬p ˄ T) 
-                Not (Not (Not p) :&&: T :&&: T),                -- ¬(¬¬p ˄ T ˄ T)
-                Not (Not (Not p) :&&: T :&&: F),                -- ¬(¬¬p ˄ T ˄ F)                
-                Not (Not (Not p) :&&: T :&&: Not (Not p)),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
-                Not (Not (Not p) :&&: T :&&: Not (Not q)),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
-                Not (Not (Not p) :&&: Not p :&&: T)           -- ¬(¬¬p ˄ ¬p ˄ T)
-               ]
-
-quickTestSet2 :: [SLogic]
-quickTestSet2 = [
-                p :&&: Not (p :&&: q),                             
-                p :&&: Not (q :&&: p),                               
-                p :&&: Not (q :&&: r :&&: p),                          
-                p :&&: Not (q :&&: p :&&: r :&&: s :&&: t),          
-                p :&&: (p :&&: Not (q :&&: p :&&: r :&&: s :&&: t))                    
-               ]
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Main
@@ -104,23 +73,40 @@ main = do
 
 -- Distributivity rule testing
     --tstRuleDistributivity
+    --tstApplyDistributivity
+    --tstDerivDistributivity
 
 -- Double Not rule testing
     --tstRuleDoubleNot
+    --tstApplyDoubleNot
+    --tstDerivDoubleNot
 
 -- Equivalence Elimination rule testing
     --tstRuleEquivalenceElimination
+    --tstApplyEquivalenceElimination
+    --tstDerivEquivalenceElimination
 
 -- Idempotency rule testing
     --tstRuleIdempotency
+    --tstApplyIdempotency
+    --tstDerivIdempotency
+
 
 -- Implication Elimination rule testing
     --tstRuleImplicationElimination
+    --tstApplyImplicationElimination
+    --tstDerivImplicationElimination
 
 -- FRuleConjunction rule testing
     --tstRuleFRuleConjunction
+    --tstApplyFRuleConjunction
+    --tstDerivFRuleConjunction
     --tstRuleFRuleConjunctionC
+    --tstApplyFRuleConjunctionC
+    --tstDerivFRuleConjunctionC
     --tstRuleFRuleConjunctionA
+    --tstApplyFRuleConjunctionA
+    --tstDerivFRuleConjunctionA
 
 -- FRuleComplement rule testing
     --tstRuleFRuleComplement
@@ -129,34 +115,63 @@ main = do
 
 -- FRuleDisjunction rule testing
     --tstRuleFRuleDisjunction
+    --tstApplyFRuleDisjunction
+    --tstDerivFRuleDisjunction
     --tstRuleFRuleDisjunctionC
+    --tstApplyFRuleDisjunctionC
+    --tstDerivFRuleDisjunctionC
     --tstRuleFRuleDisjunctionA
+    --tstApplyFRuleDisjunctionA
+    --tstDerivFRuleDisjunctionA
 
 -- FRuleNotT rule testing
     --tstRuleFRuleNotT
+    --tstApplyFRuleNotT
+    --tstDerivFRuleNotT
 
 -- TRuleConjunction rule testing
     --tstRuleTRuleConjunction
+    --tstApplyTRuleConjunction
+    --tstDerivTRuleConjunction
     --tstRuleTRuleConjunctionC
+    --tstApplyTRuleConjunction
+    --tstDerivTRuleConjunction
     --tstRuleTRuleConjunctionA
+    --tstApplyTRuleConjunctionA
+    --tstDerivTRuleConjunctionA
 
 -- TRuleComplement rule testing
     --tstRuleTRuleComplement
+    --tstApplyTRuleComplement
+    --tstDerivTRuleComplement
     --tstRuleTRuleComplementC
+    --tstApplyTRuleComplementC
+    --tstDerivTRuleComplementC
     --tstRuleTRuleComplementA
+    tstApplyTRuleComplementA
+    --tstDerivTRuleComplementA
 
 -- TRuleDisjunction rule testing
     --tstRuleTRuleDisjunction
+    --tstApplyTRuleDisjunction
+    --tstDerivTRuleDisjunction
     --tstRuleTRuleDisjunctionC
+    --tstApplyTRuleDisjunctionC
+    --tstDerivTRuleDisjunctionC
     --tstRuleTRuleDisjunctionA
+    --tstApplyTRuleDisjunctionA
+    tstDerivTRuleDisjunctionA
 
 -- TRuleNotF rule testing
-    tstRuleTRuleNotF   
+    --tstRuleTRuleNotF  
+    --tstApplyTRuleNotF
+    --tstDerivTRuleNotF
+ 
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test functions for rules
 --------------------------------------------------------------------------------------------------------------------------------------
-tstRuleAbsorption,  tstRuleAbsorptionC, tstRuleAbsorptionA, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativityOrd,  
+tstRuleAbsorption, tstRuleAbsorptionC, tstRuleAbsorptionA, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativityOrd,  
     tstRuleDeMorganAndComplex, tstRuleDeMorganAndSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganOrSimple, tstRuleDeMorganComplex, 
     tstRuleDeMorganSimple, tstRuleDeMorganAndGSimple, tstRuleDeMorganAndGComplex, tstRuleDeMorganOrGSimple, tstRuleDeMorganOrGComplex,
     tstRuleDeMorganG, tstRuleDistributivity, tstRuleDoubleNot, tstRuleEquivalenceElimination, tstRuleIdempotency, 

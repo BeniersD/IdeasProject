@@ -1,4 +1,4 @@
-module LogicConstants
+module LogicConstants ( o, p, q, r, s ,t )
      where
 import Domain.Logic.Formula
 import Ideas.Utils.Prelude

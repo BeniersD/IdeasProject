@@ -6,7 +6,6 @@ module LogicTestFunctions (tstRuleGeneric, tstStrategyGeneric, clean, tstDerivat
 import Data.Foldable as Foldable
 import Domain.Logic.Formula
 import Ideas.Common.Library
-import LogicFunctions
 import LogicExercices
 import LogicReductionStrategies
 

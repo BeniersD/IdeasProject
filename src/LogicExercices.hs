@@ -1,7 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE TypeFamilies #-}
-
 module LogicExercices (minimalExercise, basicExercise, evalExercise
    ) where
 
@@ -13,7 +9,17 @@ import Ideas.Main.Default
 import Ideas.Utils.Prelude (splitsWithElem, readM)
 import LogicReductionRules
 import LogicReductionStrategies
-import LogicFunctions
+
+isWff :: Logic a -> Bool
+isWff T             = True
+isWff F             = True
+isWff ( Var _ )     = True
+isWff ( Not x )     = isWff x
+isWff ( x :&&: y )  = isWff x && isWff y
+isWff ( x :||: y )  = isWff x && isWff y
+isWff ( x :<->: y ) = isWff x && isWff y
+isWff ( x :->: y)   = isWff x && isWff y
+--isWff x             = False
 
 minimalExercise :: LabeledStrategy SLogic -> Exercise SLogic
 minimalExercise x = emptyExercise

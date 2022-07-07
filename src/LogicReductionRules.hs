@@ -6,12 +6,9 @@ module LogicReductionRules
      ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF, commutativity
    ) where
 
-import Ideas.Common.Library hiding (description)
-import Ideas.Main.Default
+import Ideas.Common.Library 
 import Domain.Logic.Formula
-import Ideas.Utils.Prelude
 import Data.Maybe
-import Data.List
 
 ------------------------------------------------------------------------------------------------------------
 -- Generic rewrite/reduction functions
