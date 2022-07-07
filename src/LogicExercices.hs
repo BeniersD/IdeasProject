@@ -9,17 +9,7 @@ import Ideas.Main.Default
 import Ideas.Utils.Prelude (splitsWithElem, readM)
 import LogicReductionRules
 import LogicReductionStrategies
-
-isWff :: Logic a -> Bool
-isWff T             = True
-isWff F             = True
-isWff ( Var _ )     = True
-isWff ( Not x )     = isWff x
-isWff ( x :&&: y )  = isWff x && isWff y
-isWff ( x :||: y )  = isWff x && isWff y
-isWff ( x :<->: y ) = isWff x && isWff y
-isWff ( x :->: y)   = isWff x && isWff y
---isWff x             = False
+import LogicFunctions
 
 minimalExercise :: LabeledStrategy SLogic -> Exercise SLogic
 minimalExercise x = emptyExercise

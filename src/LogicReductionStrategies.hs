@@ -7,10 +7,11 @@ module LogicReductionStrategies where
 import Ideas.Common.Library hiding (layer)
 import Data.List
 import Data.Maybe
-import Domain.Logic.Formula hiding (isAnd, isOr)
+import Domain.Logic.Formula 
 import LogicReductionRules
 import Ideas.Common.Traversal.Navigator
 import qualified Ideas.Common.Strategy.Combinators as Combinators
+import LogicFunctions
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Strategies: under construction
@@ -166,20 +167,6 @@ stratRuleOnceC r = label ("rewrite.commutative." ++ showId r) (ruleOnce ruleComm
 
 -- Commutative version of a rule
 stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (ruleAll ruleCommutativity .*. liftToContext r)
-
---------------------------------------------------------------------------------------------------------------------------------------
--- Generic checker functions
---------------------------------------------------------------------------------------------------------------------------------------
-isOr, isAnd, isOrdered :: SLogic -> Bool
-isOr (p :||: q)               = True
-isOr _                        = False
-
-isAnd (p :&&: q)              = True
-isAnd _                       = False
-
-isOrdered (p :||: q) | p >= q = True
-isOrdered (p :&&: q) | p >= q = True
-isOrdered _                   = False
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Set of simple logic strategies and rules, including
