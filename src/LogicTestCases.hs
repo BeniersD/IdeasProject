@@ -17,37 +17,39 @@ commutativityTestSet =
                   p :&&: Not p,                    -- 2. (p ˄ ¬p)
                   q :&&: Not p,                    -- 3. (q ˄ ¬p)  
                   p :&&: Not q,                    -- 4. (p ˄ ¬q)
-                  Not q :&&: p,                  
-                  Not p :&&: q,                  
-                  Not p :&&: Not q,                  
-                  Not q :&&: Not p,                  
-                  p :&&: Not (Not p),
-                  Not (Not p :&&: p),
-                  T :&&: F,
-                  F :&&: T,
-                  T :&&: p,
-                  p :&&: T,
-                  F :&&: p,
-                  p :&&: F, 
-                  p :&&: (q :&&: r),
-                  p :||: (q :||: r),
-                  p :&&: (q :&&: p),
-                  p :&&: (p :||: q),
-                  (p :&&: q) :&&: p,
-                  (p :&&: q) :&&: (q :&&: p),
-                  p :||: q,
-                  q :||: p,
-                  p :||: Not (Not p),
-                  Not (Not p :||: p),
-                  T :||: F,
-                  F :||: T,
-                  T :||: p,
-                  p :||: T,
-                  F :||: p,
-                  p :||: F, 
-                  p :||: (p :||: q),
-                  (p :||: q) :||: p,
-                  (p :||: q) :||: (q :||: p)
+                  Not q :&&: p,                    -- 5.
+                  Not p :&&: q,                    -- 6.
+                  Not p :&&: Not q,                -- 7.
+                  Not q :&&: Not p,                -- 8.  
+                  p :&&: Not (Not p),              -- 10.
+                  Not (Not p :&&: p),              -- 11.
+                  T :&&: F,                        -- 12. 
+                  F :&&: T,                        -- 13.
+                  T :&&: p,                        -- 14.  
+                  p :&&: T,                        -- 15.
+                  F :&&: p,                        -- 16.  
+                  p :&&: F,                        -- 17.
+                  p :&&: (q :&&: r),               -- 18.
+                  p :||: (q :||: r),               -- 19.
+                  p :&&: (q :&&: p),               -- 20.
+                  p :&&: (p :||: q),               -- 21.
+                  (p :&&: q) :&&: p,               -- 22.
+                  (p :&&: q) :&&: (q :&&: p),      -- 23.
+                  p :||: q,                        -- 24.
+                  q :||: p,                        -- 25.
+                  p :||: Not (Not p),              -- 26.
+                  Not (Not p :||: p),              -- 27.
+                  T :||: F,                        -- 28.
+                  F :||: T,                        -- 29.
+                  T :||: p,                        -- 30.
+                  p :||: T,                        -- 31.
+                  F :||: p,                        -- 32.
+                  p :||: F,                        -- 33.
+                  p :||: (p :||: q),               -- 34.
+                  (p :||: q) :||: p,               -- 35.
+                  (p :||: q) :||: (q :||: p),       -- 36.
+                  (q :||: p) :||: (q :||: p),       -- 37.
+                  (q :||: p) :||: (q :||: p) :||: (Not q :||: Not p) :||: (F :||: T)      -- 38.
                 ]
 
 implicationEliminationDerivTestSet =
@@ -261,8 +263,11 @@ absorptionTestSet =
                   (p :||: (p :&&: q)) :&&: (p :&&: q),                      -- 21. Commutative Absorption 5                  
                   (Not (Not p) :||: Not (Not q)) :&&: Not (Not q),          -- 22. Commutative Absorption 5
                   ((p :&&: q) :||: q) :&&: ((p :&&: q) :||: q),             -- 23. Absorption, somewhere, repeat
-                  ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: q),             -- 24. Commutative Absorption 1, somewhere, repeat
-                  (((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q     -- 25. Commutative Absorption 4, Absorption, somewhere, repeat
+                  ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: r),             -- 24. Commutative Absorption 2, somewhere, repeat
+                  ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: q),             -- 25. Commutative Absorption 2, somewhere, repeat
+                  (((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q,    -- 26. Commutative Absorption 4, Absorption, somewhere, repeat
+                  (p :&&: (p :||: q)) :||: ((p :&&: q) :||: p) :||: ((p :||: q) :&&: p) :||: (p :&&: (q :||: p)) :||: ((p :&&: q) :||: ((p :&&: q) :&&: q)) :||: ((q :||: p) :&&: p)
+                                                                            -- 26. Commutative All Absorption variants, somewhere, repeat
                 ]
 
 idempotencyTestSet =
@@ -390,5 +395,4 @@ distributivityTestSet =
                   ((p :&&: q) :||: r) :||: s,           -- Right distributivity - ((p ˄ q) ˅ r) ˅ s
                   Not (p :||: (q :&&: r)),              -- Somewhere, left distributivity - ¬(p ˅ (q ˄ r))
                   Not ((p :&&: q) :||: r)               -- Somewhere, right distributivity - ¬((p ˄ q) ˅ r)
-
                 ]

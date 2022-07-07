@@ -8,8 +8,8 @@ import LogicTestCases
 import LogicReductionStrategies
 import LogicTestFunctions
 import Ideas.Common.Exercise
-import LogicExercices
 import Ideas.Common.Library
+import LogicExercices
 
 quickTestSet :: [SLogic]
 quickTestSet = [
@@ -43,68 +43,96 @@ quickTestSet2 = [
 --------------------------------------------------------------------------------------------------------------------------------------
 main :: IO ()
 main = do    
+    -- Absorption rule testing -- needs attention!!
+    --tstRuleAbsorption
+    --tstDerivAbsorption
+    --tstRuleAbsorptionC
+    --tstDerivAbsorptionC
+    --tstRuleAbsorptionA
+    --tstDerivAbsorptionA
+    
+    
+    
+    -- Associativity rule testing
+    --tstRuleAssociativity
+    tstApplyAssociativity
+    --tstDerivAssociativity
+    
+    
+
+    -- Commutativity rule testing
+    --tstRuleCommutativity
+
+
+    --tstRuleCommutativityOrd
+
+   
+    -- DeMorgan rule testing
     --tstRuleDeMorganOrSimple
     --tstRuleDeMorganOrComplex
     --tstRuleDeMorganAndSimple
     --tstRuleDeMorganAndComplex
     --tstRuleDeMorganSimple
     --tstRuleDeMorganComplex
-    --tstRuleCommutativity
-    --tstRuleCommutativityOrd
-    --tstRuleAbsorption
-    tstRuleTRuleAbsorptionC
+    --tstRuleDeMorganAndGSimple
+    --tstRuleDeMorganAndGComplex 
+    --tstRuleDeMorganOrGSimple
+    --tstRuleDeMorganOrGComplex 
+    --tstRuleDeMorganG
+
+    -- Distributivity rule testing
+    --tstRuleDistributivity
+
+    -- Double Not rule testing
     --tstRuleDoubleNot
+
+    -- Equivalence Elimination rule testing
     --tstRuleEquivalenceElimination
+
+    -- Idempotency rule testing
     --tstRuleIdempotency
+
+    -- Implication Elimination rule testing
     --tstRuleImplicationElimination
-    --tstRuleFRuleComplement
-    --tstRuleFRuleComplementC
-    --tstRuleTRuleComplement
-    --tstRuleTRuleComplementC
-    --tstRuleFRuleNotT
-    --tstRuleTRuleNotF
+
+    -- FRuleConjunction rule testing
     --tstRuleFRuleConjunction
     --tstRuleFRuleConjunctionC
-    --tstRuleTRuleConjunction
-    --tstRuleTRuleConjunctionC
+    --tstRuleFRuleConjunctionA
+
+    -- FRuleComplement rule testing
+    --tstRuleFRuleComplement
+    --tstRuleFRuleComplementC
+    --tstRuleFRuleComplementA
+
+    -- FRuleDisjunction rule testing
     --tstRuleFRuleDisjunction
     --tstRuleFRuleDisjunctionC
+    --tstRuleFRuleDisjunctionA
+
+    -- FRuleNotT rule testing
+    --tstRuleFRuleNotT
+
+    -- TRuleConjunction rule testing
+    --tstRuleTRuleConjunction
+    --tstRuleTRuleConjunctionC
+    --tstRuleTRuleConjunctionA
+
+    -- TRuleComplement rule testing
+    --tstRuleTRuleComplement
+    --tstRuleTRuleComplementC
+    --tstRuleTRuleComplementA
+
+    -- TRuleDisjunction rule testing
     --tstRuleTRuleDisjunction
     --tstRuleTRuleDisjunctionC
-    --tstRuleDistributivity
-    --tstDeMorganAndGSimple
-    --tstDeMorganAndGComplex 
-    --tstDeMorganOrGSimple
-    --tstDeMorganOrGComplex 
-    --tstDeMorganG  
-    --mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ clean y) [(y, show x ++ " :\t" ++ (showDerivation (basicExercise (evalStrategy ruleAbsorptionF SomeWhere )) x)) | (x, y) <- zip (take 35 absorptionTestSet) [0..]]
-    
-    --mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ clean y) [(y, show x ++ " :\t" ++ (showDerivation (minimalExercise stratFRuleComplementC) x)) | (x, y) <- zip boolRuleComplementTestSet [0..]]
-    --mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ clean y) [(y, show x ++ " :\t" ++ (showDerivation (basicExercise stratFRuleComplementC) x)) | (x, y) <- zip boolRuleComplementTestSet [0..]]
-    --tstRuleAbsorption 
-     --mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ clean y) [(y, show x ++ " :\t" ++ (showDerivations (basicExercise stratAbsorptionC) x)) | (x, y) <- zip absorptionTestSet [0..]]
-     --putStrLn "----------"
-     --putStrLn $ show (absorptionTestSet!!18)
-     --putStr $ show (applyD tstLayer $ newContext $ termNavigator (absorptionTestSet!!18))
-     --putStrLn $ showDerivations (basicExercise tstLayer) (absorptionTestSet!!18) 
-     --putStrLn "----------"
-     --putStrLn $ show (absorptionTestSet!!7)
-     --putStr $ show (applyD tstLayer $ newContext $ termNavigator (absorptionTestSet!!7))
-     --putStrLn $ showDerivations (minimalExercise tstLayer) (absorptionTestSet!!7) 
+    --tstRuleTRuleDisjunctionA
 
-     --tstRuleTRuleComplementC
-    --tstRuleFRuleDisjunctionC
-    --tstRuleTRuleDisjunctionC
-    --mapM_ print quickTestSet
-    --mapM_ print quickTestSet2
-    --pptest "Test Layer Top All" [applyD (stratMultiLayerMany ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
-    --pptest "Test Layer Top All" [applyD (stratMultiLayerMany ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet ] 
-    --pptest "Test Layer Top All" [applyD (stratMultiLayerMany ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
-    --pptest "Test Layer Top All" [applyD (strattst ruleDeMorgan) $ newContext $ termNavigator x | x <- quickTestSet2 ] 
-    
+    -- TRuleNotF rule testing
+    --tstRuleTRuleNotF   
 
 --------------------------------------------------------------------------------------------------------------------------------------
--- Test Functions
+-- Test functions for rules
 --------------------------------------------------------------------------------------------------------------------------------------
 tstRuleAbsorption, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativityOrd, tstRuleDeMorganAndComplex, 
     tstRuleDeMorganAndSimple, tstRuleDeMorganOrComplex, tstRuleDeMorganOrSimple, tstRuleDeMorganComplex, 
@@ -112,203 +140,244 @@ tstRuleAbsorption, tstRuleAssociativity, tstRuleCommutativity, tstRuleCommutativ
     tstRuleFRuleComplement, tstRuleTRuleComplement, tstRuleFRuleConjunctionC, tstRuleFRuleConjunction, tstRuleTRuleConjunction,
     tstRuleTRuleConjunctionC, tstRuleFRuleComplementC, tstRuleTRuleComplementC, tstRuleFRuleDisjunctionC,
     tstRuleTRuleDisjunctionC, tstRuleFRuleDisjunction, tstRuleTRuleDisjunction, tstRuleFRuleNotT, tstRuleTRuleNotF,
-    tstRuleDistributivity, tstRuleTRuleAbsorptionC :: IO ()
-tstRuleAbsorption             = tstRuleGeneric ruleAbsorption             absorptionTestSet 
-tstRuleTRuleAbsorptionC       = tstRuleGeneric ruleAbsorptionC            absorptionTestSet
-tstRuleAssociativity          = tstRuleGeneric ruleAssociativity          associativityTestSet 
-tstRuleCommutativity          = tstRuleGeneric ruleCommutativity          commutativityTestSet 
-tstRuleCommutativityOrd       = tstRuleGeneric ruleCommutativityOrd       commutativityTestSet 
-tstRuleDeMorganAndComplex     = tstRuleGeneric ruleDeMorganAnd            deMorganAndTestSetComplex 
-tstRuleDeMorganAndSimple      = tstRuleGeneric ruleDeMorganAnd            deMorganAndTestSetSimple 
-tstRuleDeMorganOrComplex      = tstRuleGeneric ruleDeMorganOr             deMorganOrTestSetComplex 
-tstRuleDeMorganOrSimple       = tstRuleGeneric ruleDeMorganOr             deMorganOrTestSetSimple 
-tstRuleDeMorganComplex        = tstRuleGeneric ruleDeMorgan               (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
-tstRuleDeMorganSimple         = tstRuleGeneric ruleDeMorgan               (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
-tstRuleDoubleNot              = tstRuleGeneric ruleDoubleNot              doubleNotTestSet 
-tstRuleEquivalenceElimination = tstRuleGeneric ruleEquivalenceElimination equivalenceEliminationTestSet 
-tstRuleIdempotency            = tstRuleGeneric ruleIdempotency            idempotencyTestSet 
-tstRuleImplicationElimination = tstRuleGeneric ruleImplicationElimination implicationEliminationTestSet 
-tstRuleFRuleComplement        = tstRuleGeneric ruleFRuleComplement        boolRuleComplementTestSet 
-tstRuleTRuleComplement        = tstRuleGeneric ruleTRuleComplement        boolRuleComplementTestSet 
-tstRuleFRuleConjunction       = tstRuleGeneric ruleFRuleConjunction       boolRuleConjunctionTestSet 
-tstRuleTRuleConjunction       = tstRuleGeneric ruleTRuleConjunction       boolRuleConjunctionTestSet 
-tstRuleFRuleDisjunction       = tstRuleGeneric ruleFRuleDisjunction       boolRuleDisjunctionTestSet 
-tstRuleTRuleDisjunction       = tstRuleGeneric ruleTRuleDisjunction       boolRuleDisjunctionTestSet 
-tstRuleFRuleNotT              = tstRuleGeneric ruleFRuleNotT              boolRuleNotTestSet 
-tstRuleTRuleNotF              = tstRuleGeneric ruleTRuleNotF              boolRuleNotTestSet 
-tstRuleDistributivity         = tstRuleGeneric ruleDistributivity         distributivityTestSet 
-tstRuleFRuleConjunctionC      = tstRuleGeneric ruleFRuleConjunctionC      boolRuleConjunctionTestSet 
-tstRuleTRuleConjunctionC      = tstRuleGeneric ruleTRuleConjunctionC      boolRuleConjunctionTestSet 
-tstRuleFRuleComplementC       = tstRuleGeneric ruleFRuleComplementC       boolRuleComplementTestSet 
-tstRuleTRuleComplementC       = tstRuleGeneric ruleTRuleComplementC       boolRuleComplementTestSet 
-tstRuleFRuleDisjunctionC      = tstRuleGeneric ruleFRuleDisjunctionC      boolRuleDisjunctionTestSet 
-tstRuleTRuleDisjunctionC      = tstRuleGeneric ruleTRuleDisjunctionC      boolRuleDisjunctionTestSet
-tstDeMorganAndGSimple         = tstRuleGeneric ruleDeMorganAndG           deMorganAndTestSetSimple 
-tstDeMorganAndGComplex        = tstRuleGeneric ruleDeMorganAndG           deMorganAndTestSetComplex 
-tstDeMorganOrGSimple          = tstRuleGeneric ruleDeMorganOrG            deMorganOrTestSetSimple 
-tstDeMorganOrGComplex         = tstRuleGeneric ruleDeMorganOrG            deMorganOrTestSetComplex 
-tstDeMorganG                  = tstRuleGeneric ruleDeMorganG              (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex)
+    tstRuleDistributivity, tstRuleAbsorptionC, tstRuleAbsorptionA :: IO ()
+-- Absorption rule testing
+tstRuleAbsorption             = tstRuleGeneric     ruleAbsorption             absorptionTestSet 
+tstRuleAbsorptionC            = tstStrategyGeneric stratAbsorptionC           absorptionTestSet
+tstRuleAbsorptionA            = tstStrategyGeneric stratAbsorptionA           absorptionTestSet
 
+-- Associativity rule testing
+tstRuleAssociativity          = tstRuleGeneric     ruleAssociativity          associativityTestSet 
 
+-- Commutativity rule testing
+tstRuleCommutativity          = tstRuleGeneric     ruleCommutativity          commutativityTestSet 
+tstRuleCommutativityOrd       = tstRuleGeneric     ruleCommutativityOrd       commutativityTestSet 
 
+-- DeMorgan rule testing
+tstRuleDeMorganAndComplex     = tstRuleGeneric     ruleDeMorganAnd            deMorganAndTestSetComplex 
+tstRuleDeMorganAndSimple      = tstRuleGeneric     ruleDeMorganAnd            deMorganAndTestSetSimple 
+tstRuleDeMorganOrComplex      = tstRuleGeneric     ruleDeMorganOr             deMorganOrTestSetComplex 
+tstRuleDeMorganOrSimple       = tstRuleGeneric     ruleDeMorganOr             deMorganOrTestSetSimple 
+tstRuleDeMorganComplex        = tstRuleGeneric     ruleDeMorgan               (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstRuleDeMorganSimple         = tstRuleGeneric     ruleDeMorgan               (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
+tstRuleDeMorganAndGSimple     = tstStrategyGeneric ruleDeMorganAndG           deMorganAndTestSetSimple 
+tstRuleDeMorganAndGComplex    = tstStrategyGeneric ruleDeMorganAndG           deMorganAndTestSetComplex 
+tstRuleDeMorganOrGSimple      = tstStrategyGeneric ruleDeMorganOrG            deMorganOrTestSetSimple 
+tstRuleDeMorganOrGComplex     = tstStrategyGeneric ruleDeMorganOrG            deMorganOrTestSetComplex 
+tstRuleDeMorganG              = tstStrategyGeneric ruleDeMorganG              (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex)
 
+-- Distributivity rule testing
+tstRuleDistributivity         = tstRuleGeneric     ruleDistributivity         distributivityTestSet 
 
-    --pptest "deMorganDerivTestSet" deMorganDerivTestSet
-    --pptest "DeMorgan Strategy" [applyD (deMorgan) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
-    --pptest "Test Layer Top All" [applyD (testlta ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+-- Double Not rule testing
+tstRuleDoubleNot              = tstRuleGeneric     ruleDoubleNot              doubleNotTestSet 
 
+-- Equivalence Elimination rule testing
+tstRuleEquivalenceElimination = tstRuleGeneric     ruleEquivalenceElimination equivalenceEliminationTestSet 
 
-    -- putStrLn "\n"    
-    --mapM_ print $ [apply (checkStrategy) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
-    --mapM_ print $ [apply (layerFirst  lift ruleCommutativity) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet]     
-    --mapM_ print $ [apply (testlf ruleDeMorganAnd) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+-- Idempotency rule testing
+tstRuleIdempotency            = tstRuleGeneric     ruleIdempotency            idempotencyTestSet 
 
-    -- putStrLn "\n"         
-    --mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr, ruleTRuleNotF])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+-- Implication Elimination rule testing
+tstRuleImplicationElimination = tstRuleGeneric     ruleImplicationElimination implicationEliminationTestSet 
 
+-- FRuleConjunction rule testing
+tstRuleFRuleConjunction       = tstRuleGeneric     ruleFRuleConjunction       boolRuleConjunctionTestSet 
+tstRuleFRuleConjunctionC      = tstRuleGeneric     ruleFRuleConjunctionC      boolRuleConjunctionTestSet 
+tstRuleFRuleConjunctionA      = tstRuleGeneric     ruleFRuleConjunctionA      boolRuleConjunctionTestSet 
 
-    --putStrLn "\n"         
-    --mapM_ print $ [apply (testlf3 (multiRuleChoiceStrategy [ruleDeMorganAnd, ruleDeMorganOr, ruleFRuleNotT, ruleTRuleNotF])) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+-- FRuleComplement rule testing
+tstRuleFRuleComplement        = tstRuleGeneric     ruleFRuleComplement        boolRuleComplementTestSet  
+tstRuleFRuleComplementC       = tstRuleGeneric     ruleFRuleComplementC       boolRuleComplementTestSet
+tstRuleFRuleComplementA       = tstRuleGeneric     ruleFRuleComplementA       boolRuleComplementTestSet
 
+-- FRuleDisjunction rule testing
+tstRuleFRuleDisjunction       = tstRuleGeneric     ruleFRuleDisjunction       boolRuleDisjunctionTestSet 
+tstRuleFRuleDisjunctionC      = tstRuleGeneric     ruleFRuleDisjunctionC      boolRuleDisjunctionTestSet 
+tstRuleFRuleDisjunctionA      = tstRuleGeneric     ruleFRuleDisjunctionA      boolRuleDisjunctionTestSet 
 
-    --putStrLn "\nT-Rule Complement testSet:"
-    --mapM_ print boolRuleComplementTestSet
+-- FRuleNotT rule testing
+tstRuleFRuleNotT              = tstRuleGeneric     ruleFRuleNotT              boolRuleNotTestSet 
 
-    --putStrLn "\nruleTRuleComplement:"
-    --mapM_ print $ map (applyD ruleTRuleComplement) boolRuleComplementTestSet   
+-- TRuleConjunction rule testing
+tstRuleTRuleConjunction       = tstRuleGeneric     ruleTRuleConjunction       boolRuleConjunctionTestSet 
+tstRuleTRuleConjunctionC      = tstRuleGeneric     ruleTRuleConjunctionC      boolRuleConjunctionTestSet 
+tstRuleTRuleConjunctionA      = tstRuleGeneric     ruleTRuleConjunctionA      boolRuleConjunctionTestSet 
 
-    --putStrLn "\nruleCommutativeTRuleComplement:"
-    --mapM_ print $ map (applyD ruleCommutativeTRuleComplement) boolRuleComplementTestSet   
+-- TRuleComplement rule testing
+tstRuleTRuleComplement        = tstRuleGeneric     ruleTRuleComplement        boolRuleComplementTestSet
+tstRuleTRuleComplementC       = tstRuleGeneric     ruleTRuleComplementC       boolRuleComplementTestSet 
+tstRuleTRuleComplementA       = tstRuleGeneric     ruleTRuleComplementA       boolRuleComplementTestSet 
 
+-- TRuleDisjunction rule testing
+tstRuleTRuleDisjunction       = tstRuleGeneric     ruleTRuleDisjunction       boolRuleDisjunctionTestSet 
+tstRuleTRuleDisjunctionC      = tstRuleGeneric     ruleTRuleDisjunctionC      boolRuleDisjunctionTestSet
+tstRuleTRuleDisjunctionA      = tstRuleGeneric     ruleTRuleDisjunctionA      boolRuleDisjunctionTestSet
 
-{--
-    putStrLn "\nDeMorgan Deriv TestSet:"
-    mapM_ print deMorganDerivTestSet
+-- TRuleNotF rule testing
+tstRuleTRuleNotF              = tstRuleGeneric     ruleTRuleNotF              boolRuleNotTestSet 
 
-    
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Test functions for apply
+--------------------------------------------------------------------------------------------------------------------------------------
+tstApplyAbsorptionA :: IO ()
 
-    putStrLn "\nMulti DeMorgan Strategy:"
-    mapM_ print $ [apply (multiDeMorgan) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+-- Absorption rule testing
+tstApplyAbsorption             = tstApply ruleAbsorption             SomeWhereRepeat absorptionTestSet
+tstApplyAbsorptionC            = tstApply stratAbsorptionC           SomeWhereRepeat absorptionTestSet
+--tstApplyAbsorptionC            = tstApply ruleAbsorptionC            SomeWhereRepeat absorptionTestSet
+tstApplyAbsorptionA            = tstApply stratAbsorptionA           SomeWhereRepeat absorptionTestSet
+--tstApplyAbsorptionA            = tstApply ruleAbsorptionA            SomeWhereRepeat absorptionTestSet
 
-    putStrLn "\nDeMorgan Derivative Strategy:"
-    mapM_ print $ [apply (deMorganDeriv) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+-- Associativity rule testing
+tstApplyAssociativity          = tstApply ruleAssociativity          SomeWhereRepeat associativityTestSet
 
-    putStrLn "\nComplete DeMorgan Strategy:"
-    mapM_ print $ [apply (deMorganComplete) $ newContext $ termNavigator x | x <- deMorganDerivTestSet] 
+-- Commutativity rule testing
+tstApplyCommutativity          = tstApply ruleCommutativity          SomeWhereRepeat commutativityTestSet 
+tstApplyCommutativityOrd       = tstApply ruleCommutativityOrd       SomeWhereRepeat commutativityTestSet 
 
+-- DeMorgan rule testing
+tstApplyDeMorganAndComplex     = tstApply ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetComplex 
+tstApplyDeMorganAndSimple      = tstApply ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetSimple 
+tstApplyDeMorganOrComplex      = tstApply ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetComplex 
+tstApplyDeMorganOrSimple       = tstApply ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetSimple 
+tstApplyDeMorganComplex        = tstApply ruleDeMorgan               SomeWhereRepeat (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstApplyDeMorganSimple         = tstApply ruleDeMorgan               SomeWhereRepeat (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
+tstApplyDeMorganAndGSimple     = tstApply ruleDeMorganAndG           SomeWhereRepeat deMorganAndTestSetSimple 
+tstApplyDeMorganAndGComplex    = tstApply ruleDeMorganAndG           SomeWhereRepeat deMorganAndTestSetComplex 
+tstApplyDeMorganOrGSimple      = tstApply ruleDeMorganOrG            SomeWhereRepeat deMorganOrTestSetSimple 
+tstApplyDeMorganOrGComplex     = tstApply ruleDeMorganOrG            SomeWhereRepeat deMorganOrTestSetComplex 
+tstApplyDeMorganG              = tstApply ruleDeMorganG              SomeWhereRepeat (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex)
 
-    putStrLn "\nImplication Elimination Deriv TestSet:"
-    mapM_ print implicationEliminationDerivTestSet
+-- Distributivity rule testing
+tstApplyDistributivity         = tstApply ruleDistributivity         SomeWhereRepeat distributivityTestSet 
 
-    putStrLn "\nImplication Elimination Strategy:"
-    mapM_ print $ [apply (liftToContext ruleImplicationElimination) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
+-- Double Not rule testing
+tstApplyDoubleNot              = tstApply ruleDoubleNot              SomeWhereRepeat doubleNotTestSet 
 
-    putStrLn "\nMulti Implication Elimination Strategy:"
-    mapM_ print $ [apply (multiImplicationElimination) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
+-- Equivalence Elimination rule testing
+tstApplyEquivalenceElimination = tstApply ruleEquivalenceElimination SomeWhereRepeat equivalenceEliminationTestSet 
 
-    putStrLn "\nImplication Elimination Derivative Strategy"
-    mapM_ print $ [apply (implicationEliminationDeriv) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
+-- Idempotency rule testing
+tstApplyIdempotency            = tstApply ruleIdempotency            SomeWhereRepeat idempotencyTestSet 
 
-    putStrLn "\nMulti Implication Elimination Derivative Strategy"
-    mapM_ print $ [apply (mulitImplicationEliminationDeriv) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
+-- Implication Elimination rule testing
+tstApplyImplicationElimination = tstApply ruleImplicationElimination SomeWhereRepeat implicationEliminationTestSet 
 
-    putStrLn "\nComplete Implication Elimination Derivative Strategy:"
-    mapM_ print $ [apply (implicationEliminationComplete) $ newContext $ termNavigator x | x <- implicationEliminationDerivTestSet] 
-    Test code:   
-    putStrLn "hasRule / applyRule / applyRuleD doubleNotRule:"
-    print $ map (hasRule doubleNotRule) samples
-    print $ map (applyRule doubleNotRule) samples
-    print $ map (applyRuleD doubleNotRule) samples
+-- FRuleConjunction rule testing
+tstApplyFRuleConjunction       = tstApply ruleFRuleConjunction       SomeWhereRepeat boolRuleConjunctionTestSet 
+tstApplyFRuleConjunctionC      = tstApply ruleFRuleConjunctionC      SomeWhereRepeat boolRuleConjunctionTestSet 
+tstApplyFRuleConjunctionA      = tstApply ruleFRuleConjunctionA      SomeWhereRepeat boolRuleConjunctionTestSet 
 
-    putStrLn "\nApply minimalExercise:"
-    print $ map (apply (minimalExercise doubleNotOrDeMorgan)) samples
-    print $ map (applyD (minimalExercise doubleNotOrDeMorgan)) samples
-    print $ map (applyAll (minimalExercise doubleNotOrDeMorgan)) samples    
+-- FRuleComplement rule testing
+tstApplyFRuleComplement        = tstApply ruleFRuleComplement        SomeWhereRepeat boolRuleComplementTestSet  
+tstApplyFRuleComplementC       = tstApply ruleFRuleComplementC       SomeWhereRepeat boolRuleComplementTestSet
+tstApplyFRuleComplementA       = tstApply ruleFRuleComplementA       SomeWhereRepeat boolRuleComplementTestSet
 
-    --putStrLn "\nMultirule commutativity:"
-    --mapM_ print $ [apply (multiRule2Strategy ruleCommutativity) $ newContext $ termNavigator x | x <- samples]
+-- FRuleDisjunction rule testing
+tstApplyFRuleDisjunction       = tstApply ruleFRuleDisjunction       SomeWhereRepeat boolRuleDisjunctionTestSet 
+tstApplyFRuleDisjunctionC      = tstApply ruleFRuleDisjunctionC      SomeWhereRepeat boolRuleDisjunctionTestSet 
+tstApplyFRuleDisjunctionA      = tstApply ruleFRuleDisjunctionA      SomeWhereRepeat boolRuleDisjunctionTestSet 
 
---    putStrLn "\ndeMorganDerivative2:"
---    mapM_ print $ [apply (deMorganDerivative) $ newContext $ termNavigator x | x <- samples] 
-    --mapM_ print $ [apply (deMorganDerivative1Strategy) $ newContext $ termNavigator x | x <- samples] 
-    --mapM_ print $ [apply (evalStrategy doubleNot) $ newContext $ termNavigator x | x <- samples]
-    --mapM_ print $ map (applyAll ruleDeMorgan) samples    
-    --mapM_ print $ map (applyAll deMorgan) samples 
-    --putStrLn "\n"
-    --mapM_ print $ [apply (evalStrategy deMorgan) $ newContext $ termNavigator x | x <- samples]
+-- FRuleNotT rule testing
+tstApplyFRuleNotT              = tstApply ruleFRuleNotT              SomeWhereRepeat boolRuleNotTestSet 
 
-    putStrLn "\nApply evalStrategy: Create a strategy to apply a rule or rules multiple times - Standard"
-    print $ [apply (evalStrategy doubleNot) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy deMorgan) $ newContext $ termNavigator x | x <- samples]    
-    print $ [apply (evalStrategy doubleNotOrDeMorgan) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy deMorganAndNextDoubleNot) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy deMorganInterleaveDoubleNot) $ newContext $ termNavigator x | x <- samples]    
+-- TRuleConjunction rule testing
+tstApplyTRuleConjunction       = tstApply ruleTRuleConjunction       SomeWhereRepeat boolRuleConjunctionTestSet 
+tstApplyTRuleConjunctionC      = tstApply ruleTRuleConjunctionC      SomeWhereRepeat boolRuleConjunctionTestSet 
+tstApplyTRuleConjunctionA      = tstApply ruleTRuleConjunctionA      SomeWhereRepeat boolRuleConjunctionTestSet 
 
-    putStrLn "\nApply evalStrategy: Create a strategy to apply a rule or rules multiple times - Maybe"
-    print $ [apply (evalStrategy2 doubleNot) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy2 deMorgan) $ newContext $ termNavigator x | x <- samples]    
-    print $ [apply (evalStrategy2 doubleNotOrDeMorgan) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy2 deMorganAndNextDoubleNot) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy2 deMorganInterleaveDoubleNot) $ newContext $ termNavigator x | x <- samples]    
+-- TRuleComplement rule testing
+tstApplyTRuleComplement        = tstApply ruleTRuleComplement        SomeWhereRepeat boolRuleComplementTestSet
+tstApplyTRuleComplementC       = tstApply ruleTRuleComplementC       SomeWhereRepeat boolRuleComplementTestSet 
+tstApplyTRuleComplementA       = tstApply ruleTRuleComplementA       SomeWhereRepeat boolRuleComplementTestSet 
 
-    putStrLn "\nApply evalStrategy: Single application before multiple application"
-    print $ [apply (evalStrategy3 doubleNot) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy3 deMorgan) $ newContext $ termNavigator x | x <- samples]    
-    print $ [apply (evalStrategy3 doubleNotOrDeMorgan) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy3 deMorganAndNextDoubleNot) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy3 deMorganInterleaveDoubleNot) $ newContext $ termNavigator x | x <- samples]    
+-- TRuleDisjunction rule testing
+tstApplyTRuleDisjunction       = tstApply ruleTRuleDisjunction       SomeWhereRepeat boolRuleDisjunctionTestSet 
+tstApplyTRuleDisjunctionC      = tstApply ruleTRuleDisjunctionC      SomeWhereRepeat boolRuleDisjunctionTestSet
+tstApplyTRuleDisjunctionA      = tstApply ruleTRuleDisjunctionA      SomeWhereRepeat boolRuleDisjunctionTestSet
 
-    putStrLn "\nApply evalStrategy: Single application before multiple application (Left-biased choice: if the left-operand strategy can be applied)"
-    print $ [apply (evalStrategy4 doubleNot) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy4 deMorgan) $ newContext $ termNavigator x | x <- samples]    
-    print $ [apply (evalStrategy4 doubleNotOrDeMorgan) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy4 deMorganAndNextDoubleNot) $ newContext $ termNavigator x | x <- samples]
-    print $ [apply (evalStrategy4 deMorganInterleaveDoubleNot) $ newContext $ termNavigator x | x <- samples]    
+-- TRuleNotF rule testing
+tstApplyTRuleNotF              = tstApply ruleTRuleNotF              SomeWhereRepeat boolRuleNotTestSet 
 
-    putStrLn "\nApply evalStrategy: Single application before multiple application (Left-biased choice: if the left-operand strategy can be applied) - rule based"
-    --print $ [apply (evalStrategy4 (singleRuleStartegy doubleNotRule)) $ newContext $ termNavigator x | x <- samples]    
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Test functions for derivations
+--------------------------------------------------------------------------------------------------------------------------------------
+tstDerivAbsorption, tstDerivAbsorptionC, tstDerivAbsorptionA :: IO ()
 
-    putStrLn "\nApply evalStrategy: Single application one rule before multiple application second rule"
-    print $ [apply (evalStrategy5 doubleNot deMorgan) $ newContext $ termNavigator x | x <- deMorganTestSet]    
-    --print $ [apply (evalStrategy5 (singleRuleStartegy doubleNotRule) (singleRuleStartegy deMorganRule)) $ newContext $ termNavigator x | x <- deMorganTestSet]    
+-- Absorption rule testing
+tstDerivAbsorption             = tstDerivation ruleAbsorption             SomeWhereRepeat absorptionTestSet
+tstDerivAbsorptionC            = tstDerivation stratAbsorptionC           SomeWhereRepeat absorptionTestSet
+--tstDerivAbsorptionC            = tstDerivation ruleAbsorptionC            SomeWhereRepeat absorptionTestSet
+tstDerivAbsorptionA            = tstDerivation stratAbsorptionA           SomeWhereRepeat absorptionTestSet
+--tstDerivAbsorptionA            = tstDerivation ruleAbsorptionA            SomeWhereRepeat absorptionTestSet
 
+-- Associativity rule testing
+tstDerivAssociativity          = tstDerivation (ruleToStrategy ruleAssociativity)     SomeWhereRepeat associativityTestSet
 
-    putStrLn "\nApply evalStrategy: Single application of one rule somewhere"
-    --print $ applyAll (evalStrategy6 (singleRuleStartegy doubleNotRule)) $ newContext $ termNavigator (samples !! 2)
+-- Commutativity rule testing
+tstDerivCommutativity          = tstDerivation ruleCommutativity          SomeWhereRepeat commutativityTestSet 
+tstDerivCommutativityOrd       = tstDerivation ruleCommutativityOrd       SomeWhereRepeat commutativityTestSet 
 
-    print $ apply (multipleRuleChoiceStartegy [ruleDoubleNot, ruleDeMorgan]) $ newContext $ termNavigator (samples !! 7)
-    --print $ [apply (multipleRuleChoiceStartegy [doubleNotRule, deMorganRule]) $ newContext $ termNavigator x | x <- samples]    
+tstDerivDeMorganAndComplex     = tstDerivation ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetComplex 
+tstDerivDeMorganAndSimple      = tstDerivation ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetSimple 
+tstDerivDeMorganOrComplex      = tstDerivation ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetComplex 
+tstDerivDeMorganOrSimple       = tstDerivation ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetSimple 
+tstDerivDeMorganComplex        = tstDerivation ruleDeMorgan               SomeWhereRepeat (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstDerivDeMorganSimple         = tstDerivation ruleDeMorgan               SomeWhereRepeat (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
+tstDerivDeMorganAndGSimple     = tstDerivation ruleDeMorganAndG           SomeWhereRepeat deMorganAndTestSetSimple 
+tstDerivDeMorganAndGComplex    = tstDerivation ruleDeMorganAndG           SomeWhereRepeat deMorganAndTestSetComplex 
+tstDerivDeMorganOrGSimple      = tstDerivation ruleDeMorganOrG            SomeWhereRepeat deMorganOrTestSetSimple 
+tstDerivDeMorganOrGComplex     = tstDerivation ruleDeMorganOrG            SomeWhereRepeat deMorganOrTestSetComplex 
+tstDerivDeMorganG              = tstDerivation ruleDeMorganG              SomeWhereRepeat (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex)
 
-    --putStrLn "\nPrint Derivation minimalExercise:"
-    --printDerivation (minimalExercise doubleNotOrDeMorgan) (head samples)
-    --printDerivation (minimalExercise doubleNotOrDeMorgan) (samples !! 1)
-    --printDerivation (minimalExercise doubleNotOrDeMorgan) (samples !! 2)
-    --printDerivation (minimalExercise doubleNotOrDeMorgan) (samples !! 3)    
-    --printDerivation (minimalExercise doubleNotOrDeMorgan) (samples !! 4)
-    --printDerivation (minimalExercise doubleNotOrDeMorgan) (samples !! 5)
-    --printDerivation (minimalExercise doubleNotOrDeMorgan) (samples !! 6)
-    --printDerivation (minimalExercise doubleNotOrDeMorgan) (last samples)
+-- Distributivity rule testing
+tstDerivDistributivity         = tstDerivation ruleDistributivity         SomeWhereRepeat distributivityTestSet 
 
-    --putStrLn  "\nPrint Derivation basicExercise:"
-    --printDerivation (basicExercise doubleNotOrDeMorgan) (head samples)    
-    --printDerivation (basicExercise doubleNotOrDeMorgan) (samples !! 1)
-    --printDerivation (basicExercise doubleNotOrDeMorgan) (samples !! 2)
-    --printDerivation (basicExercise doubleNotOrDeMorgan) (samples !! 3)    
-    --printDerivation (basicExercise doubleNotOrDeMorgan) (samples !! 4)
-    --printDerivation (basicExercise doubleNotOrDeMorgan) (samples !! 5)
-    --printDerivation (basicExercise doubleNotOrDeMorgan) (samples !! 6)    
-    --printDerivation (basicExercise doubleNotOrDeMorgan) (last samples)        
+-- Double Not rule testing
+tstDerivDoubleNot              = tstDerivation ruleDoubleNot              SomeWhereRepeat doubleNotTestSet 
 
-    --putStrLn  "\nPrintDerivation basicExercise:"
-    --printDerivation (evalExercise doubleNotOrDeMorgan) (head samples)
-    --printDerivations (evalExercise doubleNotOrDeMorgan) (head samples)
-    --printDerivation (evalExercise doubleNotOrDeMorgan) (samples !! 1)    
-    --printDerivation (evalExercise doubleNotOrDeMorgan) (samples !! 2)
-    --printDerivations (evalExercise doubleNotOrDeMorgan) (samples !! 2)
-    --print $ showDerivation (evalExercise doubleNotOrDeMorgan) (samples !! 2)
-    --printDerivation (evalExercise doubleNotOrDeMorgan) (samples !! 3)
-    --printDerivation (evalExercise doubleNotOrDeMorgan) (samples !! 4)
-    --printDerivation (evalExercise doubleNotOrDeMorgan) (samples !! 5)
-    --printDerivation (evalExercise doubleNotOrDeMorgan) (samples !! 6)    
-    --printDerivation (evalExercise doubleNotOrDeMorgan) (last samples)
---}
+-- Equivalence Elimination rule testing
+tstDerivEquivalenceElimination = tstDerivation ruleEquivalenceElimination SomeWhereRepeat equivalenceEliminationTestSet 
+
+-- Idempotency rule testing
+tstDerivIdempotency            = tstDerivation ruleIdempotency            SomeWhereRepeat idempotencyTestSet 
+
+-- Implication Elimination rule testing
+tstDerivImplicationElimination = tstDerivation ruleImplicationElimination SomeWhereRepeat implicationEliminationTestSet 
+
+-- FRuleConjunction rule testing
+tstDerivFRuleConjunction       = tstDerivation ruleFRuleConjunction       SomeWhereRepeat boolRuleConjunctionTestSet 
+tstDerivFRuleConjunctionC      = tstDerivation ruleFRuleConjunctionC      SomeWhereRepeat boolRuleConjunctionTestSet 
+tstDerivFRuleConjunctionA      = tstDerivation ruleFRuleConjunctionA      SomeWhereRepeat boolRuleConjunctionTestSet 
+
+-- FRuleComplement rule testing
+tstDerivFRuleComplement        = tstDerivation ruleFRuleComplement        SomeWhereRepeat boolRuleComplementTestSet  
+tstDerivFRuleComplementC       = tstDerivation ruleFRuleComplementC       SomeWhereRepeat boolRuleComplementTestSet
+tstDerivFRuleComplementA       = tstDerivation ruleFRuleComplementA       SomeWhereRepeat boolRuleComplementTestSet
+
+-- FRuleDisjunction rule testing
+tstDerivFRuleDisjunction       = tstDerivation ruleFRuleDisjunction       SomeWhereRepeat boolRuleDisjunctionTestSet 
+tstDerivFRuleDisjunctionC      = tstDerivation ruleFRuleDisjunctionC      SomeWhereRepeat boolRuleDisjunctionTestSet 
+tstDerivFRuleDisjunctionA      = tstDerivation ruleFRuleDisjunctionA      SomeWhereRepeat boolRuleDisjunctionTestSet 
+
+-- FRuleNotT rule testing
+tstDerivFRuleNotT              = tstDerivation ruleFRuleNotT              SomeWhereRepeat boolRuleNotTestSet 
+
+-- TRuleConjunction rule testing
+tstDerivTRuleConjunction       = tstDerivation ruleTRuleConjunction       SomeWhereRepeat boolRuleConjunctionTestSet 
+tstDerivTRuleConjunctionC      = tstDerivation ruleTRuleConjunctionC      SomeWhereRepeat boolRuleConjunctionTestSet 
+tstDerivTRuleConjunctionA      = tstDerivation ruleTRuleConjunctionA      SomeWhereRepeat boolRuleConjunctionTestSet 
+
+-- TRuleComplement rule testing
+tstDerivTRuleComplement        = tstDerivation ruleTRuleComplement        SomeWhereRepeat boolRuleComplementTestSet
+tstDerivTRuleComplementC       = tstDerivation ruleTRuleComplementC       SomeWhereRepeat boolRuleComplementTestSet 
+tstDerivTRuleComplementA       = tstDerivation ruleTRuleComplementA       SomeWhereRepeat boolRuleComplementTestSet 
+
+-- TRuleDisjunction rule testing
+tstDerivTRuleDisjunction       = tstDerivation ruleTRuleDisjunction       SomeWhereRepeat boolRuleDisjunctionTestSet 
+tstDerivTRuleDisjunctionC      = tstDerivation ruleTRuleDisjunctionC      SomeWhereRepeat boolRuleDisjunctionTestSet
+tstDerivTRuleDisjunctionA      = tstDerivation ruleTRuleDisjunctionA      SomeWhereRepeat boolRuleDisjunctionTestSet
+
+-- TRuleNotF rule testing
+tstDerivTRuleNotF              = tstDerivation ruleTRuleNotF              SomeWhereRepeat boolRuleNotTestSet 
