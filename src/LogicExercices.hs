@@ -41,7 +41,7 @@ evalExercise    x = emptyExercise
                         -- properties    = setProperty "indistinguishability" withoutContext (indExpr x),
                         -- ->? -
                         similarity    = withoutContext (==), 
-                        ready         = predicate isWff, 
+                        ready         = predicate (const True),-- isTerm, 
                         examples      = examplesFor Easy []
                      }
 

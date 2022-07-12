@@ -6,13 +6,29 @@ import LogicTestCases
 import LogicReductionStrategies
 import LogicTestFunctions
 import LogicExercices
+import LogicConstants
 
+
+import Ideas.Common.Library
+import LogicFunctions
+import Domain.Logic.Formula
+import Ideas.Common.Traversal.Navigator
+import qualified Ideas.Common.Strategy.Combinators as Combinators 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Main
 --------------------------------------------------------------------------------------------------------------------------------------
 main :: IO ()
 main = do    
--- Absorption rule testing -- needs attention!!
+    --tstApply      stratDoubleNot          SomeWhereRepeatS layerTestSet 
+    --tstDerivation stratDoubleNot          SomeWhereRepeatS layerTestSet 
+    --tstApply      stratLayerDoubleNot          SomeWhereRepeatS layerTestSet 
+    --tstDerivation stratDoubleNot          SomeWhereRepeatS layerTestSet
+    --tstDerivation stratDerivDeMorgan      SomeWhere (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex) 
+    --tstDerivation stratDerivLayerDeMorgan          SomeWhere (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex) 
+    --  tstDerivation stratLayerTFRuleNotTF SomeWhereRepeatS layerTestSet 
+      tstDerivation stratLayerUnary       Single layerTestSet 
+
+-- Absorption rule testing
     --tstRuleAbsorption
     --tstApplyAbsorption
     --tstDerivAbsorption
@@ -22,6 +38,7 @@ main = do
     --tstRuleAbsorptionA
     --tstApplyAbsorptionA
     --tstDerivAbsorptionA
+
     
 -- Associativity rule testing
     --tstRuleAssociativity
@@ -148,7 +165,7 @@ main = do
     --tstApplyTRuleComplementC
     --tstDerivTRuleComplementC
     --tstRuleTRuleComplementA
-    tstApplyTRuleComplementA
+    --tstApplyTRuleComplementA
     --tstDerivTRuleComplementA
 
 -- TRuleDisjunction rule testing
@@ -160,13 +177,17 @@ main = do
     --tstDerivTRuleDisjunctionC
     --tstRuleTRuleDisjunctionA
     --tstApplyTRuleDisjunctionA
-    tstDerivTRuleDisjunctionA
+    --tstDerivTRuleDisjunctionA
 
 -- TRuleNotF rule testing
     --tstRuleTRuleNotF  
     --tstApplyTRuleNotF
     --tstDerivTRuleNotF
  
+
+-- Negative terms
+    --tstDerivation stratNegTerms           SomeWhereRepeatS negTermsTestSet
+
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test functions for rules
@@ -273,82 +294,82 @@ tstApplyAbsorption, tstApplyAbsorptionC, tstApplyAbsorptionA, tstApplyAssociativ
     tstApplyTRuleDisjunction, tstApplyTRuleDisjunctionC, tstApplyTRuleDisjunctionA, tstApplyTRuleNotF :: IO ()
 
 -- Absorption rule testing
-tstApplyAbsorption             = tstApply ruleAbsorption             SomeWhereRepeat absorptionTestSet
-tstApplyAbsorptionC            = tstApply stratAbsorptionC           SomeWhereRepeat absorptionTestSet
---tstApplyAbsorptionC            = tstApply ruleAbsorptionC            SomeWhereRepeat absorptionTestSet
-tstApplyAbsorptionA            = tstApply stratAbsorptionA           SomeWhereRepeat absorptionTestSet
---tstApplyAbsorptionA            = tstApply ruleAbsorptionA            SomeWhereRepeat absorptionTestSet
+tstApplyAbsorption             = tstApply ruleAbsorption             SomeWhereRepeatS absorptionTestSet
+tstApplyAbsorptionC            = tstApply stratAbsorptionC           SomeWhereRepeatS absorptionTestSet
+--tstApplyAbsorptionC            = tstApply ruleAbsorptionC            SomeWhereRepeatS absorptionTestSet
+tstApplyAbsorptionA            = tstApply stratAbsorptionA           SomeWhereRepeatS absorptionTestSet
+--tstApplyAbsorptionA            = tstApply ruleAbsorptionA            SomeWhereRepeatS absorptionTestSet
 
 -- Associativity rule testing
-tstApplyAssociativity          = tstApply ruleAssociativity          SomeWhereRepeat associativityTestSet
+tstApplyAssociativity          = tstApply ruleAssociativity          SomeWhereRepeatS associativityTestSet
 
 -- Commutativity rule testing
-tstApplyCommutativity          = tstApply ruleCommutativity          SomeWhereRepeat commutativityTestSet 
-tstApplyCommutativityOrd       = tstApply ruleCommutativityOrd       SomeWhereRepeat commutativityTestSet 
+tstApplyCommutativity          = tstApply ruleCommutativity          SomeWhereRepeatS commutativityTestSet 
+tstApplyCommutativityOrd       = tstApply ruleCommutativityOrd       SomeWhereRepeatS commutativityTestSet 
 
 -- DeMorgan rule testing
-tstApplyDeMorganAndComplex     = tstApply ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetComplex 
-tstApplyDeMorganAndSimple      = tstApply ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetSimple 
-tstApplyDeMorganOrComplex      = tstApply ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetComplex 
-tstApplyDeMorganOrSimple       = tstApply ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetSimple 
-tstApplyDeMorganComplex        = tstApply ruleDeMorgan               SomeWhereRepeat (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
-tstApplyDeMorganSimple         = tstApply ruleDeMorgan               SomeWhereRepeat (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
-tstApplyDeMorganAndGSimple     = tstApply ruleDeMorganAndG           SomeWhereRepeat deMorganAndTestSetSimple 
-tstApplyDeMorganAndGComplex    = tstApply ruleDeMorganAndG           SomeWhereRepeat deMorganAndTestSetComplex 
-tstApplyDeMorganOrGSimple      = tstApply ruleDeMorganOrG            SomeWhereRepeat deMorganOrTestSetSimple 
-tstApplyDeMorganOrGComplex     = tstApply ruleDeMorganOrG            SomeWhereRepeat deMorganOrTestSetComplex 
-tstApplyDeMorganG              = tstApply ruleDeMorganG              SomeWhereRepeat (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex)
+tstApplyDeMorganAndComplex     = tstApply ruleDeMorganAnd            SomeWhereRepeatS deMorganAndTestSetComplex 
+tstApplyDeMorganAndSimple      = tstApply ruleDeMorganAnd            SomeWhereRepeatS deMorganAndTestSetSimple 
+tstApplyDeMorganOrComplex      = tstApply ruleDeMorganOr             SomeWhereRepeatS deMorganOrTestSetComplex 
+tstApplyDeMorganOrSimple       = tstApply ruleDeMorganOr             SomeWhereRepeatS deMorganOrTestSetSimple 
+tstApplyDeMorganComplex        = tstApply ruleDeMorgan               SomeWhereRepeatS (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstApplyDeMorganSimple         = tstApply ruleDeMorgan               SomeWhereRepeatS (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
+tstApplyDeMorganAndGSimple     = tstApply ruleDeMorganAndG           SomeWhereRepeatS deMorganAndTestSetSimple 
+tstApplyDeMorganAndGComplex    = tstApply ruleDeMorganAndG           SomeWhereRepeatS deMorganAndTestSetComplex 
+tstApplyDeMorganOrGSimple      = tstApply ruleDeMorganOrG            SomeWhereRepeatS deMorganOrTestSetSimple 
+tstApplyDeMorganOrGComplex     = tstApply ruleDeMorganOrG            SomeWhereRepeatS deMorganOrTestSetComplex 
+tstApplyDeMorganG              = tstApply ruleDeMorganG              SomeWhereRepeatS (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex)
 
 -- Distributivity rule testing
-tstApplyDistributivity         = tstApply ruleDistributivity         SomeWhereRepeat distributivityTestSet 
+tstApplyDistributivity         = tstApply ruleDistributivity         SomeWhereRepeatS distributivityTestSet 
 
 -- Double Not rule testing
-tstApplyDoubleNot              = tstApply ruleDoubleNot              SomeWhereRepeat doubleNotTestSet 
+tstApplyDoubleNot              = tstApply ruleDoubleNot              SomeWhereRepeatS doubleNotTestSet 
 
 -- Equivalence Elimination rule testing
-tstApplyEquivalenceElimination = tstApply ruleEquivalenceElimination SomeWhereRepeat equivalenceEliminationTestSet 
+tstApplyEquivalenceElimination = tstApply ruleEquivalenceElimination SomeWhereRepeatS equivalenceEliminationTestSet 
 
 -- Idempotency rule testing
-tstApplyIdempotency            = tstApply ruleIdempotency            SomeWhereRepeat idempotencyTestSet 
+tstApplyIdempotency            = tstApply ruleIdempotency            SomeWhereRepeatS idempotencyTestSet 
 
 -- Implication Elimination rule testing
-tstApplyImplicationElimination = tstApply ruleImplicationElimination SomeWhereRepeat implicationEliminationTestSet 
+tstApplyImplicationElimination = tstApply ruleImplicationElimination SomeWhereRepeatS implicationEliminationTestSet 
 
 -- FRuleConjunction rule testing
-tstApplyFRuleConjunction       = tstApply ruleFRuleConjunction       SomeWhereRepeat boolRuleConjunctionTestSet 
-tstApplyFRuleConjunctionC      = tstApply ruleFRuleConjunctionC      SomeWhereRepeat boolRuleConjunctionTestSet 
-tstApplyFRuleConjunctionA      = tstApply ruleFRuleConjunctionA      SomeWhereRepeat boolRuleConjunctionTestSet 
+tstApplyFRuleConjunction       = tstApply ruleFRuleConjunction       SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstApplyFRuleConjunctionC      = tstApply ruleFRuleConjunctionC      SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstApplyFRuleConjunctionA      = tstApply ruleFRuleConjunctionA      SomeWhereRepeatS boolRuleConjunctionTestSet 
 
 -- FRuleComplement rule testing
-tstApplyFRuleComplement        = tstApply ruleFRuleComplement        SomeWhereRepeat boolRuleComplementTestSet  
-tstApplyFRuleComplementC       = tstApply ruleFRuleComplementC       SomeWhereRepeat boolRuleComplementTestSet
-tstApplyFRuleComplementA       = tstApply ruleFRuleComplementA       SomeWhereRepeat boolRuleComplementTestSet
+tstApplyFRuleComplement        = tstApply ruleFRuleComplement        SomeWhereRepeatS boolRuleComplementTestSet  
+tstApplyFRuleComplementC       = tstApply ruleFRuleComplementC       SomeWhereRepeatS boolRuleComplementTestSet
+tstApplyFRuleComplementA       = tstApply ruleFRuleComplementA       SomeWhereRepeatS boolRuleComplementTestSet
 
 -- FRuleDisjunction rule testing
-tstApplyFRuleDisjunction       = tstApply ruleFRuleDisjunction       SomeWhereRepeat boolRuleDisjunctionTestSet 
-tstApplyFRuleDisjunctionC      = tstApply ruleFRuleDisjunctionC      SomeWhereRepeat boolRuleDisjunctionTestSet 
-tstApplyFRuleDisjunctionA      = tstApply ruleFRuleDisjunctionA      SomeWhereRepeat boolRuleDisjunctionTestSet 
+tstApplyFRuleDisjunction       = tstApply ruleFRuleDisjunction       SomeWhereRepeatS boolRuleDisjunctionTestSet 
+tstApplyFRuleDisjunctionC      = tstApply ruleFRuleDisjunctionC      SomeWhereRepeatS boolRuleDisjunctionTestSet 
+tstApplyFRuleDisjunctionA      = tstApply ruleFRuleDisjunctionA      SomeWhereRepeatS boolRuleDisjunctionTestSet 
 
 -- FRuleNotT rule testing
-tstApplyFRuleNotT              = tstApply ruleFRuleNotT              SomeWhereRepeat boolRuleNotTestSet 
+tstApplyFRuleNotT              = tstApply ruleFRuleNotT              SomeWhereRepeatS boolRuleNotTestSet 
 
 -- TRuleConjunction rule testing
-tstApplyTRuleConjunction       = tstApply ruleTRuleConjunction       SomeWhereRepeat boolRuleConjunctionTestSet 
-tstApplyTRuleConjunctionC      = tstApply ruleTRuleConjunctionC      SomeWhereRepeat boolRuleConjunctionTestSet 
-tstApplyTRuleConjunctionA      = tstApply ruleTRuleConjunctionA      SomeWhereRepeat boolRuleConjunctionTestSet 
+tstApplyTRuleConjunction       = tstApply ruleTRuleConjunction       SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstApplyTRuleConjunctionC      = tstApply ruleTRuleConjunctionC      SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstApplyTRuleConjunctionA      = tstApply ruleTRuleConjunctionA      SomeWhereRepeatS boolRuleConjunctionTestSet 
 
 -- TRuleComplement rule testing
-tstApplyTRuleComplement        = tstApply ruleTRuleComplement        SomeWhereRepeat boolRuleComplementTestSet
-tstApplyTRuleComplementC       = tstApply ruleTRuleComplementC       SomeWhereRepeat boolRuleComplementTestSet 
-tstApplyTRuleComplementA       = tstApply ruleTRuleComplementA       SomeWhereRepeat boolRuleComplementTestSet 
+tstApplyTRuleComplement        = tstApply ruleTRuleComplement        SomeWhereRepeatS boolRuleComplementTestSet
+tstApplyTRuleComplementC       = tstApply ruleTRuleComplementC       SomeWhereRepeatS boolRuleComplementTestSet 
+tstApplyTRuleComplementA       = tstApply ruleTRuleComplementA       SomeWhereRepeatS boolRuleComplementTestSet 
 
 -- TRuleDisjunction rule testing
-tstApplyTRuleDisjunction       = tstApply ruleTRuleDisjunction       SomeWhereRepeat boolRuleDisjunctionTestSet 
-tstApplyTRuleDisjunctionC      = tstApply ruleTRuleDisjunctionC      SomeWhereRepeat boolRuleDisjunctionTestSet
-tstApplyTRuleDisjunctionA      = tstApply ruleTRuleDisjunctionA      SomeWhereRepeat boolRuleDisjunctionTestSet
+tstApplyTRuleDisjunction       = tstApply ruleTRuleDisjunction       SomeWhereRepeatS boolRuleDisjunctionTestSet 
+tstApplyTRuleDisjunctionC      = tstApply ruleTRuleDisjunctionC      SomeWhereRepeatS boolRuleDisjunctionTestSet
+tstApplyTRuleDisjunctionA      = tstApply ruleTRuleDisjunctionA      SomeWhereRepeatS boolRuleDisjunctionTestSet
 
 -- TRuleNotF rule testing
-tstApplyTRuleNotF              = tstApply ruleTRuleNotF              SomeWhereRepeat boolRuleNotTestSet 
+tstApplyTRuleNotF              = tstApply ruleTRuleNotF              SomeWhereRepeatS boolRuleNotTestSet 
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Test functions for derivations
@@ -365,79 +386,79 @@ tstDerivAbsorption, tstDerivAbsorptionC, tstDerivAbsorptionA, tstDerivAssociativ
 
 
 -- Absorption rule testing
-tstDerivAbsorption             = tstDerivation ruleAbsorption             SomeWhereRepeat absorptionTestSet
-tstDerivAbsorptionC            = tstDerivation stratAbsorptionC           SomeWhereRepeat absorptionTestSet
---tstDerivAbsorptionC            = tstDerivation ruleAbsorptionC            SomeWhereRepeat absorptionTestSet
-tstDerivAbsorptionA            = tstDerivation stratAbsorptionA           SomeWhereRepeat absorptionTestSet
---tstDerivAbsorptionA            = tstDerivation ruleAbsorptionA            SomeWhereRepeat absorptionTestSet
+tstDerivAbsorption             = tstDerivation ruleAbsorption             SomeWhereRepeatS absorptionTestSet
+tstDerivAbsorptionC            = tstDerivation stratAbsorptionC           SomeWhereRepeatS absorptionTestSet
+--tstDerivAbsorptionC            = tstDerivation ruleAbsorptionC            SomeWhereRepeatS absorptionTestSet
+tstDerivAbsorptionA            = tstDerivation stratAbsorptionA           SomeWhereRepeatS absorptionTestSet
+--tstDerivAbsorptionA            = tstDerivation ruleAbsorptionA            SomeWhereRepeatS absorptionTestSet
 
 -- Associativity rule testing
-tstDerivAssociativity          = tstDerivation (ruleToStrategy ruleAssociativity)     SomeWhereRepeat associativityTestSet
+tstDerivAssociativity          = tstDerivation (ruleToStrategy ruleAssociativity)     SomeWhereRepeatS associativityTestSet
 
 -- Commutativity rule testing
-tstDerivCommutativity          = tstDerivation ruleCommutativity          SomeWhereRepeat commutativityTestSet 
-tstDerivCommutativityOrd       = tstDerivation ruleCommutativityOrd       SomeWhereRepeat commutativityTestSet 
+tstDerivCommutativity          = tstDerivation ruleCommutativity          SomeWhereRepeatS commutativityTestSet 
+tstDerivCommutativityOrd       = tstDerivation ruleCommutativityOrd       SomeWhereRepeatS commutativityTestSet 
 
 -- DeMorgan rule testing
-tstDerivDeMorganAndComplex     = tstDerivation ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetComplex 
-tstDerivDeMorganAndSimple      = tstDerivation ruleDeMorganAnd            SomeWhereRepeat deMorganAndTestSetSimple 
-tstDerivDeMorganOrComplex      = tstDerivation ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetComplex 
-tstDerivDeMorganOrSimple       = tstDerivation ruleDeMorganOr             SomeWhereRepeat deMorganOrTestSetSimple 
-tstDerivDeMorganComplex        = tstDerivation ruleDeMorgan               SomeWhereRepeat (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
-tstDerivDeMorganSimple         = tstDerivation ruleDeMorgan               SomeWhereRepeat (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
-tstDerivDeMorganAndGSimple     = tstDerivation ruleDeMorganAndG           SomeWhereRepeat deMorganAndTestSetSimple 
-tstDerivDeMorganAndGComplex    = tstDerivation ruleDeMorganAndG           SomeWhereRepeat deMorganAndTestSetComplex 
-tstDerivDeMorganOrGSimple      = tstDerivation ruleDeMorganOrG            SomeWhereRepeat deMorganOrTestSetSimple 
-tstDerivDeMorganOrGComplex     = tstDerivation ruleDeMorganOrG            SomeWhereRepeat deMorganOrTestSetComplex 
-tstDerivDeMorganG              = tstDerivation ruleDeMorganG              SomeWhereRepeat (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex)
+tstDerivDeMorganAndComplex     = tstDerivation ruleDeMorganAnd            SomeWhereRepeatS deMorganAndTestSetComplex 
+tstDerivDeMorganAndSimple      = tstDerivation ruleDeMorganAnd            SomeWhereRepeatS deMorganAndTestSetSimple 
+tstDerivDeMorganOrComplex      = tstDerivation ruleDeMorganOr             SomeWhereRepeatS deMorganOrTestSetComplex 
+tstDerivDeMorganOrSimple       = tstDerivation ruleDeMorganOr             SomeWhereRepeatS deMorganOrTestSetSimple 
+tstDerivDeMorganComplex        = tstDerivation ruleDeMorgan               SomeWhereRepeatS (deMorganAndTestSetComplex ++ deMorganOrTestSetComplex) 
+tstDerivDeMorganSimple         = tstDerivation ruleDeMorgan               SomeWhereRepeatS (deMorganAndTestSetSimple ++ deMorganOrTestSetSimple) 
+tstDerivDeMorganAndGSimple     = tstDerivation ruleDeMorganAndG           SomeWhereRepeatS deMorganAndTestSetSimple 
+tstDerivDeMorganAndGComplex    = tstDerivation ruleDeMorganAndG           SomeWhereRepeatS deMorganAndTestSetComplex 
+tstDerivDeMorganOrGSimple      = tstDerivation ruleDeMorganOrG            SomeWhereRepeatS deMorganOrTestSetSimple 
+tstDerivDeMorganOrGComplex     = tstDerivation ruleDeMorganOrG            SomeWhereRepeatS deMorganOrTestSetComplex 
+tstDerivDeMorganG              = tstDerivation ruleDeMorganG              SomeWhereRepeatS (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex)
 
 -- Distributivity rule testing
-tstDerivDistributivity         = tstDerivation ruleDistributivity         SomeWhereRepeat distributivityTestSet 
+tstDerivDistributivity         = tstDerivation ruleDistributivity         SomeWhereRepeatS distributivityTestSet 
 
 -- Double Not rule testing
-tstDerivDoubleNot              = tstDerivation ruleDoubleNot              SomeWhereRepeat doubleNotTestSet 
+tstDerivDoubleNot              = tstDerivation ruleDoubleNot              SomeWhereRepeatS doubleNotTestSet 
 
 -- Equivalence Elimination rule testing
-tstDerivEquivalenceElimination = tstDerivation ruleEquivalenceElimination SomeWhereRepeat equivalenceEliminationTestSet 
+tstDerivEquivalenceElimination = tstDerivation ruleEquivalenceElimination SomeWhereRepeatS equivalenceEliminationTestSet 
 
 -- Idempotency rule testing
-tstDerivIdempotency            = tstDerivation ruleIdempotency            SomeWhereRepeat idempotencyTestSet 
+tstDerivIdempotency            = tstDerivation ruleIdempotency            SomeWhereRepeatS idempotencyTestSet 
 
 -- Implication Elimination rule testing
-tstDerivImplicationElimination = tstDerivation ruleImplicationElimination SomeWhereRepeat implicationEliminationTestSet 
+tstDerivImplicationElimination = tstDerivation ruleImplicationElimination SomeWhereRepeatS implicationEliminationTestSet 
 
 -- FRuleConjunction rule testing
-tstDerivFRuleConjunction       = tstDerivation ruleFRuleConjunction       SomeWhereRepeat boolRuleConjunctionTestSet 
-tstDerivFRuleConjunctionC      = tstDerivation ruleFRuleConjunctionC      SomeWhereRepeat boolRuleConjunctionTestSet 
-tstDerivFRuleConjunctionA      = tstDerivation ruleFRuleConjunctionA      SomeWhereRepeat boolRuleConjunctionTestSet 
+tstDerivFRuleConjunction       = tstDerivation ruleFRuleConjunction       SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstDerivFRuleConjunctionC      = tstDerivation ruleFRuleConjunctionC      SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstDerivFRuleConjunctionA      = tstDerivation ruleFRuleConjunctionA      SomeWhereRepeatS boolRuleConjunctionTestSet 
 
 -- FRuleComplement rule testing
-tstDerivFRuleComplement        = tstDerivation ruleFRuleComplement        SomeWhereRepeat boolRuleComplementTestSet  
-tstDerivFRuleComplementC       = tstDerivation ruleFRuleComplementC       SomeWhereRepeat boolRuleComplementTestSet
-tstDerivFRuleComplementA       = tstDerivation ruleFRuleComplementA       SomeWhereRepeat boolRuleComplementTestSet
+tstDerivFRuleComplement        = tstDerivation ruleFRuleComplement        SomeWhereRepeatS boolRuleComplementTestSet  
+tstDerivFRuleComplementC       = tstDerivation ruleFRuleComplementC       SomeWhereRepeatS boolRuleComplementTestSet
+tstDerivFRuleComplementA       = tstDerivation ruleFRuleComplementA       SomeWhereRepeatS boolRuleComplementTestSet
 
 -- FRuleDisjunction rule testing
-tstDerivFRuleDisjunction       = tstDerivation ruleFRuleDisjunction       SomeWhereRepeat boolRuleDisjunctionTestSet 
-tstDerivFRuleDisjunctionC      = tstDerivation ruleFRuleDisjunctionC      SomeWhereRepeat boolRuleDisjunctionTestSet 
-tstDerivFRuleDisjunctionA      = tstDerivation ruleFRuleDisjunctionA      SomeWhereRepeat boolRuleDisjunctionTestSet 
+tstDerivFRuleDisjunction       = tstDerivation ruleFRuleDisjunction       SomeWhereRepeatS boolRuleDisjunctionTestSet 
+tstDerivFRuleDisjunctionC      = tstDerivation ruleFRuleDisjunctionC      SomeWhereRepeatS boolRuleDisjunctionTestSet 
+tstDerivFRuleDisjunctionA      = tstDerivation ruleFRuleDisjunctionA      SomeWhereRepeatS boolRuleDisjunctionTestSet 
 
 -- FRuleNotT rule testing
-tstDerivFRuleNotT              = tstDerivation ruleFRuleNotT              SomeWhereRepeat boolRuleNotTestSet 
+tstDerivFRuleNotT              = tstDerivation ruleFRuleNotT              SomeWhereRepeatS boolRuleNotTestSet 
 
 -- TRuleConjunction rule testing
-tstDerivTRuleConjunction       = tstDerivation ruleTRuleConjunction       SomeWhereRepeat boolRuleConjunctionTestSet 
-tstDerivTRuleConjunctionC      = tstDerivation ruleTRuleConjunctionC      SomeWhereRepeat boolRuleConjunctionTestSet 
-tstDerivTRuleConjunctionA      = tstDerivation ruleTRuleConjunctionA      SomeWhereRepeat boolRuleConjunctionTestSet 
+tstDerivTRuleConjunction       = tstDerivation ruleTRuleConjunction       SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstDerivTRuleConjunctionC      = tstDerivation ruleTRuleConjunctionC      SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstDerivTRuleConjunctionA      = tstDerivation ruleTRuleConjunctionA      SomeWhereRepeatS boolRuleConjunctionTestSet 
 
 -- TRuleComplement rule testing
-tstDerivTRuleComplement        = tstDerivation ruleTRuleComplement        SomeWhereRepeat boolRuleComplementTestSet
-tstDerivTRuleComplementC       = tstDerivation ruleTRuleComplementC       SomeWhereRepeat boolRuleComplementTestSet 
-tstDerivTRuleComplementA       = tstDerivation ruleTRuleComplementA       SomeWhereRepeat boolRuleComplementTestSet 
+tstDerivTRuleComplement        = tstDerivation ruleTRuleComplement        SomeWhereRepeatS boolRuleComplementTestSet
+tstDerivTRuleComplementC       = tstDerivation ruleTRuleComplementC       SomeWhereRepeatS boolRuleComplementTestSet 
+tstDerivTRuleComplementA       = tstDerivation ruleTRuleComplementA       SomeWhereRepeatS boolRuleComplementTestSet 
 
 -- TRuleDisjunction rule testing
-tstDerivTRuleDisjunction       = tstDerivation ruleTRuleDisjunction       SomeWhereRepeat boolRuleDisjunctionTestSet 
-tstDerivTRuleDisjunctionC      = tstDerivation ruleTRuleDisjunctionC      SomeWhereRepeat boolRuleDisjunctionTestSet
-tstDerivTRuleDisjunctionA      = tstDerivation ruleTRuleDisjunctionA      SomeWhereRepeat boolRuleDisjunctionTestSet
+tstDerivTRuleDisjunction       = tstDerivation ruleTRuleDisjunction       SomeWhereRepeatS boolRuleDisjunctionTestSet 
+tstDerivTRuleDisjunctionC      = tstDerivation ruleTRuleDisjunctionC      SomeWhereRepeatS boolRuleDisjunctionTestSet
+tstDerivTRuleDisjunctionA      = tstDerivation ruleTRuleDisjunctionA      SomeWhereRepeatS boolRuleDisjunctionTestSet
 
 -- TRuleNotF rule testing
-tstDerivTRuleNotF              = tstDerivation ruleTRuleNotF              SomeWhereRepeat boolRuleNotTestSet 
+tstDerivTRuleNotF              = tstDerivation ruleTRuleNotF              SomeWhereRepeatS boolRuleNotTestSet 

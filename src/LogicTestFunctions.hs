@@ -82,8 +82,8 @@ tstDerivation r s xs = mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ y) [(y, s
         --ex = minimalExercise es
         ex = basicExercise es
         --ex = evalExercise es
-        --f  = showDerivation ex
-        f  = showDerivations ex
+        f  = showDerivation ex
+        --f  = showDerivations ex
 
 
 -- Delivers a list with the results after application of the strategy or rule

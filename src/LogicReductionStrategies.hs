@@ -17,7 +17,7 @@ import LogicFunctions
 -- Strategies: under construction
 --------------------------------------------------------------------------------------------------------------------------------------
 data LayerOrd = TopFirst | LayerFirst
-data EvaluationType = Single | SomeWhere | SomeWhereRepeat | Repeat 
+data EvaluationType = Single | SomeWhere | SomeWhereRepeatS | SomeWhereRepeat1 | RepeatS | Repeat1 
 
 class LogicRuleConversion a where
     type Out a   :: * 
@@ -30,7 +30,6 @@ instance LogicRuleConversion (Rule SLogic) where
 instance LogicRuleConversion (Rule (Context SLogic)) where 
     type Out (Rule (Context SLogic)) = (LabeledStrategy (Context SLogic))
     ruleToStrategy x = label (showId x) $ x
-
 
 class LogicEvaluationStrategy a where
     type Out2 a   :: * 
@@ -50,32 +49,70 @@ instance LogicEvaluationStrategy (LabeledStrategy SLogic) where
 
 instance LogicEvaluationStrategy (LabeledStrategy (Context SLogic)) where  
     type Out2 (LabeledStrategy (Context SLogic)) = (EvaluationType -> LabeledStrategy (Context SLogic))
-    evalStrategy r Single          = evalStrategyG ("Evaluate - " ++ showId r)                     r 
-    evalStrategy r SomeWhere       = evalStrategyG ("Evaluate somewhere - " ++ showId r)           (somewhere r)
-    evalStrategy r Repeat          = evalStrategyG ("Evaluate repeat - " ++ showId r)              (repeatS   r) 
-    evalStrategy r SomeWhereRepeat = evalStrategyG ("Evaluate repeat somewhere - " ++ showId r)    (repeatS   (somewhere r))
+    evalStrategy r Single           = evalStrategyG ("Evaluate - " ++ showId r)                     r 
+    evalStrategy r SomeWhere        = evalStrategyG ("Evaluate somewhere - " ++ showId r)           (somewhere r)
+    evalStrategy r RepeatS          = evalStrategyG ("Evaluate repeat - " ++ showId r)              (repeatS   r) 
+    evalStrategy r Repeat1          = evalStrategyG ("Evaluate repeat - " ++ showId r)              (repeat1   r) 
+    evalStrategy r SomeWhereRepeatS = evalStrategyG ("Evaluate repeat somewhere - " ++ showId r)    (repeatS   (somewhere r))
+    evalStrategy r SomeWhereRepeat1 = evalStrategyG ("Evaluate repeat somewhere - " ++ showId r)    (repeat1   (somewhere r))
 
 evalStrategyG :: (IsId l, IsStrategy f) => l -> f a -> LabeledStrategy a
 evalStrategyG l s = label l $ s
 
-stratRuleTopLayerMany, stratMultiLayerManyROtd :: Rule SLogic -> LabeledStrategy (Context (SLogic))
-stratRuleTopLayerMany r = label desc strat
+evalConditionOnTerm :: (SLogic -> Bool) -> Strategy (Context SLogic)
+evalConditionOnTerm c = check (maybe False c . currentInContext)
+
+stratRuleTopLayerMany, stratMultiLayerManyROtd :: (IsStrategy f, Navigator a, HasId (f a)) => f a -> LabeledStrategy a
+stratRuleTopLayerMany f = label d $ s
     where
-        desc  = "Multilayer Many - " ++ showId r
-        strat = fix $ \s -> (ruleToStrategy r) .*. (layerMany s)
+        d  = "Multilayer Many - " ++ showId f
+        s = fix $ \x -> f .*. (layerMany x)
 
 stratMultiLayerManyROtd r = label desc strat
     where
         desc  = "Layer Many Repeat Oncetd - " ++ showId r
         strat = repeatS (oncetd (stratRuleTopLayerMany r)) 
 
-stratNegateRules :: (Navigator SLogic) => Strategy SLogic
-stratNegateRules = s1 .*. s2 
-    where 
-        s1 = layerFirst (stratFRuleComplementA |> stratTRuleComplementA |> stratFRuleConjunctionA |> stratTRuleConjunctionA |> 
-             stratFRuleDisjunctionA |> stratTRuleDisjunctionA |> ruleIdempotency |> ruleImplicationElimination |> ruleEquivalenceElimination)
-        s2 = layerAll (ruleDoubleNot)
-{--
+stratMultiDoubleNot, stratDoubleNotUnary, stratDoubleNot, stratLayerDoubleNot, stratLayerTFRuleNotTF, stratLayerUnary, stratDerivDeMorgan, stratDerivLayerDeMorgan:: LabeledStrategy (Context SLogic)
+stratMultiDoubleNot = label d s
+    where
+        d = "Rewrite Strategy Multi Double Not"
+        r = liftToContext ruleDoubleNot
+        s = evalConditionOnTerm isMultiDoubleNot .*. repeat1 r
+
+stratDoubleNotUnary   = label "Rewrite Strategy Unary Double Not" $ ruleMultiDoubleNot |> (liftToContext ruleDoubleNot)
+stratLayerDoubleNot   = label "Rewrite Strategy Layered Double Not" ((evalConditionOnTerm (not . isUnaryTerm)) .*. layerSome stratDoubleNotUnary)
+stratDoubleNot        = label "Rewrite Strategy Layered Double Not" $ stratLayerDoubleNot |> stratDoubleNotUnary
+stratLayerTFRuleNotTF = label "Rewrite Strategy Layered T-Rule Not F or F-RuleNot-T" (c .*. s)
+    where
+        c = evalConditionOnTerm (not . isUnaryTerm) 
+        s = layerSome (liftToContext ruleTRuleNotF .|. liftToContext ruleFRuleNotT)   
+stratLayerUnary = label "Rewrite Strategy Layered Unary" (c .*. s)
+    where
+        c = evalConditionOnTerm (not . isUnaryTerm) 
+        s = layerSome (replicateS 2 (stratDoubleNotUnary .|. liftToContext ruleTRuleNotF .|. liftToContext ruleFRuleNotT))
+
+
+stratDerivDeMorgan    = label "Rewrite Strategy DeMorgan Derivative"     $ liftToContext stratDeMorgan .*. try(stratDoubleNot)
+stratDerivLayerDeMorgan    = label "Rewrite Strategy DeMorgan Derivative"    $ stratRuleTopLayerMany stratDerivDeMorgan
+
+
+ruleDoubleNotC :: Rule (Context SLogic)
+ruleMultiDoubleNot  = convertToRule "Multi Double Not"                "multi.doublenot"   stratMultiDoubleNot
+ruleLayerDoubleNot  = convertToRule "Layered Double Not"              "layered.doublenot" stratLayerDoubleNot
+ruleDoubleNotC      = convertToRule "Double Not (All Variants)"       "doublenot.all"     stratDoubleNot
+
+
+--stratNegTerms :: LabeledStrategy (Context SLogic)
+--stratNegTerms = label "Negate term strategy" $ ((check isNot) .*. ((s1 .*. dn) .|. (stratDeMorgan .*. dn))) 
+--    where 
+--        s1 = layerFirst (stratFRuleComplementA)-- .|. stratTRuleComplementA .|. stratFRuleConjunctionA .|. stratTRuleConjunctionA .|. 
+--             --stratFRuleDisjunctionA .|. stratTRuleDisjunctionA .|. ruleIdempotency .|. ruleImplicationElimination .|. ruleEquivalenceElimination)
+--        dn = try (layerAll (liftToContext ruleDoubleNot))
+
+--stratDeMorganDoubleNot = (check isNot)
+
+    {--
 multiStrategyChoice, multiStrategyRuleOrElse, multiStrategySeq :: [Strategy a] -> LabeledStrategy (Context (a))
 multiStrategyChoice xs = label d s
     where
@@ -87,13 +124,14 @@ multiStrategyRuleOrElse xs = label d s
     where
         d = intercalate "-orelse-" (map showId xs)
         s = orelse (map liftToContext xs)
-
 -- Apply of a given list of rules (sequence)
 multiStrategySeq xs = label d s
     where
         d = intercalate "-and-" (map showId xs)
         s = Combinators.sequence (map xs)
+
 --}
+
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Visits -- from Traversal.sh
@@ -122,11 +160,12 @@ layer :: (Navigator a) => Strategy a -> Strategy a
 layer s          = ruleDown .*. s .*. ruleUp
 
 layerAll, layerFirst, layerLeftMost, layerRightMost, layerMany :: (IsStrategy f, Navigator a) => f a -> Strategy a
-layerAll s       = layer (visit VisitAll ruleRight s)
-layerFirst s     = layer (visit VisitFirst ruleRight s)
-layerLeftMost s  = layer (visitm VisitLeftMost s)
+layerAll s       = layer (visit  VisitAll       ruleRight s)
+layerSome s      = layer (visit  VisitSome      ruleRight s)
+layerFirst s     = layer (visit  VisitFirst     ruleRight s)
+layerLeftMost s  = layer (visitm VisitLeftMost  s)
 layerRightMost s = layer (visitm VisitRightMost s)
-layerMany s      = layer (visit VisitMany ruleRight s)
+layerMany s      = layer (visit  VisitMany      ruleRight s)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Strategies
@@ -245,25 +284,26 @@ stratAbsorptionC  = label "Rewrite Strategy Commutativity-Absortion"      $ s
         lc = liftToContext ruleCommutativity
         hlm = (layerLeftMost lc) .*. la
         hrm = (layerRightMost lc) .*. la
-        s  = (check (maybe False isCommutativeAbsorption1 . fromContext) .*. hlm )         |>   
-             (check (maybe False isCommutativeAbsorption2 . fromContext) .*. (lc .*. la))  |> 
-             (check (maybe False isCommutativeAbsorption3 . fromContext) .*. hrm )         |>  
-             (check (maybe False isCommutativeAbsorption4 . fromContext) .*. (lc .*. hlm)) |> 
-             (check (maybe False isCommutativeAbsorption5 . fromContext) .*. (lc .*. hrm)) |> 
+        s  = (evalConditionOnTerm isCommutativeAbsorption1 .*. hlm )         |>   
+             (evalConditionOnTerm isCommutativeAbsorption2 .*. (lc .*. la))  |> 
+             (evalConditionOnTerm isCommutativeAbsorption3 .*. hrm )         |>  
+             (evalConditionOnTerm isCommutativeAbsorption4 .*. (lc .*. hlm)) |> 
+             (evalConditionOnTerm isCommutativeAbsorption5 .*. (lc .*. hrm)) |> 
              failS
 
 stratAbsorptionA  = label "Rewrite Strategy Commutativity-Absortion"     $ ruleToStrategy (ruleAbsorption) |> ruleAbsorptionC
-stratDeMorganAndG = label "Rewrite Strategy DeMorgan And Generalisation" $ stratRuleTopLayerMany ruleDeMorganAnd
-stratDeMorganOrG  = label "Rewrite Strategy DeMorgan Or Generalisation"  $ stratRuleTopLayerMany ruleDeMorganOr
-stratDeMorganG    = label "Rewrite Strategy DeMorgan Generalisations"    $ stratRuleTopLayerMany ruleDeMorgan
---stratDeMorganA    = label "Rewrite Strategy DeMorgan Generalisations"    $ stratDeMorgan |> stratDeMorganG
+stratDeMorganAndG = label "Rewrite Strategy DeMorgan And Generalisation" $ stratRuleTopLayerMany (ruleToStrategy ruleDeMorganAnd)
+stratDeMorganOrG  = label "Rewrite Strategy DeMorgan Or Generalisation"  $ stratRuleTopLayerMany (ruleToStrategy ruleDeMorganOr)
+stratDeMorganG    = label "Rewrite Strategy DeMorgan Generalisations"    $ stratRuleTopLayerMany (ruleToStrategy ruleDeMorgan)
+stratDeMorganA    = label "Rewrite Strategy DeMorgan All Variants)"      $ liftToContext stratDeMorgan |> stratDeMorganG
 
-ruleAbsorptionC, ruleAbsorptionA, ruleDeMorganAndG, ruleDeMorganOrG, ruleDeMorganG :: Rule (Context SLogic)
+ruleAbsorptionC, ruleAbsorptionA, ruleDeMorganAndG, ruleDeMorganOrG, ruleDeMorganG, ruleDeMorganA :: Rule (Context SLogic)
 ruleAbsorptionC  = convertToRule "Commutative Absorption"                "single.commutativity.absorption" stratAbsorptionC
 ruleAbsorptionA  = convertToRule "Commutative Absorption (All variants)" "absorption.all"                  stratAbsorptionA
 ruleDeMorganAndG = convertToRule "DeMorgan And Generalisations"          "generalisations.DeMorgan.And"    stratDeMorganAndG
 ruleDeMorganOrG  = convertToRule "DeMorgan Or Generalisations"           "generalisations.DeMorgan.Or"     stratDeMorganOrG
 ruleDeMorganG    = convertToRule "DeMorgan Generalisations"              "generalisations.DeMorgan"        stratDeMorganG
+ruleDeMorganA    = convertToRule "DeMorgan (All variants)"               "DeMorgan.all"                    stratDeMorganA
 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Set of advanced logic Strategies, including:
