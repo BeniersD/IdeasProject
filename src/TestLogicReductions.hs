@@ -14,6 +14,7 @@ import LogicFunctions
 import Domain.Logic.Formula
 import Ideas.Common.Traversal.Navigator
 import qualified Ideas.Common.Strategy.Combinators as Combinators 
+
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Main
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -21,12 +22,19 @@ main :: IO ()
 main = do    
     --tstApply      stratDoubleNot          SomeWhereRepeatS layerTestSet 
     --tstDerivation stratDoubleNot          SomeWhereRepeatS layerTestSet 
-    --tstApply      stratLayerDoubleNot          SomeWhereRepeatS layerTestSet 
+    --tstDerivation      stratDoubleNotUnary          SomeWhere layerTestSet
+    --tstApply      stratLayerDoubleNot          SomeWhere layerTestSet 
+    --tstDerivation      stratLayerDoubleNot          SomeWhere layerTestSet 
     --tstDerivation stratDoubleNot          SomeWhereRepeatS layerTestSet
     --tstDerivation stratDerivDeMorgan      SomeWhere (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex) 
-    --tstDerivation stratDerivLayerDeMorgan          SomeWhere (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex) 
-    --  tstDerivation stratLayerTFRuleNotTF SomeWhereRepeatS layerTestSet 
-      tstDerivation stratLayerUnary       Single layerTestSet 
+    --tstDerivation stratDerivLayerDeMorgan          SomeWhere (deMorganOrTestSetSimple ++ deMorganAndTeomplex) 
+    --tstDerivation stratLayerTFRuleNotTF SomeWhere  layerTestSet 
+    --tstDerivation stratAssocitivityCommutativity SomeWhereRepeatS  commutativityTestSet 
+    --tstApply stratAssociativityCommutativity SomeWhereRepeatS  commutativityTestSet 
+    --tstDerivation stratCommutativitySpec SomeWhereRepeatS commutativityTestSet
+    --tstDerivation ruleAssociativityCommutativity SomeWhereRepeatS  commutativityTestSet 
+
+    printDerivations (evalExercise (evalStrategy ruleAssociativityCommutativity Single)) (commutativityTestSet!!38)
 
 -- Absorption rule testing
     --tstRuleAbsorption
@@ -430,7 +438,7 @@ tstDerivImplicationElimination = tstDerivation ruleImplicationElimination SomeWh
 -- FRuleConjunction rule testing
 tstDerivFRuleConjunction       = tstDerivation ruleFRuleConjunction       SomeWhereRepeatS boolRuleConjunctionTestSet 
 tstDerivFRuleConjunctionC      = tstDerivation ruleFRuleConjunctionC      SomeWhereRepeatS boolRuleConjunctionTestSet 
-tstDerivFRuleConjunctionA      = tstDerivation ruleFRuleConjunctionA      SomeWhereRepeatS boolRuleConjunctionTestSet 
+tstDerivFRuleConjunctionA      = tstDerivation stratFRuleConjunctionA      SomeWhereRepeatS boolRuleConjunctionTestSet 
 
 -- FRuleComplement rule testing
 tstDerivFRuleComplement        = tstDerivation ruleFRuleComplement        SomeWhereRepeatS boolRuleComplementTestSet  

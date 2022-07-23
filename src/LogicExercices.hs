@@ -10,12 +10,25 @@ import Ideas.Utils.Prelude (splitsWithElem, readM)
 import LogicReductionRules
 import LogicReductionStrategies
 import LogicFunctions
+import LogicTestCases
 
-minimalExercise :: LabeledStrategy SLogic -> Exercise SLogic
+main :: IO ()
+main = defaultMain (dr (evalStrategy ruleAssociativityCommutativity Single))
+
+dr :: LabeledStrategy (Context SLogic) -> DomainReasoner
+dr x = describe "Domain reasoner for tutorial" (newDomainReasoner "eval") 
+   { exercises = [Some (minimalExercise x), Some (basicExercise x), Some (evalExercise x)]
+   , services  = myServices x
+   }
+
+myServices :: LabeledStrategy (Context SLogic) -> [Service]
+myServices x = metaServiceList (dr x) ++ serviceList
+
+minimalExercise :: LabeledStrategy (Context SLogic) -> Exercise SLogic
 minimalExercise x = emptyExercise
                      { 
                         exerciseId    = describe "Evaluate an expression (minimal)" $ newId "eval.minimal", 
-                        strategy      = liftToContext x, 
+                        strategy      = x, 
                         prettyPrinter = show
                      }
 
@@ -42,7 +55,7 @@ evalExercise    x = emptyExercise
                         -- ->? -
                         similarity    = withoutContext (==), 
                         ready         = predicate (const True),-- isTerm, 
-                        examples      = examplesFor Easy []
+                        examples      = examplesFor Easy commutativityTestSet
                      }
 
 eqExpr :: SLogic -> SLogic -> Bool

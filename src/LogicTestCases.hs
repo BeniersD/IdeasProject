@@ -21,36 +21,43 @@ commutativityTestSet =
                   Not p :&&: q,                    -- 6.
                   Not p :&&: Not q,                -- 7.
                   Not q :&&: Not p,                -- 8.  
-                  p :&&: Not (Not p),              -- 10.
-                  Not (Not p :&&: p),              -- 11.
-                  T :&&: F,                        -- 12. 
-                  F :&&: T,                        -- 13.
-                  T :&&: p,                        -- 14.  
-                  p :&&: T,                        -- 15.
-                  F :&&: p,                        -- 16.  
-                  p :&&: F,                        -- 17.
-                  p :&&: (q :&&: r),               -- 18.
-                  p :||: (q :||: r),               -- 19.
-                  p :&&: (q :&&: p),               -- 20.
-                  p :&&: (p :||: q),               -- 21.
-                  (p :&&: q) :&&: p,               -- 22.
-                  (p :&&: q) :&&: (q :&&: p),      -- 23.
-                  p :||: q,                        -- 24.
-                  q :||: p,                        -- 25.
-                  p :||: Not (Not p),              -- 26.
-                  Not (Not p :||: p),              -- 27.
-                  T :||: F,                        -- 28.
-                  F :||: T,                        -- 29.
-                  T :||: p,                        -- 30.
-                  p :||: T,                        -- 31.
-                  F :||: p,                        -- 32.
-                  p :||: F,                        -- 33.
-                  p :||: (p :||: q),               -- 34.
-                  (p :||: q) :||: p,               -- 35.
-                  (p :||: q) :||: (q :||: p),       -- 36.
-                  (q :||: p) :||: (q :||: p),       -- 37.
-                  p :||: F :||: Not p :||: T :||: q :||: Not q :||: (p :&&: q) :||: (Not p :&&: q) :||: (p :&&: Not q) :||: (Not p :&&: Not q) :||: (p :&&: q :&&: r), 
-                  (q :||: p) :||: (q :||: p) :||: (Not q :||: Not p) :||: (F :||: T)      -- 38.
+                  p :&&: Not (Not p),              -- 9.
+                  Not (Not p :&&: p),              -- 10.
+                  T :&&: F,                        -- 11. 
+                  F :&&: T,                        -- 12.
+                  T :&&: p,                        -- 13.  
+                  p :&&: T,                        -- 14.
+                  F :&&: p,                        -- 15.  
+                  p :&&: F,                        -- 16.
+                  p :&&: (q :&&: r),               -- 17.
+                  p :||: (q :||: r),               -- 18.
+                  p :&&: (q :&&: p),               -- 19.
+                  T :&&: (p :||: q),               -- 20.
+                  (p :&&: q) :&&: F,               -- 21.
+                  (p :&&: q) :&&: (q :&&: p),      -- 22.
+                  p :||: q,                        -- 23.
+                  q :||: p,                        -- 24.
+                  p :||: Not (Not p),              -- 25.
+                  Not (Not T :||: p),              -- 26.
+                  T :||: F,                        -- 27.
+                  F :||: T,                        -- 28.
+                  Not (Not (Not T)) :||: T,        -- 29.
+                  Not (Not  F) :||: Not (Not (Not (Not T))), -- 30.
+                  T :||: p,                        -- 31.
+                  p :||: T,                        -- 32.
+                  F :||: p,                        -- 33.
+                  p :||: F,                        -- 34.
+                  p :||: (Not p :||: q),               -- 35.
+                  (p :||: q) :||: Not p,               -- 36.
+                  (Not (Not p) :||: Not q) :||: (q :||: p),       -- 37.
+                  (q :||: p) :||: (q :||: p),       -- 38.
+                  (q :||: Not (Not p)) :||: (q :||: Not p),       -- 39.
+                  (q :||: p) :||: (Not (Not q) :||: Not p)  :||: (Not q :||: Not (Not p)),       -- 40.
+                  p :||: F :||: Not p :||: T :||: q :||: Not q :||: (p :&&: q) :||: (Not p :&&: q) :||: (p :&&: Not q) :||: (Not p :&&: Not q) :||: (p :&&: q :&&: r), -- 41.
+                  (q :||: p) :||: (q :||: p) :||: (Not q :||: Not p) :||: (F :||: T),      -- 42.
+                  q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T,  -- 43.
+                  (q :||: p) :||: (q :||: p) :&&: ((q :->: p) :||: (q :<->: p) :||: (q :||: p) :||: p), -- 44.
+                  (Not p :&&: r :&&: Not (Not (Not F))) :||: Not (Not (Not F)) :||: Not (Not (Not r)) :||: Not (Not (Not p)) :||: (Not p :&&: q) :||: (Not (Not p) :&&: q :&&: Not p) :||: q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T :||: Not (Not (Not T)) :||: (Not q :<->: Not p)-- 45.
                 ]
 
 implicationEliminationDerivTestSet =
@@ -375,6 +382,7 @@ associativityTestSet =
                   (q :||: p) :||: r,                                   -- (q ˅ p) ˅ r
                   Not ((q :||: p) :||: r),                             -- ¬((q ˅ p) ˅ r)  
                   ((q :||: p) :||: r) :||: s,                          -- ((q ˅ p) ˅ r) ˅ s)  
+                  ((q :||: p) :||: r) :&&: (s :||: t),                 -- ((q ˅ p) ˅ r) ˄ (s ˅ t)  
                   Not (((q :||: p) :||: r) :||: s),                    -- ¬((q ˅ p) ˅ r) ˅ s)  
                   ((q :||: p) :||: r) :||: s,                          -- ((q ˅ p) ˅ r) ˅ s)  
                   Not (((q :||: p) :||: r) :||: s),                    -- ¬((q ˅ p) ˅ r) ˅ s)  
@@ -410,6 +418,10 @@ layerTestSet =
                   Not (Not (Not (Not (Not (Not p))))),
                   Not (Not p) :||: q,
                   Not (Not p) :&&: q,
+                  Not (Not p) :->: q,
+                  Not (Not p) :<->: q,
+                  Not (Not (Not (Not (Not (Not p))))) :->: Not (Not q),
+                  (Not (Not (Not (Not (Not (Not p))))) :->: Not (Not q)) :&&: Not (Not q),
                   p :&&: Not F,
                   p :&&: Not (Not F),
                   Not T :&&: q,
