@@ -1,4 +1,4 @@
-module LogicFunctions (isOrdered, isMultiDoubleNot, isUnaryTerm, isAssoCommOrdered, skipNegations, countNegations, compareLogic, skipNegation, isNegation, isThruthValue
+module LogicFunctions (isOrdered, isDoubleNot, isMultiDoubleNot, isUnaryTerm, isAssoCommOrdered, skipNegations, countNegations, compareLogic, skipNegation, isNegation, isThruthValue
    ) where
 
 import Domain.Logic.Formula
@@ -7,18 +7,20 @@ import Data.Maybe
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Generic checker functions
 --------------------------------------------------------------------------------------------------------------------------------------
-isAssoCommOrdered, isMultiDoubleNot, isNegation, isOrdered, isThruthValue, isUnaryTerm  :: SLogic -> Bool
-
+isAssoCommOrdered, isDoubleNot, isMultiDoubleNot, isNegation, isOrdered, isThruthValue, isUnaryTerm  :: SLogic -> Bool
 
 isAssoCommOrdered (p :||: q) | (skipNegations p /= skipNegations q) = isOrdered (skipNegations p :||: skipNegations q)
 isAssoCommOrdered (p :&&: q) | (skipNegations p /= skipNegations q) = isOrdered (skipNegations p :&&: skipNegations q)
 isAssoCommOrdered x                                                 = isOrdered x
 
+isDoubleNot (Not (Not p))                  = True
+isDoubleNot _                              = False
+
 isMultiDoubleNot (Not (Not (Not (Not p)))) = True
 isMultiDoubleNot _                         = False
 
-isNegation (Not _) = True
-isNegation _       = False
+isNegation (Not _)                         = True
+isNegation _                               = False
 
 isOrdered (p :||: q) | (isThruthValue . skipNegations) p && (not . isUnaryTerm) q = True
 isOrdered (p :&&: q) | (isThruthValue . skipNegations) p && (not . isUnaryTerm) q = True

@@ -25,16 +25,26 @@ main = do
     --tstDerivation      stratDoubleNotUnary          SomeWhere layerTestSet
     --tstApply      stratLayerDoubleNot          SomeWhere layerTestSet 
     --tstDerivation      stratLayerDoubleNot          SomeWhere layerTestSet 
-    --tstDerivation stratDoubleNot          SomeWhereRepeatS layerTestSet
+    --tstDerivation stratDoubleNot          SomeWhere layerTestSet
     --tstDerivation stratDerivDeMorgan      SomeWhere (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex) 
-    --tstDerivation stratDerivLayerDeMorgan          SomeWhere (deMorganOrTestSetSimple ++ deMorganAndTeomplex) 
+    --tstDerivation stratDerivDeMorgan      SomeWhere deMorganDerivTestSet
+    --tstDerivation stratDerivDeMorganG          SomeWhere (deMorganOrTestSetSimple ++ deMorganAndTestSetComplex) 
+    --tstDerivation stratDeMorganG          SomeWhere deMorganDerivTestSet
+    --tstDerivation stratDerivDeMorganG          SomeWhere deMorganDerivTestSet
     --tstDerivation stratLayerTFRuleNotTF SomeWhere  layerTestSet 
-    --tstDerivation stratAssocitivityCommutativity SomeWhereRepeatS  commutativityTestSet 
-    --tstApply stratAssociativityCommutativity SomeWhereRepeatS  commutativityTestSet 
-    --tstDerivation stratCommutativitySpec SomeWhereRepeatS commutativityTestSet
-    --tstDerivation ruleAssociativityCommutativity SomeWhereRepeatS  commutativityTestSet 
+    --tstDerivation stratDoubleNotTFRuleNotTF SomeWhere  layerTestSet
+    --putStrLn $ show (isDoubleNot (Not (Not F)))
+    --putStrLn $ show (isDoubleNot (Not (Not (Not F))))
+    --tstDerivation stratDoubleNotTFRuleNotTF SomeWhere  layerTestSet 
+    --tstDerivation stratDoubleNotTFRuleNotTF SomeWhereRepeatS  layerTestSet 
+    --tstDerivation stratMultiTFRuleNotTF SomeWhere  layerTestSet
+    --tstDerivation stratTFRuleNotTF SomeWhere  layerTestSet
+    --tstDerivation stratAC SomeWhereRepeatS  commutativityTestSet 
+    tstDerivation stratACI SomeWhere  commutativityTestSet 
+    --tstApply stratAC SomeWhereRepeatS  commutativityTestSet 
+    --tstDerivation ruleAC SomeWhereRepeatS  commutativityTestSet 
 
-    printDerivations (evalExercise (evalStrategy ruleAssociativityCommutativity Single)) (commutativityTestSet!!38)
+    --printDerivations (evalExercise (evalStrategy ruleAssociativityCommutativity Single)) (commutativityTestSet!!45)
 
 -- Absorption rule testing
     --tstRuleAbsorption

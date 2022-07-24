@@ -13,7 +13,7 @@ import LogicFunctions
 import LogicTestCases
 
 main :: IO ()
-main = defaultMain (dr (evalStrategy ruleAssociativityCommutativity Single))
+main = defaultMain (dr (evalStrategy ruleAC Single))
 
 dr :: LabeledStrategy (Context SLogic) -> DomainReasoner
 dr x = describe "Domain reasoner for tutorial" (newDomainReasoner "eval") 

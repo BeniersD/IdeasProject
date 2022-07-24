@@ -57,7 +57,8 @@ commutativityTestSet =
                   (q :||: p) :||: (q :||: p) :||: (Not q :||: Not p) :||: (F :||: T),      -- 42.
                   q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T,  -- 43.
                   (q :||: p) :||: (q :||: p) :&&: ((q :->: p) :||: (q :<->: p) :||: (q :||: p) :||: p), -- 44.
-                  (Not p :&&: r :&&: Not (Not (Not F))) :||: Not (Not (Not F)) :||: Not (Not (Not r)) :||: Not (Not (Not p)) :||: (Not p :&&: q) :||: (Not (Not p) :&&: q :&&: Not p) :||: q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T :||: Not (Not (Not T)) :||: (Not q :<->: Not p)-- 45.
+                  Not p :&&: Not q :&&: Not r :&&: Not (Not q) :&&: Not (Not r) :&&: Not (Not q), --45
+                  (Not p :&&: r :&&: Not (Not (Not F))) :||: Not (Not (Not F)) :||: Not (Not (Not r)) :||: Not (Not (Not p)) :||: (Not p :&&: q) :||: (Not (Not p) :&&: q :&&: Not p) :||: q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T :||: Not (Not (Not T)) :||: (Not q :<->: Not p)-- 46.
                 ]
 
 implicationEliminationDerivTestSet =
@@ -97,44 +98,48 @@ equivalenceEliminationDerivTestSet =
 
 deMorganDerivTestSet =
                 [ 
-                  Not (p :&&: q),                               -- ¬(p ˄ q)  
-                  Not (q :&&: p),                               -- ¬(q ˄ p)  
-                  Not (q :&&: p :&&: r),                        -- ¬(q ˄ p ˄ r)  
-                  Not (q :&&: p :&&: r :&&: s),                 -- ¬(q ˄ p ˄ r ˄ s)  
-                  Not (Not (q :&&: p)),                         -- ¬¬(q ˄ p)  
-                  Not (Not (Not p) :&&: T),                     -- ¬(¬¬p ˄ T) 
-                  Not (Not (Not p) :&&: T :&&: T),              -- ¬(¬¬p ˄ T ˄ T)
-                  Not (Not (Not p) :&&: T :&&: F),              -- ¬(¬¬p ˄ T ˄ F)                
-                  Not (Not (Not p) :&&: T :&&: Not (Not p)),    -- ¬(¬¬p ˄ T ˄ ¬¬p)    
-                  Not (Not (Not p) :&&: T :&&: Not (Not q)),    -- ¬(¬¬p ˄ T ˄ ¬¬q)        
-                  Not (Not (Not p) :&&: Not p :&&: T),          -- ¬(¬¬p ˄ ¬p ˄ T)
-                  Not (T :||: Not (Not p)),                     -- ¬(T ˅ ¬¬p)
-                  Not (q :||: p :||: r),                        -- ¬(q ˅ p ˅ r)  
-                  Not (q :||: p :||: r :||: s),                 -- ¬(q ˅ p ˅ r ˅ s)                  
-                  Not (Not (Not p) :||: T),                     -- ¬(¬¬p ˅ T)
-                  Not (Not (Not p) :||: T :||: T),              -- ¬(¬¬p ˅ T ˅ T)        
-                  Not (Not (Not p) :||: T :||: F),              -- ¬(¬¬p ˅ T ˅ F)                
-                  Not (T :||: Not (Not p) :||: Not (Not p)),    -- ¬(T ˅ ¬¬p ˅ ¬¬p)    
-                  Not (Not (Not p) :||: T :||: Not (Not p)),    -- ¬(¬¬p ˅ T ˅ ¬¬p)    
-                  Not (Not (Not p) :||: T :||: Not (Not q)),    -- ¬(¬¬p ˅ T ˅ ¬¬q)        
-                  Not (Not (Not p) :||: Not p :||: T),          -- ¬(¬¬p ˅ ¬p ˅ T)
-                  Not (F :&&: Not (Not p)),                     -- ¬(F ˄ ¬¬p)
-                  Not (Not (Not p) :&&: F),                     -- ¬(¬¬p ˄ F)
-                  Not (Not (Not p) :&&: F :&&: F),              -- ¬(¬¬p ˄ F ˄ F)        
-                  Not (Not (Not p) :&&: F :&&: T),              -- ¬(¬¬p ˄ F ˄ T)                
-                  Not (Not (Not p) :&&: F :&&: Not (Not p)),    -- ¬(¬¬p ˄ F ˄ ¬¬p)    
-                  Not (Not (Not p) :&&: F :&&: Not (Not q)),    -- ¬(¬¬p ˄ F ˄ ¬¬q)        
-                  Not (F :&&: Not (Not p) :&&: Not p),          -- ¬(F ˄ ¬¬p ˄ ¬p)        
-                  Not (Not (Not p) :&&: Not p :&&: F),          -- ¬(¬¬p ˄ ¬p ˄ F)
-                  Not (Not (Not p) :&&: F :&&: Not p),          -- ¬(¬¬p ˄ F ˄ ¬p)                
-                  Not (F :||: Not (Not p)),                     -- ¬(T ˅ ¬¬p)
-                  Not (F :||: Not (Not p) :||: Not (Not p)),    -- ¬(T ˅ ¬¬p ˅ ¬¬p)            
-                  Not (Not (Not p) :||: F),                     -- ¬(¬¬p ˅ F)
-                  Not (Not (Not p) :||: F :||: F),              -- ¬(¬¬p ˅ F ˅ F)        
-                  Not (Not (Not p) :||: F :||: T),              -- ¬(¬¬p ˅ F ˅ T)                
-                  Not (Not (Not p) :||: F :||: Not (Not p)),    -- ¬(¬¬p ˅ F ˅ ¬¬p)    
-                  Not (Not (Not p) :||: F :||: Not (Not q)),    -- ¬(¬¬p ˅ F ˅ ¬¬q)        
-                  Not (Not (Not p) :||: Not p :||: F)           -- ¬(¬¬p ˅ ¬p ˅ F)
+                  Not (p :&&: q),                               -- 0. ¬(p ˄ q)  
+                  Not (q :&&: p),                               -- 1. ¬(q ˄ p)  
+                  Not (q :&&: p :&&: r),                        -- 2. ¬(q ˄ p ˄ r)  
+                  Not (q :&&: p :&&: r :&&: s),                 -- 3. ¬(q ˄ p ˄ r ˄ s)  
+                  Not (Not (q :&&: p)),                         -- 4. ¬¬(q ˄ p)  
+                  Not (Not (Not p) :||: Not (Not q)),           -- 5. ¬(¬¬p ˅ ¬¬p)
+                  Not (Not (Not p) :||: Not (Not (Not q))),     -- 6. ¬(¬¬p ˅ ¬¬¬q)
+                  Not (Not (Not p) :||: Not (Not (Not q))) :->: Not (Not (Not p) :||: Not (Not (Not q)) :||: Not (Not r)),     -- 6. ¬(¬¬p ˅ ¬¬¬q) -> ¬(¬¬p ˅ ¬¬¬q ˅ ¬¬r) 
+                  Not (Not (Not p) :||: Not (Not (Not q)) :||: Not (Not r) :||: Not (Not (Not (Not s)))),     -- 7.  ¬(¬¬p ˅ ¬¬¬q ˅ ¬¬r ˅ ¬¬¬¬s)
+                  Not (Not (Not p) :&&: T),                     -- 7. ¬(¬¬p ˄ T) 
+                  Not (Not (Not p) :&&: T :&&: T),              -- 8. ¬(¬¬p ˄ T ˄ T)
+                  Not (Not (Not p) :&&: T :&&: F),              -- 9. ¬(¬¬p ˄ T ˄ F)                
+                  Not (Not (Not p) :&&: T :&&: Not (Not p)),    -- 10. ¬(¬¬p ˄ T ˄ ¬¬p)    
+                  Not (Not (Not p) :&&: T :&&: Not (Not q)),    -- 11. ¬(¬¬p ˄ T ˄ ¬¬q)        
+                  Not (Not (Not p) :&&: Not p :&&: T),          -- 12. ¬(¬¬p ˄ ¬p ˄ T)
+                  Not (T :||: Not (Not p)),                     -- 13. ¬(T ˅ ¬¬p)
+                  Not (q :||: p :||: r),                        -- 14. ¬(q ˅ p ˅ r)  
+                  Not (q :||: p :||: r :||: s),                 -- 15. ¬(q ˅ p ˅ r ˅ s)                  
+                  Not (Not (Not p) :||: T),                     -- 16. ¬(¬¬p ˅ T)
+                  Not (Not (Not p) :||: T :||: T),              -- 17. ¬(¬¬p ˅ T ˅ T)        
+                  Not (Not (Not p) :||: T :||: F),              -- 18. ¬(¬¬p ˅ T ˅ F)                 
+                  Not (T :||: Not (Not p) :||: Not (Not p)),    -- 19. ¬(T ˅ ¬¬p ˅ ¬¬p)    
+                  Not (Not (Not p) :||: T :||: Not (Not p)),    -- 20. ¬(¬¬p ˅ T ˅ ¬¬p)    
+                  Not (Not (Not p) :||: T :||: Not (Not q)),    -- 21. ¬(¬¬p ˅ T ˅ ¬¬q)        
+                  Not (Not (Not p) :||: Not p :||: T),          -- 22. ¬(¬¬p ˅ ¬p ˅ T)
+                  Not (F :&&: Not (Not p)),                     -- 23. ¬(F ˄ ¬¬p)
+                  Not (Not (Not p) :&&: F),                     -- 24. ¬(¬¬p ˄ F)
+                  Not (Not (Not p) :&&: F :&&: F),              -- 25. ¬(¬¬p ˄ F ˄ F)        
+                  Not (Not (Not p) :&&: F :&&: T),              -- 26. ¬(¬¬p ˄ F ˄ T)                
+                  Not (Not (Not p) :&&: F :&&: Not (Not p)),    -- 27. ¬(¬¬p ˄ F ˄ ¬¬p)    
+                  Not (Not (Not p) :&&: F :&&: Not (Not q)),    -- 28. ¬(¬¬p ˄ F ˄ ¬¬q)        
+                  Not (F :&&: Not (Not p) :&&: Not p),          -- 29. ¬(F ˄ ¬¬p ˄ ¬p)        
+                  Not (Not (Not p) :&&: Not p :&&: F),          -- 30. ¬(¬¬p ˄ ¬p ˄ F)
+                  Not (Not (Not p) :&&: F :&&: Not p),          -- 31. ¬(¬¬p ˄ F ˄ ¬p)                
+                  Not (F :||: Not (Not p)),                     -- 32. ¬(T ˅ ¬¬p)
+                  Not (F :||: Not (Not p) :||: Not (Not p)),    -- 33. ¬(T ˅ ¬¬p ˅ ¬¬p)            
+                  Not (Not (Not p) :||: F),                     -- 34. ¬(¬¬p ˅ F)
+                  Not (Not (Not p) :||: F :||: F),              -- 35. ¬(¬¬p ˅ F ˅ F)        
+                  Not (Not (Not p) :||: F :||: T),              -- 36. ¬(¬¬p ˅ F ˅ T)                
+                  Not (Not (Not p) :||: F :||: Not (Not p)),    -- 37. ¬(¬¬p ˅ F ˅ ¬¬p)    
+                  Not (Not (Not p) :||: F :||: Not (Not q)),    -- 38. ¬(¬¬p ˅ F ˅ ¬¬q)        
+                  Not (Not (Not p) :||: Not p :||: F)           -- 39. ¬(¬¬p ˅ ¬p ˅ F)                  
                 ]
 
 doubleNotTestSet =
@@ -142,6 +147,7 @@ doubleNotTestSet =
                   Not (Not p),
                   Not (Not (p :&&: q)),
                   Not (Not p) :&&: Not( Not p),
+                  Not( Not( Not( Not p))) :||: Not( Not( Not( Not p))),
                   Not (Not p) :&&: Not( Not p) :||: Not( Not( Not( Not p))),
                   Not (Not p) :||: Not( Not p) :||: Not( Not( Not( Not p))),
                   Not (Not p) :&&: Not( Not p) :&&: Not( Not( Not( Not p))) :||: Not( Not( Not( Not p))),
@@ -213,7 +219,8 @@ deMorganOrTestSetComplex =
                   Not (Not (Not p) :||: Not p :&&: T),                                  -- ¬(¬¬p ˄ ¬p ˄ T)
                   (p :->: Not (Not p)) :<->: (Not p :<->: Not p),                       -- ¬(¬¬p ˄ ¬p ˄ T)
                   (Not p :<->: Not p) :<->: Not (Not (Not p) :||: Not p :&&: T),        -- (¬p ↔ ¬p) ↔ ¬(¬¬p ˅ ¬p ˄ T)
-                  Not (Not (Not p) :&&: Not p :&&: T :||: Not p) :<->: Not p            -- ¬(¬¬p ˄ ¬p ˄ T ˅ ¬p) ↔ ¬p
+                  Not (Not (Not p) :&&: Not p :&&: T :||: Not p) :<->: Not p,            -- ¬(¬¬p ˄ ¬p ˄ T ˅ ¬p) ↔ ¬p
+                  Not (p :||: q :||: r :||: Not q :||: Not r :||: Not q)
                 ]
 
 deMorganAndDoubleNotTestSet =
@@ -416,18 +423,27 @@ layerTestSet =
                   Not (Not (Not (Not p))),
                   Not (Not (Not (Not (Not p)))),
                   Not (Not (Not (Not (Not (Not p))))),
+                  Not F,
+                  Not (Not F),
+                  Not (Not (Not T)),
+                  Not (Not (Not (Not F))),
+                  Not (Not (Not (Not (Not T)))),
                   Not (Not p) :||: q,
                   Not (Not p) :&&: q,
                   Not (Not p) :->: q,
                   Not (Not p) :<->: q,
+                  Not( Not( Not p)) :||: Not( Not( Not( Not p))),
+                  Not( Not( Not( Not p))) :||: Not( Not( Not( Not p))),
                   Not (Not (Not (Not (Not (Not p))))) :->: Not (Not q),
                   (Not (Not (Not (Not (Not (Not p))))) :->: Not (Not q)) :&&: Not (Not q),
+                  ((Not (Not (Not (Not (Not (Not p))))) :&&: Not (Not q)) :->: (Not (Not q)) :&&: Not (Not (Not (Not (Not (Not q)))))),
                   p :&&: Not F,
                   p :&&: Not (Not F),
                   Not T :&&: q,
                   Not (Not p) :&&: Not F,
                   Not (Not p) :&&: Not (Not F),
                   Not (Not T) :&&: Not F,
+                  Not T :&&: Not F,
                   Not (Not F) :&&: Not (Not T),
                   Not (Not (Not F)) :&&: Not (Not (Not T)),
                   p :||: Not (Not q),

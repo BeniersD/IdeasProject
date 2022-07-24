@@ -60,10 +60,7 @@ evalStrategyG :: (IsId l, IsStrategy f) => l -> f a -> LabeledStrategy a
 evalStrategyG l s = label l $ s
 
 evalCondOnTerm :: (SLogic -> Bool) -> Strategy (Context SLogic)
-evalCondOnTerm c = check (maybe False c . currentInContext)
-
-
-stratCommutativitySpec  = label "Rewrite Strategy Commutativity-Ordered"              $ (check (not . isAssoCommOrdered) .*. ruleCommutativity)               |> failS
+evalCondOnTerm c = check (maybe False c . currentInContext)      
 
 ruleassociativityReverse :: Rule SLogic
 ruleassociativityReverse = createRule "Associativity Reversed"           "single.associativity.reversed"          f
@@ -73,11 +70,12 @@ ruleassociativityReverse = createRule "Associativity Reversed"           "single
         f (p :&&: (q :&&: r)) = Just ((p :&&: q) :&&: r)
         f _ = Nothing
 
-ruleAssociativityCommutativity :: Rule (Context SLogic)
-ruleAssociativityCommutativity = convertToRule "Associativity Commutativity Ordered"           "single.associativity.commutative.ordered"           (evalStrategy stratAssociativityCommutativity SomeWhereRepeat1)
+ruleAC, ruleACI :: Rule (Context SLogic)
+ruleAC  = convertToRule "Rule Associativity Commutativity"             "single.associativity.commutative"  stratAC       
+ruleACI = convertToRule "Rule Associativity Commutativity Idempotency" "single.associativity.commutative.idempotency"  stratACI    
 
-stratAssociativityCommutativity :: LabeledStrategy (Context SLogic)
-stratAssociativityCommutativity = label "Rewrite Strategy Associativity-Commutativity-Ordered" $  s
+stratAC, stratACI :: LabeledStrategy (Context SLogic)
+stratAC = label "Rewrite Strategy Associativity-Commutativity" $  s
     where
         f ::  SLogic -> Bool
         f (p :||: (q :||: r)) | (skipNegations p == skipNegations q) && (not . isOrdered) (p :||: q)                             = True
@@ -87,8 +85,19 @@ stratAssociativityCommutativity = label "Rewrite Strategy Associativity-Commutat
         f _                                                                                                                      = False
         lar = liftToContext ruleassociativityReverse
         la  = liftToContext ruleAssociativity
-        s = liftToContext ruleAssociativity |> liftToContext stratCommutativitySpec |> (evalCondOnTerm f .*. (lar .*. layerLeftMost (liftToContext ruleCommutativity) .*. la)) |> failS
+        rc = (check (not . isAssoCommOrdered) .*. ruleCommutativity) 
+        ra = liftToContext ruleAssociativity |> liftToContext rc |> (evalCondOnTerm f .*. (lar .*. layerLeftMost (liftToContext ruleCommutativity) .*. la)) 
+        s = repeat1 (somewhere ra)
 
+stratACI = label "Rewrite Strategy Associativity-Commutativity Idempotency" $  s
+    where
+        f ::  SLogic -> Bool
+        f (p :||: (q :||: r)) | p == q = True
+        f (p :&&: (q :&&: r)) | p == q = True
+        f _                            = False
+        lar = liftToContext ruleassociativityReverse
+        ri = liftToContext ruleIdempotency |> (evalCondOnTerm f .*. lar)
+        s = stratAC .*. repeatS( oncebu (ri))
 
 stratRuleTopLayerMany, stratMultiLayerManyROtd :: (IsStrategy f, Navigator a, HasId (f a)) => f a -> LabeledStrategy a
 stratRuleTopLayerMany f = label d $ s
@@ -101,34 +110,41 @@ stratMultiLayerManyROtd r = label desc strat
         desc  = "Layer Many Repeat Oncetd - " ++ showId r
         strat = repeatS (oncetd (stratRuleTopLayerMany r)) 
 
-stratMultiDoubleNot, stratDoubleNotUnary, stratDoubleNot, stratLayerDoubleNot, stratLayerTFRuleNotTF, stratLayerUnary, stratDerivDeMorgan, stratDerivLayerDeMorgan:: LabeledStrategy (Context SLogic)
+stratMultiDoubleNot, stratDoubleNotUnary, stratDoubleNot, stratLayerDoubleNot, stratLayerTFRuleNotTF, stratDerivDeMorgan, stratDerivDeMorganG,
+    stratDoubleNotTFRuleNotTF :: LabeledStrategy (Context SLogic)
 stratMultiDoubleNot = label d s
     where
         d = "Rewrite Strategy Multi Double Not"
         r = liftToContext ruleDoubleNot
-        s = evalCondOnTerm isMultiDoubleNot .*. repeat1 r
+        s = evalCondOnTerm isMultiDoubleNot .*. evalCondOnTerm isUnaryTerm .*. repeat1 r
+stratDoubleNotUnary   = label "Rewrite Strategy Unary Double Not" $ ruleMultiDoubleNot .|. (liftToContext ruleDoubleNot)
+stratLayerDoubleNot   = label "Rewrite Strategy Layered Double Not" ((evalCondOnTerm (not . isUnaryTerm)) .*. layerAll stratDoubleNotUnary)
+stratDoubleNot        = label "Rewrite Strategy Layered Double Not" $ stratDoubleNotUnary |> stratLayerDoubleNot
 
-stratDoubleNotUnary   = label "Rewrite Strategy Unary Double Not" $ ruleMultiDoubleNot |> (liftToContext ruleDoubleNot)
-stratLayerDoubleNot   = label "Rewrite Strategy Layered Double Not" ((evalCondOnTerm (not . isUnaryTerm)) .*. layerSome stratDoubleNotUnary)
-stratDoubleNot        = label "Rewrite Strategy Layered Double Not" $ stratDoubleNotUnary |> stratLayerDoubleNot 
-stratLayerTFRuleNotTF = label "Rewrite Strategy Layered T-Rule Not F or F-RuleNot-T" (c .*. s)
+stratMultiTFRuleNotTF = label d s
     where
-        c = evalCondOnTerm (not . isUnaryTerm) 
-        s = layerSome (liftToContext ruleTRuleNotF .|. liftToContext ruleFRuleNotT)   
-stratLayerUnary = label "Rewrite Strategy Layered Unary" (c .*. s)
-    where
-        c = evalCondOnTerm (not . isUnaryTerm) 
-        s = layerSome (replicateS 2 (stratDoubleNotUnary .|. liftToContext ruleTRuleNotF .|. liftToContext ruleFRuleNotT))
+        d = "Rewrite Strategy Multi Double Not"
+        r = liftToContext ruleTRuleNotF .|. liftToContext ruleFRuleNotT
+        s = evalCondOnTerm isDoubleNot .*. evalCondOnTerm isUnaryTerm .*. repeat1 (oncebu r)
+stratTFRuleNotTFUnary = label "Rewrite Strategy Unary TFRuleNotTFUnary" $ ruleMultiTFRuleNotTF |> liftToContext ruleTRuleNotF |> liftToContext ruleFRuleNotT 
+stratLayerTFRuleNotTF = label "Rewrite Strategy Layered T-Rule Not F or F-RuleNot-T" $ evalCondOnTerm (not . isUnaryTerm) .*. layerAll stratTFRuleNotTFUnary 
+
+stratTFRuleNotTF = label "Rewrite Strategy Layered Double Not" $ stratTFRuleNotTFUnary |> stratLayerTFRuleNotTF 
+
+
+stratDoubleNotTFRuleNotTF = label "Rewrite Strategy Layered T-Rule Not F or F-RuleNot-T" $ (stratDoubleNot .*. try(stratTFRuleNotTF)) |> stratDoubleNot |> stratTFRuleNotTF
 
 
 stratDerivDeMorgan    = label "Rewrite Strategy DeMorgan Derivative"     $ liftToContext stratDeMorgan .*. try(stratDoubleNot)
-stratDerivLayerDeMorgan    = label "Rewrite Strategy DeMorgan Derivative"    $ stratRuleTopLayerMany stratDerivDeMorgan
-
+stratDerivDeMorganG    = label "Rewrite Strategy DeMorgan Derivative Generalisations"    $ stratDeMorganG .*. fulltd (try(stratDoubleNotUnary))
 
 ruleDoubleNotC :: Rule (Context SLogic)
-ruleMultiDoubleNot  = convertToRule "Multi Double Not"                "coarsegrain.doublenot"   stratMultiDoubleNot
-ruleLayerDoubleNot  = convertToRule "Layered Double Not"              "layer.doublenot" stratLayerDoubleNot
-ruleDoubleNotC      = convertToRule "Double Not (All Variants)"       "doublenot.all"     stratDoubleNot
+ruleMultiDoubleNot    = convertToRule "Multi Double Not"                     "coarsegrain.doublenot"   stratMultiDoubleNot
+ruleLayerDoubleNot    = convertToRule "Layered Double Not"                   "layer.doublenot" stratLayerDoubleNot
+ruleDoubleNotC        = convertToRule "Double Not (All Variants)"            "doublenot.all"     stratDoubleNot
+ruleMultiTFRuleNotTF  = convertToRule "Multi TRuleNotF / FRuleNotT"          "coarsegrain.TRuleNotF.FRuleNotT"   stratMultiTFRuleNotTF
+ruleLayerTFRuleNotTF  = convertToRule "Layered TRuleNotF / FRuleNotT"        "layer.TRuleNotF.FRuleNotT" stratLayerTFRuleNotTF
+ruleTFRuleNotTFC      = convertToRule "TRuleNotF / FRuleNotT (All Variants)" "TRuleNotF.FRuleNotT.all"     stratTFRuleNotTF
 
 
 --stratNegTerms :: LabeledStrategy (Context SLogic)
@@ -244,16 +260,16 @@ stratRuleAllC r = label ("rewrite.commutative." ++ showId r) (ruleAll ruleCommut
 stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC,
     stratFRuleDisjunctionC, stratTRuleDisjunctionC, stratCommutativityOrd, stratDeMorgan, stratFRuleComplementA,
     stratTRuleComplementA, stratFRuleConjunctionA, stratTRuleConjunctionA, stratFRuleDisjunctionA, stratTRuleDisjunctionA :: LabeledStrategy SLogic
-stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ (check (not . isOrdered) .*. stratRuleC ruleFRuleComplement)  |> failS
-stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ (check (not . isOrdered) .*. stratRuleC ruleTRuleComplement)  |> failS
-stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Conjunction" $ (check (not . isOrdered) .*. stratRuleC ruleFRuleConjunction) |> failS
-stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ (check (not . isOrdered) .*. stratRuleC ruleTRuleConjunction) |> failS
+stratFRuleComplementC  = label "Rewrite Strategy Commutative-and-F-Rule Complement"  $ (check (not . isOrdered) .*. stratRuleC ruleFRuleComplement)  
+stratTRuleComplementC  = label "Rewrite Strategy Commutative-and-T-Rule Complement"  $ (check (not . isOrdered) .*. stratRuleC ruleTRuleComplement)  
+stratFRuleConjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Conjunction" $ (check (not . isOrdered) .*. stratRuleC ruleFRuleConjunction) 
+stratTRuleConjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Conjunction" $ (check (not . isOrdered) .*. stratRuleC ruleTRuleConjunction) 
 
 
-stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ (check (not . isOrdered) .*. stratRuleC ruleFRuleDisjunction) |> failS
-stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ (check (not . isOrdered) .*. stratRuleC ruleTRuleDisjunction) |> failS
+stratFRuleDisjunctionC = label "Rewrite Strategy Commutative-and-F-Rule Disjunction" $ (check (not . isOrdered) .*. stratRuleC ruleFRuleDisjunction) 
+stratTRuleDisjunctionC = label "Rewrite Strategy Commutative-and-T-Rule Disjunction" $ (check (not . isOrdered) .*. stratRuleC ruleTRuleDisjunction) 
 
-stratCommutativityOrd  = label "Rewrite Strategy Commutativity-Ordered"              $ (check (not . isOrdered) .*. ruleCommutativity)               |> failS
+stratCommutativityOrd  = label "Rewrite Strategy Commutativity-Ordered"              $ (check (not . isOrdered) .*. ruleCommutativity)               
 
 stratDeMorgan          = label "Rewrite Strategy DeMorgan"                           $ ruleDeMorganOr           |>  ruleDeMorganAnd
 stratFRuleComplementA  = label "Rewrite Strategy F-Rule Complement"                  $ ruleFRuleComplement      |>  ruleFRuleComplementC
@@ -317,8 +333,7 @@ stratAbsorptionC  = label "Rewrite Strategy Commutativity-Absortion"      $ s
               (evalCondOnTerm isCommutativeAbsorption2 .*. (lc .*. la))  |> 
               (evalCondOnTerm isCommutativeAbsorption3 .*. hrm )         |>  
               (evalCondOnTerm isCommutativeAbsorption4 .*. (lc .*. hlm)) |> 
-              (evalCondOnTerm isCommutativeAbsorption5 .*. (lc .*. hrm)) |> 
-              failS
+              (evalCondOnTerm isCommutativeAbsorption5 .*. (lc .*. hrm)) 
 
 stratAbsorptionA  = label "Rewrite Strategy Commutativity-Absortion"     $ ruleToStrategy (ruleAbsorption) |> ruleAbsorptionC
 stratDeMorganAndG = label "Rewrite Strategy DeMorgan And Generalisation" $ stratRuleTopLayerMany (ruleToStrategy ruleDeMorganAnd)
