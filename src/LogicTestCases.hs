@@ -11,7 +11,7 @@ commutativityTestSet, doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTest
   deMorganAndDoubleNotTestSet,   implicationEliminationTestSet, implicationEliminationDerivTestSet , absorptionTestSet, idempotencyTestSet, 
   boolRuleConjunctionTestSet, boolRuleDisjunctionTestSet, boolRuleComplementTestSet, boolRuleNotTestSet, deMorganAndImplicationEliminationTestSet, 
   deMorganAndEquivalenceEliminationTestSet, equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet, 
-  layerTestSet :: [SLogic]
+  layerTestSet, negationsTestSet :: [SLogic]
 commutativityTestSet =
                 [ p :&&: q,                        -- 0. (p ˄ q)  
                   q :&&: p,                        -- 1. (q ˄ p)  
@@ -342,16 +342,17 @@ boolRuleDisjunctionTestSet =
                  p :||: T,                             -- 1. T-rule disjunction
                  (p :&&: q) :||: T,                    -- 2. T-rule disjunction
                  F :||: p,                             -- 3. Commutative F-rule disjunction 
-                 T :||: p,                             -- 4. Commutative T-rule disjunction
-                 T :||: (p :&&: q),                    -- 5. Commutative T-rule disjunction
-                 (F :||: p) :||: (p :||: F),           -- 6. Somewhere, repeat, F-rule disjunction and commutative F-rule disjunction
-                 (T :||: p) :||: (p :||: T),           -- 7. Somewhere, repeat, T-rule disjunction and commutative T-rule disjunction
-                 (F :||: p) :||: p,                    -- 8. Somewhere, commutative f-rule disjunction 
-                 (T :||: p) :||: p,                    -- 9. Somewhere, commutative T-rule disjunction 
-                 p :&&: (F :||: p),                    -- 10. Somewehere, commutative F-rule disjunction
-                 p :||: (T :||: p),                    -- 11. Somewhere, commutative T-rule disjunction
-                 (F :||: p) :||: (p :||: F) :||: p,    -- 12. Somewhere, repeat, F-rule disjunction and commutative F-rule disjunction
-                 (T :||: p) :||: (p :||: T) :||: p     -- 13. Somewhere, repeat, T-rule disjunction and commutative T-rule disjunction
+                 F :||: (p :&&: q),                    -- 4. Commutative T-rule disjunction
+                 T :||: p,                             -- 5. Commutative T-rule disjunction
+                 T :||: (p :&&: q),                    -- 6. Commutative T-rule disjunction
+                 (F :||: p) :||: (p :||: F),           -- 7. Somewhere, repeat, F-rule disjunction and commutative F-rule disjunction
+                 (T :||: p) :||: (p :||: T),           -- 8. Somewhere, repeat, T-rule disjunction and commutative T-rule disjunction
+                 (F :||: p) :||: p,                    -- 9. Somewhere, commutative f-rule disjunction 
+                 (T :||: p) :||: p,                    -- 10. Somewhere, commutative T-rule disjunction 
+                 p :&&: (F :||: p),                    -- 11. Somewehere, commutative F-rule disjunction
+                 p :||: (T :||: p),                    -- 12. Somewhere, commutative T-rule disjunction
+                 (F :||: p) :||: (p :||: F) :||: p,    -- 13. Somewhere, repeat, F-rule disjunction and commutative F-rule disjunction
+                 (T :||: p) :||: (p :||: T) :||: p     -- 14. Somewhere, repeat, T-rule disjunction and commutative T-rule disjunction
                 ]
 
 boolRuleComplementTestSet =
@@ -489,6 +490,34 @@ layerTestSet =
                   Not (Not p :||: q),
                   Not (p :||: Not q),
                   Not (Not p :||: Not q),
+                  Not (T :->: F),
+                  Not (p :->: q),
+                  Not (p :->: Not p),
+                  Not (p :->: T),
+                  Not (T :<->: F),
+                  Not (p :<->: q),
+                  Not (p :<->: Not p),
+                  Not (p :<->: T)
+                ]
+
+negationsTestSet = [              
+                  Not (p :&&: q),
+                  Not (Not p :&&: q),
+                  Not (p :&&: Not q),
+                  Not (Not p :&&: Not q),
+                  Not (p :||: q),
+                  Not (Not p :||: q),
+                  Not (p :||: Not q),
+                  Not (Not p :||: Not q),
+                  Not (T :||: q),
+                  Not (Not p :||: F),            
+                  Not (T :||: Not F),
+                  Not (F :||: T),
+                  Not (F :||: Not p),
+                  Not (p :&&: (Not p :||: q)),
+                  Not (p :||: (q :&&: Not p)),
+                  Not((Not p :||: q) :&&: p),
+                  Not ((q :&&: Not p) :||: p),               
                   Not (T :->: F),
                   Not (p :->: q),
                   Not (p :->: Not p),

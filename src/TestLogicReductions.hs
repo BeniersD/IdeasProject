@@ -76,9 +76,9 @@ main = do
     --tstStrategyGeneric stratAbsorptionD             absorptionTestSet
     --tstDerivation      stratAbsorptionD             SomeWhere absorptionTestSet
 
-    --tstApply           stratAbsorptionA             SomeWhereRepeat1 absorptionTestSet
+    --tstApply           stratAbsorptionA             SomeWhere absorptionTestSet
     --tstStrategyGeneric stratAbsorptionA             absorptionTestSet
-    tstDerivation      stratAbsorptionA             SomeWhereRepeat1 absorptionTestSet
+    --tstDerivation      stratAbsorptionA             SomeWhere absorptionTestSet
 
     --tstApply           ruleAbsorptionA              SomeWhereRepeat1 absorptionTestSet
     --tstStrategyGeneric ruleAbsorptionA              absorptionTestSet
@@ -205,10 +205,9 @@ main = do
     --tstStrategyGeneric stratEquivalenceEliminationN (layerTestSet ++ equivalenceEliminationDerivTestSet) 
     --tstDerivation      stratEquivalenceEliminationN SomeWhere  layerTestSet
 
-
     --tstApply           stratEquivalenceEliminationA SomeWhere (equivalenceEliminationDerivTestSet ++ layerTestSet) 
     --tstStrategyGeneric stratEquivalenceEliminationA (equivalenceEliminationDerivTestSet ++ layerTestSet) 
-    --tstDerivation      stratEquivalenceEliminationA SomeWhere  (equivalenceEliminationDerivTestSet ++ layerTestSet)
+    tstDerivation      stratEquivalenceEliminationA SomeWhere  (equivalenceEliminationDerivTestSet ++ layerTestSet)
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Idempotency rule testing
 -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -245,7 +244,7 @@ main = do
 
     --tstApply           ruleFRuleConjunctionC        SomeWhereRepeat1 boolRuleConjunctionTestSet 
     --tstRuleGeneric     ruleFRuleConjunctionC        boolRuleConjunctionTestSet 
-    --tstDerivation      ruleFRuleConjunctionC        SomeWhereRepeat1 boolRuleConjunctionTestSet 
+    --tstDerivation      ruleFRuleConjunctionC        SomeWhere boolRuleConjunctionTestSet 
 
     --tstApply           ruleFRuleConjunctionA        SomeWhereRepeat1 boolRuleConjunctionTestSet 
     --tstRuleGeneric     ruleFRuleConjunctionA        boolRuleConjunctionTestSet
@@ -276,6 +275,10 @@ main = do
     --tstApply           ruleFRuleDisjunctionC        SomeWhereRepeat1 boolRuleDisjunctionTestSet 
     --tstRuleGeneric     ruleFRuleDisjunctionC        boolRuleDisjunctionTestSet 
     --tstDerivation      ruleFRuleDisjunctionC        SomeWhereRepeat1 boolRuleDisjunctionTestSet 
+
+    --tstApply           stratFRuleDisjunctionA       SomeWhere        boolRuleDisjunctionTestSet 
+    --tstRuleGeneric     stratFRuleDisjunctionA       boolRuleDisjunctionTestSet 
+    --tstDerivation      stratFRuleDisjunctionA       SomeWhere        boolRuleDisjunctionTestSet 
 
     --tstApply           ruleFRuleDisjunctionA        SomeWhereRepeat1 boolRuleDisjunctionTestSet 
     --tstRuleGeneric     ruleFRuleDisjunctionA        boolRuleDisjunctionTestSet 
@@ -318,6 +321,10 @@ main = do
     --tstRuleGeneric     ruleTRuleComplementA         boolRuleComplementTestSet 
     --tstDerivation      ruleTRuleComplementA         SomeWhereRepeat1 boolRuleComplementTestSet    
 
+    --tstApply           stratTRuleComplementA         SomeWhereRepeat1 boolRuleComplementTestSet 
+    --tstRuleGeneric     stratTRuleComplementA         boolRuleComplementTestSet 
+    --tstDerivation      stratTRuleComplementA         SomeWhereRepeat1 boolRuleComplementTestSet    
+
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- TRuleDisjunction rule testing
 -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -326,21 +333,25 @@ main = do
     --tstDerivation      ruleTRuleDisjunction         SomeWhereRepeat1 boolRuleDisjunctionTestSet 
 
     --tstApply           ruleTRuleDisjunctionC        SomeWhereRepeat1 boolRuleDisjunctionTestSet
-    --tstRuleGeneric     ruleTRuleDisjunctionC        boolRuleDisjunctionTestSet
+    --tstStrategyGeneric     ruleTRuleDisjunctionC        boolRuleDisjunctionTestSet
     --tstDerivation      ruleTRuleDisjunctionC        SomeWhereRepeat1 boolRuleDisjunctionTestSet
 
     --tstApply           ruleTRuleDisjunctionA        SomeWhereRepeat1 boolRuleDisjunctionTestSet
     --tstRuleGeneric     ruleTRuleDisjunctionA        boolRuleDisjunctionTestSet
-    --tstDerivation      ruleTRuleDisjunctionA        SomeWhereRepeat1 boolRuleDisjunctionTestSet
+    --tstDerivation      ruleTRuleDisjunctionA        SomeWhere boolRuleDisjunctionTestSet
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- TRuleNotF rule testing
 -------------------------------------------------------------------------------------------------------------------------------------------------
     --tstApply           ruleTRuleNotF                SomeWhereRepeat1 boolRuleNotTestSet 
-    --tstDerivation      ruleTRuleNotF                SomeWhereRepeat1 boolRuleNotTestSet 
     --tstRuleGeneric     ruleTRuleNotF                boolRuleNotTestSet 
+    --tstDerivation      ruleTRuleNotF                SomeWhereRepeat1 boolRuleNotTestSet 
+
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
--- Negative terms
+-- Combinated strategies testings
 -------------------------------------------------------------------------------------------------------------------------------------------------
---tstDerivation          stratNegTerms                SomeWhereRepeat1 negTermsTestSet
+    --tstApply             stratAll                     Single negationsTestSet 
+    --tstStrategyGeneric   stratAll                     negationsTestSet 
+    --tstDerivation        stratAll                     Single (negationsTestSet)
+    --tstDerivation        stratNegations               Single negationsTestSet

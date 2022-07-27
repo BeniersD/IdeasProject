@@ -59,8 +59,8 @@ isMultiAndOr (_ :&&: _ :||: _)                                              = Tr
 isMultiAndOr (_ :||: _ :&&: _)                                              = True
 isMultiAndOr p                                                              = isMultiAnd p || isMultiOr p
 
-isMultiOr  (_ :||: _ :||: _)                                                = True
-isMultiOr  _                                                                = False
+isMultiOr (_ :||: _ :||: _)                                                 = True
+isMultiOr _                                                                 = False
 
 isNegation (Not _)                                                          = True
 isNegation _                                                                = False
