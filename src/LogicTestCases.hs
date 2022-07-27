@@ -4,13 +4,14 @@ module LogicTestCases
 import Domain.Logic.Formula
 import LogicConstants
 
---------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
 -- Test sets to evaluate rules and/or strategies
---------------------------------------------------------------------------------------------------------------------------------------
-commutativityTestSet, doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTestSetSimple, deMorganOrTestSetComplex, deMorganAndTestSetComplex, deMorganAndDoubleNotTestSet,
-  implicationEliminationTestSet, implicationEliminationDerivTestSet , absorptionTestSet, idempotencyTestSet, boolRuleConjunctionTestSet, boolRuleDisjunctionTestSet,
-  boolRuleComplementTestSet, boolRuleNotTestSet, deMorganAndImplicationEliminationTestSet, deMorganAndEquivalenceEliminationTestSet,
-  equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet, layerTestSet :: [SLogic]
+-------------------------------------------------------------------------------------------------------------------------------------------------
+commutativityTestSet, doubleNotTestSet, deMorganAndTestSetSimple, deMorganOrTestSetSimple, deMorganOrTestSetComplex, deMorganAndTestSetComplex, 
+  deMorganAndDoubleNotTestSet,   implicationEliminationTestSet, implicationEliminationDerivTestSet , absorptionTestSet, idempotencyTestSet, 
+  boolRuleConjunctionTestSet, boolRuleDisjunctionTestSet, boolRuleComplementTestSet, boolRuleNotTestSet, deMorganAndImplicationEliminationTestSet, 
+  deMorganAndEquivalenceEliminationTestSet, equivalenceEliminationTestSet, deMorganDerivTestSet, equivalenceEliminationDerivTestSet, 
+  layerTestSet :: [SLogic]
 commutativityTestSet =
                 [ p :&&: q,                        -- 0. (p ˄ q)  
                   q :&&: p,                        -- 1. (q ˄ p)  
@@ -78,7 +79,13 @@ implicationEliminationDerivTestSet =
                   (p :->: T) :&&: (F :->: p),
                   (T :->: Not (Not p)) :&&: (Not p :->: F),
                   (Not (Not p) :->: T) :&&: (Not p :->: T),
-                  (T :->: F) :->: (F :->: T)
+                  (T :->: F) :->: (F :->: T),
+                  (p :->: q :->: r :->: s),
+                  (p :->: Not (Not (Not q)) :->: Not (Not r) :->: Not s),
+                  (p :->: Not (Not (Not q)) :->: Not (Not p) :->: Not q),
+                  (T :->: Not (Not (Not q)) :->: Not (Not r) :->: F),
+                  T :->: F :->: F :->: T,
+                  (T :->: F :->: F :->: T)
                 ]
 
 equivalenceEliminationDerivTestSet = 
@@ -139,7 +146,8 @@ deMorganDerivTestSet =
                   Not (Not (Not p) :||: F :||: T),              -- 36. ¬(¬¬p ˅ F ˅ T)                
                   Not (Not (Not p) :||: F :||: Not (Not p)),    -- 37. ¬(¬¬p ˅ F ˅ ¬¬p)    
                   Not (Not (Not p) :||: F :||: Not (Not q)),    -- 38. ¬(¬¬p ˅ F ˅ ¬¬q)        
-                  Not (Not (Not p) :||: Not p :||: F)           -- 39. ¬(¬¬p ˅ ¬p ˅ F)                  
+                  Not (Not (Not p) :||: Not p :||: F),          -- 39. ¬(¬¬p ˅ ¬p ˅ F)   
+                  Not (Not (Not p) :||: (Not p :&&: F))         -- 40. ¬(¬¬p ˅ ¬p ˄ F)                    
                 ]
 
 doubleNotTestSet =
@@ -284,8 +292,12 @@ absorptionTestSet =
                   ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: r),             -- 24. Commutative Absorption 2, somewhere, repeat
                   ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: q),             -- 25. Commutative Absorption 2, somewhere, repeat
                   (((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q,    -- 26. Commutative Absorption 4, Absorption, somewhere, repeat
-                  (p :&&: (p :||: q)) :||: ((p :&&: q) :||: p) :||: ((p :||: q) :&&: p) :||: (p :&&: (q :||: p)) :||: ((p :&&: q) :||: ((p :&&: q) :&&: q)) :||: ((q :||: p) :&&: p)
+                  (p :&&: (p :||: q)) :||: ((p :&&: q) :||: p) :||: ((p :||: q) :&&: p) :||: (p :&&: (q :||: p)) :||: ((p :&&: q) :||: ((p :&&: q) :&&: q)) :||: ((q :||: p) :&&: p),
                                                                             -- 26. Commutative All Absorption variants, somewhere, repeat
+                  p :&&: (Not p :||: q),                                    -- 27. Absorption Derivative
+                  p :||: (q :&&: Not p),                                    -- 28. Absorption Derivative
+                  (Not p :||: q) :&&: p,                                    -- 29. Absorption Derivative
+                  (q :&&: Not p) :||: p                                     -- 30. Absorption Derivative    
                 ]
 
 idempotencyTestSet =
@@ -476,5 +488,13 @@ layerTestSet =
                   Not (p :||: q),
                   Not (Not p :||: q),
                   Not (p :||: Not q),
-                  Not (Not p :||: Not q)
+                  Not (Not p :||: Not q),
+                  Not (T :->: F),
+                  Not (p :->: q),
+                  Not (p :->: Not p),
+                  Not (p :->: T),
+                  Not (T :<->: F),
+                  Not (p :<->: q),
+                  Not (p :<->: Not p),
+                  Not (p :<->: T)
                 ]

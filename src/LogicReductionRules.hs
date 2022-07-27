@@ -6,52 +6,40 @@ module LogicReductionRules
      ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF, commutativity
    ) where
 
-import Ideas.Common.Library 
 import Domain.Logic.Formula
-import Data.Maybe
+import Ideas.Common.Library 
+import LogicFunctions
 
-------------------------------------------------------------------------------------------------------------
--- Generic rewrite/reduction functions
-------------------------------------------------------------------------------------------------------------
-hasRule :: Rule SLogic -> SLogic -> Bool
-hasRule x           = isJust . apply x
-
-createRule :: String -> String -> (SLogic -> Maybe (SLogic)) -> Rule SLogic
-createRule x y f    = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) f
-
-convertToRule :: Eq a => String -> String -> LabeledStrategy a -> Rule a
-convertToRule x y f = describe ( "Rewrite " ++ x ) $ makeRule ( "rewrite." ++ y ) (apply f)
-
-------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
 -- Set of rules
-------------------------------------------------------------------------------------------------------------
-ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, ruleDoubleNot, ruleDistributivity, ruleEquivalenceElimination, 
-   ruleIdempotency, ruleImplicationElimination, ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, ruleFRuleNotT,
-   ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: Rule SLogic
+-------------------------------------------------------------------------------------------------------------------------------------------------
+ruleAbsorption, ruleAssociativity, ruleCommutativity, ruleDeMorganAnd, ruleDeMorganOr, ruleDoubleNot, ruleDistributivity, 
+   ruleEquivalenceElimination, ruleIdempotency, ruleImplicationElimination, ruleFRuleComplement, ruleFRuleConjunction, ruleFRuleDisjunction, 
+   ruleFRuleNotT, ruleTRuleComplement, ruleTRuleConjunction, ruleTRuleDisjunction, ruleTRuleNotF :: Rule SLogic
 
-ruleAbsorption             = createRule "Absorption"              "single.absorption"             absorption
-ruleAssociativity          = createRule "Associativity"           "single.associativity"          associativity
-ruleCommutativity          = createRule "Commutativity"           "single.commutativity"          commutativity
-ruleDeMorganAnd            = createRule "DeMorgan And"            "single.demorgan.and"           deMorganAnd
-ruleDeMorganOr             = createRule "DeMorgan Or"             "single.demorgan.or"            deMorganOr
-ruleDistributivity         = createRule "Distributivity"          "single.distributivity"         distributivity
-ruleDoubleNot              = createRule "Double Not"              "single.doublenot"              doubleNot
-ruleEquivalenceElimination = createRule "Equivalence Elimination" "single.equivalenceelimination" equivalenceElimination
-ruleIdempotency            = createRule "Idempotency"             "single.idempotency"            idempotency
-ruleImplicationElimination = createRule "Implication Elimination" "single.implicationelimination" implicationElimination
-ruleFRuleComplement        = createRule "F-Rule Complement"       "single.frulecomplement"        fRuleComplement
-ruleFRuleConjunction       = createRule "F-Rule Conjunction"      "single.fruleconjunction"       fRuleConjunction
-ruleFRuleDisjunction       = createRule "F-Rule Disjunction"      "single.fruledisjunction"       fRuleDisjunction
-ruleFRuleNotT              = createRule "F-Rule Not T"            "single.frulenott"              fRuleNotT
-ruleTRuleComplement        = createRule "T-Rule Complement"       "single.trulecomplement"        tRuleComplement
-ruleTRuleConjunction       = createRule "T-Rule Conjunction"      "single.truleconjunction"       tRuleConjunction
-ruleTRuleDisjunction       = createRule "T-Rule Disjunction"      "single.truledisjunction"       tRuleDisjunction
-ruleTRuleNotF              = createRule "T-Rule Not F"            "single.trulenotf"              tRuleNotF
+ruleAbsorption             = createRule "Rewrite Absorption"              "single.absorption"             absorption
+ruleAssociativity          = createRule "Rewrite Associativity"           "single.associativity"          associativity
+ruleCommutativity          = createRule "Rewrite Commutativity"           "single.commutativity"          commutativity
+ruleDeMorganAnd            = createRule "Rewrite DeMorgan And"            "single.demorgan.and"           deMorganAnd
+ruleDeMorganOr             = createRule "Rewrite DeMorgan Or"             "single.demorgan.or"            deMorganOr
+ruleDistributivity         = createRule "Rewrite Distributivity"          "single.distributivity"         distributivity
+ruleDoubleNot              = createRule "Rewrite Double Not"              "single.doublenot"              doubleNot
+ruleEquivalenceElimination = createRule "Rewrite Equivalence Elimination" "single.equivalenceelimination" equivalenceElimination
+ruleIdempotency            = createRule "Rewrite Idempotency"             "single.idempotency"            idempotency
+ruleImplicationElimination = createRule "Rewrite Implication Elimination" "single.implicationelimination" implicationElimination
+ruleFRuleComplement        = createRule "Rewrite F-Rule Complement"       "single.frulecomplement"        fRuleComplement
+ruleFRuleConjunction       = createRule "Rewrite F-Rule Conjunction"      "single.fruleconjunction"       fRuleConjunction
+ruleFRuleDisjunction       = createRule "Rewrite F-Rule Disjunction"      "single.fruledisjunction"       fRuleDisjunction
+ruleFRuleNotT              = createRule "Rewrite F-Rule Not T"            "single.frulenott"              fRuleNotT
+ruleTRuleComplement        = createRule "Rewrite T-Rule Complement"       "single.trulecomplement"        tRuleComplement
+ruleTRuleConjunction       = createRule "Rewrite T-Rule Conjunction"      "single.truleconjunction"       tRuleConjunction
+ruleTRuleDisjunction       = createRule "Rewrite T-Rule Disjunction"      "single.truledisjunction"       tRuleDisjunction
+ruleTRuleNotF              = createRule "Rewrite T-Rule Not F"            "single.trulenotf"              tRuleNotF
 
-------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
 -- Set of laws of Equivalence
 -- Commutative variants of the rules distributiveness are added
-------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
 absorption, associativity, commutativity, deMorganAnd, deMorganOr, doubleNot, distributivity, equivalenceElimination, 
    fRuleConjunction, fRuleComplement, fRuleNotT, fRuleDisjunction, idempotency, implicationElimination,
    tRuleConjunction, tRuleComplement, tRuleNotF, tRuleDisjunction :: SLogic -> Maybe (SLogic)

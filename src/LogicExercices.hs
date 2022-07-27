@@ -12,6 +12,8 @@ import LogicReductionStrategies
 import LogicFunctions
 import LogicTestCases
 
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
 main :: IO ()
 main = defaultMain (dr (evalStrategy ruleAC Single))
 
