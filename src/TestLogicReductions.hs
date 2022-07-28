@@ -7,7 +7,7 @@ import LogicReductionRules
 import LogicTestCases
 import LogicReductionStrategies
 import LogicTestFunctions
-import LogicExercices
+--import LogicExercices
 import LogicConstants
 import LogicFunctions
 
@@ -419,11 +419,23 @@ main = do
     --tstStrategyGeneric stratToNnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstDerivation      stratToNnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
-    tstApply           stratToCnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
-    tstStrategyGeneric stratToCnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
-    tstDerivation      stratToCnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+    --tstApply           stratToCnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToCnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToCnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
     --tstApply           stratToDnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToDnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstDerivation      stratToDnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
-
+    
+    --putStrLn $ execStrategy stratAC ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)
+    --putStrLn $ show $ applyD stratAC (newContext (termNavigator ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)))
+    --putStrLn $ show $ eqExpr (p :&&: (Not p :||: q)) ((Not p :||: q) :&&: p)
+    --putStrLn $ show $ eqExpr (p :&&: (Not p :||: q)) ((Not p :||: q) :&&: r)
+    --putStrLn $ show $ eqExpr ((p :&&: q :&&: r) :&&: (p :&&: q :&&: r)) ((p :&&: r :&&: q) :&&: (q :&&: r :&&: p)) 
+    --putStrLn $ show $ eqExpr (p :&&: (q :&&: r) :&&: p :&&: (q :&&: r)) ((p :&&: r :&&: q) :&&: (q :&&: r :&&: p)) 
+    --putStrLn $ show $ eqExpr (p :&&: (q :&&: r) :&&: p :&&: (q :&&: r)) ((p :&&: r :&&: q) :||: (q :&&: r :&&: p)) 
+    --putStrLn $ show $ eqExpr (p :&&: (q :&&: r) :&&: p :&&: (q :&&: r)) (((((p :&&: p) :&&: q) :&&: q) :&&: r) :&&: r) 
+    --putStrLn $ show $ eqExpr (p :&&: (q :&&: Not r) :&&: p :&&: (q :&&: r)) (((((p :&&: p) :&&: q) :&&: q) :&&: r) :&&: Not r)
+    --putStrLn $ show $ eqExpr (p :->: (Not p :||: q)) ((Not p :||: q) :->: r)
+    --putStrLn $ show $ eqExpr (p :&&: (Not p :->: q)) ((Not p :->: q) :&&: p)
+    --putStrLn $ show $ eqExpr (p :&&: (Not p :->: q) :&&: (Not r :<->: q) :&&: r) ((Not r :<->: q) :&&: r :&&: (Not p :->: q) :&&: p)
