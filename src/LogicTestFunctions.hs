@@ -9,7 +9,6 @@ import Ideas.Common.Library
 import LogicExercices
 import LogicReductionStrategies
 
-
 tupleToStr :: (Show a) => (Int, a) -> String
 tupleToStr x = numbers ++ ". " ++ formula ++ "\n"
     where
@@ -77,7 +76,7 @@ tstDerivation :: (LogicEvaluationStrategy a, Out2 a ~ (t -> LabeledStrategy (Con
 tstDerivation r s xs = mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ y) [(y, show x ++ " :\t" ++ (f x)) | (x, y) <- zip (t) [0..]]
     where
         --t  = (take 100) xs
-        t  = (drop 0 . take 100) xs
+        t  = (drop 0 . take 1000) xs
         es = evalStrategy r s
         --ex = minimalExercise es
         --ex = basicExercise es
@@ -90,7 +89,7 @@ tstDerivation r s xs = mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ y) [(y, s
 tstApply r s xs = print $ map a t 
     where 
         --t  = (take 100) xs
-        t  = (drop 0 . take 100) xs
+        t  = (drop 0 . take 1000) xs
         es = evalStrategy r s
         --ex = minimalExercise es
         ex = basicExercise es

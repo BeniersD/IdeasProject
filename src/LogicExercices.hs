@@ -1,5 +1,8 @@
-module LogicExercices (minimalExercise, basicExercise, evalExercise
-   ) where
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+
+module LogicExercices where
 
 import Data.Function
 import Data.Typeable
@@ -7,15 +10,50 @@ import Ideas.Common.Library
 import Domain.Logic.Formula  hiding (not)
 import Ideas.Main.Default
 import Ideas.Utils.Prelude (splitsWithElem, readM)
-import LogicReductionRules
 import LogicReductionStrategies
-import LogicFunctions
 import LogicTestCases
 
--------------------------------------------------------------------------------------------------------------------------------------------------
+data EvaluationType = Single | SomeWhere | SomeWhereRepeatS | SomeWhereRepeat1 | RepeatS | Repeat1 
 
-main :: IO ()
-main = defaultMain (dr (evalStrategy ruleAC Single))
+class LogicRuleConversion a where
+    type Out a     :: * 
+    ruleToStrategy :: a -> Out a
+
+instance LogicRuleConversion (Rule SLogic) where  
+    type Out (Rule SLogic) = (LabeledStrategy (Context SLogic))
+    ruleToStrategy x    = ruleToStrategy (liftToContext x)
+
+instance LogicRuleConversion (Rule (Context SLogic)) where 
+    type Out (Rule (Context SLogic)) = (LabeledStrategy (Context SLogic))
+    ruleToStrategy x    = label (showId x) $ x
+
+class LogicEvaluationStrategy a where
+    type Out2 a  :: * 
+    evalStrategy :: a -> Out2 a
+    
+instance LogicEvaluationStrategy (Rule SLogic) where  
+    type Out2 (Rule SLogic) = (EvaluationType -> LabeledStrategy (Context SLogic))
+    evalStrategy r      = evalStrategy (ruleToStrategy r) 
+
+instance LogicEvaluationStrategy (Rule (Context SLogic)) where  
+    type Out2 (Rule (Context SLogic)) = (EvaluationType -> LabeledStrategy (Context SLogic))
+    evalStrategy r      = evalStrategy (ruleToStrategy r)
+    
+instance LogicEvaluationStrategy (LabeledStrategy SLogic) where  
+    type Out2 (LabeledStrategy SLogic) = (EvaluationType -> LabeledStrategy (Context SLogic))
+    evalStrategy r      = evalStrategy (liftToContext r)
+
+instance LogicEvaluationStrategy (LabeledStrategy (Context SLogic)) where  
+    type Out2 (LabeledStrategy (Context SLogic)) = (EvaluationType -> LabeledStrategy (Context SLogic))
+    evalStrategy r Single           = evalStrategyG ("Evaluate - " ++ showId r)                     r 
+    evalStrategy r SomeWhere        = evalStrategyG ("Evaluate somewhere - " ++ showId r)           (somewhere r)
+    evalStrategy r RepeatS          = evalStrategyG ("Evaluate repeat - " ++ showId r)              (repeatS   r) 
+    evalStrategy r Repeat1          = evalStrategyG ("Evaluate repeat - " ++ showId r)              (repeat1   r) 
+    evalStrategy r SomeWhereRepeatS = evalStrategyG ("Evaluate repeat somewhere - " ++ showId r)    (repeatS   (somewhere r))
+    evalStrategy r SomeWhereRepeat1 = evalStrategyG ("Evaluate repeat somewhere - " ++ showId r)    (repeat1   (somewhere r))
+
+evalStrategyG :: (IsId l, IsStrategy f) => l -> f a -> LabeledStrategy a
+evalStrategyG l s       = label l $ s
 
 dr :: LabeledStrategy (Context SLogic) -> DomainReasoner
 dr x = describe "Domain reasoner for tutorial" (newDomainReasoner "eval") 

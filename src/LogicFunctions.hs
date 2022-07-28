@@ -1,5 +1,5 @@
-module LogicFunctions ( createRule, convertToRule, countNegations, compareLogic, hasRule, hasBool, isAndOrOr, isAssoCommOrdered, isBool,
-   isMultiAnd, isDoubleNot, isMultiAndOr,isMultiDoubleNot, isMultiImplicationDefinition, isMultiOr, isNegation, isOrdered,  isUnary, 
+module LogicFunctions ( createRule, convertToRule, countNegations, compareLogic, hasRule, hasBool, hasNegation, isAndOrOr, isAssoCommOrdered, 
+   isBool, isMultiAnd, isDoubleNot, isMultiAndOr,isMultiDoubleNot, isMultiImplicationDefinition, isMultiOr, isNegation, isOrdered,  isUnary, 
    skipNegation, skipNegations 
    ) where
 
@@ -27,10 +27,12 @@ compareLogic p q | skipNegations p == skipNegations q                       = co
                  | skipNegations p == F && skipNegations q == T             = True
                  | otherwise                                                = skipNegations p  <= skipNegations q 
 
-hasDoubleNot, hasBool :: SLogic -> Bool
+hasBool, hasDoubleNot, hasNegation :: SLogic -> Bool
+hasBool p                                                                   = isBool p || any isBool (children p)
+
 hasDoubleNot p                                                              = any isDoubleNot (children p)
 
-hasBool p                                                                   = isBool p || any isBool (children p)
+hasNegation p                                                               = any isNegation (children p)
 
 hasRule      :: Rule SLogic -> SLogic -> Bool
 hasRule x                                                                   = isJust . apply x
