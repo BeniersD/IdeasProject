@@ -365,13 +365,13 @@ main = do
     --tstRuleGeneric     ruleTRuleComplementA         boolRuleComplementTestSet 
     --tstDerivation      ruleTRuleComplementA         SomeWhereRepeat1 boolRuleComplementTestSet    
 
-    --tstApply           stratTRuleComplementA         SomeWhereRepeat1 boolRuleComplementTestSet 
-    --tstRuleGeneric     stratTRuleComplementA         boolRuleComplementTestSet 
-    --tstDerivation      stratTRuleComplementA         SomeWhereRepeat1 boolRuleComplementTestSet    
+    --tstApply           stratTRuleComplementA        SomeWhereRepeat1 boolRuleComplementTestSet 
+    --tstRuleGeneric     stratTRuleComplementA        boolRuleComplementTestSet 
+    --tstDerivation      stratTRuleComplementA        SomeWhereRepeat1 boolRuleComplementTestSet    
 
-    --tstApply           stratTRuleComplementD         SomeWhereRepeat1 boolRuleComplementTestSet 
-    --tstRuleGeneric     stratTRuleComplementD         boolRuleComplementTestSet 
-    --tstDerivation      stratTRuleComplementD         SomeWhereRepeat1 boolRuleComplementTestSet    
+    --tstApply           stratTRuleComplementD        SomeWhereRepeat1 boolRuleComplementTestSet 
+    --tstRuleGeneric     stratTRuleComplementD        boolRuleComplementTestSet 
+    --tstDerivation      stratTRuleComplementD        SomeWhereRepeat1 boolRuleComplementTestSet    
 
     --tstApply           stratTRuleComplementN        SomeWhere        negationsTestSet
     --tstStrategyGeneric stratTRuleComplementN        negationsTestSet
@@ -385,7 +385,7 @@ main = do
     --tstDerivation      ruleTRuleDisjunction         SomeWhereRepeat1 boolRuleDisjunctionTestSet 
 
     --tstApply           ruleTRuleDisjunctionC        SomeWhereRepeat1 boolRuleDisjunctionTestSet
-    --tstStrategyGeneric     ruleTRuleDisjunctionC        boolRuleDisjunctionTestSet
+    --tstStrategyGeneric ruleTRuleDisjunctionC        boolRuleDisjunctionTestSet
     --tstDerivation      ruleTRuleDisjunctionC        SomeWhereRepeat1 boolRuleDisjunctionTestSet
 
     --tstApply           ruleTRuleDisjunctionA        SomeWhereRepeat1 boolRuleDisjunctionTestSet
@@ -413,7 +413,7 @@ main = do
 
     --tstApply           stratAll                     Single (negationsTestSet ++ layerTestSet) 
     --tstStrategyGeneric stratAll                     (negationsTestSet ++ layerTestSet) 
-    --tstDerivation      stratAll                     Single (negationsTestSet ++ layerTestSet)
+    --tstDerivation      stratAll                     Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
     --tstApply           stratToNnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToNnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
@@ -428,6 +428,10 @@ main = do
     --tstDerivation      stratToDnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
     
     --putStrLn $ execStrategy stratAC ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)
+    putStrLn $ show $ length $ applyAll stratToDnf (newContext (termNavigator (((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q))))
+    --putStrLn $ show $ length $ applyAll stratToDnf (newContext (termNavigator ((Not p :&&: r :&&: Not (Not (Not F))) :||: Not (Not (Not F)) :||: Not (Not (Not r)) :||: Not (Not (Not p)) :||: (Not p :&&: q) :||: (Not (Not p) :&&: q :&&: Not p) :||: q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T :||: Not (Not (Not T)) :||: (Not q :<->: Not p))))
+
+
     --putStrLn $ show $ applyD stratAC (newContext (termNavigator ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)))
     --putStrLn $ show $ eqExpr (p :&&: (Not p :||: q)) ((Not p :||: q) :&&: p)
     --putStrLn $ show $ eqExpr (p :&&: (Not p :||: q)) ((Not p :||: q) :&&: r)
