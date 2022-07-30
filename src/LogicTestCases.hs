@@ -548,3 +548,22 @@ negationsTestSet = [
                   Not (p :<->: Not p),
                   Not (p :<->: T)
                 ]
+
+thesisTestSet = [
+                  Not ( p :||: Not q),
+                  (Not p :&&: q),
+                  Not ( p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r),
+                  (Not p :&&: q) :&&: Not (Not (p :||: Not q) :&&: r),
+                  (Not p :&&: Not (Not q)) :&&: Not ((Not p :&&: Not (Not q)) :&&: r),
+                  (Not p :&&: Not (Not q)) :&&: (Not (Not (p :||: Not q)) :||: Not r),
+                  Not (p :||: Not q) :&&: ((Not (Not p) :||: Not (Not (Not q))) :||: Not r),
+                  Not (p :->: Not q),
+                  Not (Not p :||: Not q),
+                  Not (Not p) :&&: Not (Not q),
+                  Not (Not p) :&&: q,
+
+                  Not (p :->: Not q) :->: Not (p :->: Not q),
+                  Not (Not p :||: Not q) :->: Not (p :->: Not q),                  
+                  Not (p :->: Not q) :->: Not (Not p :||: Not q),  
+                  (p :&&: q) :->: (p :&&: q)                    
+                ]

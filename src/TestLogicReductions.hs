@@ -7,7 +7,7 @@ import LogicReductionRules
 import LogicTestCases
 import LogicReductionStrategies
 import LogicTestFunctions
---import LogicExercices
+import LogicExercices hiding (main)
 import LogicConstants
 import LogicFunctions
 
@@ -415,21 +415,46 @@ main = do
     --tstStrategyGeneric stratAll                     (negationsTestSet ++ layerTestSet) 
     --tstDerivation      stratAll                     Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
-    --tstApply           stratToNnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
-    --tstStrategyGeneric stratToNnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
-    --tstDerivation      stratToNnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
-
     --tstApply           stratToCnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToCnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstDerivation      stratToCnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
+    --tstApply           stratToCnfS1                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToCnfS1                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToCnfS1                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+
+    --tstApply           stratToCnfS2                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToCnfS2                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToCnfS2                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+
+
+    --tstApply           stratToNnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToNnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToNnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+
+    --tstApply           stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToCnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+
     --tstApply           stratToDnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToDnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstDerivation      stratToDnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+
+    --tstApply           stratToDnfS1                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToDnfS1                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToDnfS1                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+
+    --tstApply           stratToDnfS2                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToDnfS2                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToDnfS2                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+
+    --tstApply           stratToDnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToDnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToDnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
     
     --putStrLn $ execStrategy stratAC ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)
-    putStrLn $ show $ length $ applyAll stratToDnf (newContext (termNavigator (((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q))))
-    --putStrLn $ show $ length $ applyAll stratToDnf (newContext (termNavigator ((Not p :&&: r :&&: Not (Not (Not F))) :||: Not (Not (Not F)) :||: Not (Not (Not r)) :||: Not (Not (Not p)) :||: (Not p :&&: q) :||: (Not (Not p) :&&: q :&&: Not p) :||: q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T :||: Not (Not (Not T)) :||: (Not q :<->: Not p))))
+    --putStrLn $ show $ length $ applyAll stratToDnfAC (newContext (termNavigator (((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q))))
+    --putStrLn $ show $ length $ applyAll stratToDnfAC (newContext (termNavigator ((Not p :&&: r :&&: Not (Not (Not F))) :||: Not (Not (Not F)) :||: Not (Not (Not r)) :||: Not (Not (Not p)) :||: (Not p :&&: q) :||: (Not (Not p) :&&: q :&&: Not p) :||: q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T :||: Not (Not (Not T)) :||: (Not q :<->: Not p))))
 
 
     --putStrLn $ show $ applyD stratAC (newContext (termNavigator ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)))
@@ -443,3 +468,41 @@ main = do
     --putStrLn $ show $ eqExpr (p :->: (Not p :||: q)) ((Not p :||: q) :->: r)
     --putStrLn $ show $ eqExpr (p :&&: (Not p :->: q)) ((Not p :->: q) :&&: p)
     --putStrLn $ show $ eqExpr (p :&&: (Not p :->: q) :&&: (Not r :<->: q) :&&: r) ((Not r :<->: q) :&&: r :&&: (Not p :->: q) :&&: p)
+
+    --tstApply           stratToDnf                   Single thesisTestSet 
+    --tstStrategyGeneric stratToDnf                   thesisTestSet 
+    --tstDerivation      stratToDnf                   Single ((drop 7 . take 12) thesisTestSet)
+
+    --tstApply           stratToDnfS1                 Single thesisTestSet 
+    --tstStrategyGeneric stratToDnfS1                 thesisTestSet 
+    --tstDerivation      stratToDnfS1                 Single ((drop 11 . take 19) thesisTestSet)
+
+    --tstApply           stratToDnfS2                 Single thesisTestSet 
+    --tstStrategyGeneric stratToDnfS2                 thesisTestSet 
+    --tstDerivation      stratToDnfS2                 Single thesisTestSet
+
+    --tstApply           stratToDnfAC                 Single thesisTestSet 
+    --tstStrategyGeneric stratToDnfAC                 thesisTestSet 
+    --tstDerivation      stratToDnfAC                 Single ((drop 0 . take 1) thesisTestSet)
+
+    --putStrLn $ show $ derivStepsList (thesisTestSet!!11)
+    --putStrLn $ show $ derivStepsList (thesisTestSet!!12)
+    --putStrLn $ show $ derivTermsList (thesisTestSet!!11)
+    --putStrLn $ show $ derivTermsList (thesisTestSet!!12)     
+    --putStrLn $ show $ derivDiff (thesisTestSet!!11) (thesisTestSet!!12)
+    --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!4)
+    --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!5)
+    --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!6)
+    --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!8)
+    --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!9)
+    --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
+    --putStrLn $ show $ derivDiff (thesisTestSet!!1) (thesisTestSet!!10)
+    --putStrLn $ show $ derivToStringList $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
+    --putStrLn $ show $ derivToStrategy $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
+
+    putStrLn $ show $ getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)
+    putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!7)
+    putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!10)
+
+    --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!3)
+    --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!4)

@@ -93,13 +93,6 @@ evalExercise    x = emptyExercise
                         examples      = examplesFor Easy commutativityTestSet
                      }
 
-execStrategy :: LabeledStrategy (Context SLogic) -> SLogic -> String
-execStrategy s x = show $ applyD s (newContext $ termNavigator x)
-
-eqExpr :: SLogic -> SLogic -> Bool
-eqExpr x y = (execStrategy stratAC x) == (execStrategy stratAC y)
-
-
 tupleToStr :: (Show a) => (Int, a) -> String
 tupleToStr x = numbers ++ ". " ++ formula ++ "\n"
     where

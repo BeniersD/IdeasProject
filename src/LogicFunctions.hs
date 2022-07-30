@@ -1,6 +1,6 @@
 module LogicFunctions ( createRule, convertToRule, countNegations, compareLogic, hasRule, hasBool, hasNegation, isAndOrOr, isAssoCommOrdered, 
-   isBool, isMultiAnd, isDoubleNot, isMultiAndOr,isMultiDoubleNot, isMultiImplicationDefinition, isMultiOr, isNegation, isOrdered,  isUnary, 
-   skipNegation, skipNegations 
+   isBool, isDistAnd, isDistOr, isMultiAnd, isDoubleNot, isMultiAndOr, isMultiDoubleNot, isMultiImplicationDefinition, isMultiOr, isNegation, 
+   isOrdered,  isUnary, skipNegation, skipNegations 
    ) where
 
 import Data.Maybe
@@ -27,23 +27,31 @@ compareLogic p q | skipNegations p == skipNegations q                       = co
                  | skipNegations p == F && skipNegations q == T             = True
                  | otherwise                                                = skipNegations p  <= skipNegations q 
 
-hasBool, hasDoubleNot, hasNegation :: SLogic -> Bool
+hasRule :: Rule SLogic -> SLogic -> Bool
+hasRule x                                                                   = isJust . apply x
+
+
+hasBool, hasDoubleNot, hasNegation, isAndOrOr, isAssoCommOrdered, isDistAnd, isDistOr, isDoubleNot, isMultiImplicationDefinition, isMultiAnd, 
+   isMultiAndOr, isMultiDoubleNot, isMultiOr, isNegation, isOrdered, isBool, isUnary :: SLogic -> Bool
 hasBool p                                                                   = isBool p || any isBool (children p)
 
 hasDoubleNot p                                                              = any isDoubleNot (children p)
 
 hasNegation p                                                               = any isNegation (children p)
 
-hasRule      :: Rule SLogic -> SLogic -> Bool
-hasRule x                                                                   = isJust . apply x
-
-isAndOrOr, isAssoCommOrdered, isDoubleNot, isMultiImplicationDefinition, isMultiAnd, isMultiAndOr, isMultiDoubleNot, isMultiOr, 
-   isNegation, isOrdered, isBool, isUnary :: SLogic -> Bool
 isAndOrOr x                                                                 = isJust (isOr x) || isJust (isAnd x)
 
 isAssoCommOrdered (p :||: q) | (skipNegations p /= skipNegations q)         = isOrdered (skipNegations p :||: skipNegations q)
 isAssoCommOrdered (p :&&: q) | (skipNegations p /= skipNegations q)         = isOrdered (skipNegations p :&&: skipNegations q)
 isAssoCommOrdered p                                                         = isOrdered p
+
+isDistAnd ( _ :||: ( _ :&&: _ ))                                            = True
+isDistAnd (( _ :&&: _ ) :||: _ )                                            = True
+isDistAnd _                                                                 = False
+
+isDistOr ( _ :&&: ( _ :||: _ ))                                             = True
+isDistOr (( _ :||: _ ) :&&: _ )                                             = True
+isDistOr _                                                                  = False  
 
 isDoubleNot (Not (Not _))                                                   = True
 isDoubleNot _                                                               = False
