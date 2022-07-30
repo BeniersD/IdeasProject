@@ -2,7 +2,7 @@ module LogicTestCases
      where
 
 import Domain.Logic.Formula
-import LogicConstants
+import LogicFunctions
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Test sets to evaluate rules and/or strategies

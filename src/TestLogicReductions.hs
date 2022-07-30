@@ -8,7 +8,6 @@ import LogicTestCases
 import LogicReductionStrategies
 import LogicTestFunctions
 import LogicExercices hiding (main)
-import LogicConstants
 import LogicFunctions
 
 

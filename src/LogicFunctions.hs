@@ -1,12 +1,25 @@
-module LogicFunctions ( createRule, convertToRule, countNegations, compareLogic, hasRule, hasBool, hasNegation, isAndOrOr, isAssoCommOrdered, 
-   isBool, isDistAnd, isDistOr, isMultiAnd, isDoubleNot, isMultiAndOr, isMultiDoubleNot, isMultiImplicationDefinition, isMultiOr, isNegation, 
-   isOrdered,  isUnary, skipNegation, skipNegations 
+module LogicFunctions ( o, p, q, r, s ,t, createRule, convertToRule, countNegations, compareLogic, hasRule, hasBool, hasNegation, isAndOrOr, 
+   isAssoCommOrdered, isBool, isDistAnd, isDistOr, isMultiAnd, isDoubleNot, isMultiAndOr, isMultiDoubleNot, isMultiImplicationDefinition, 
+   isMultiOr, isNegation, isOrdered,  isUnary, skipNegation, skipNegations 
    ) where
 
 import Data.Maybe
 import Domain.Logic.Formula
 import Ideas.Common.Library hiding (isUnary)
+import Ideas.Utils.Prelude
 import Ideas.Utils.Uniplate
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- Constants
+------------------------------------------------------------------------------------------------------------------------------------------------
+o, p, q, r, s, t :: Logic ShowString
+o = Var (ShowString "o")
+p = Var (ShowString "p") 
+q = Var (ShowString "q") 
+r = Var (ShowString "r")
+s = Var (ShowString "s")
+t = Var (ShowString "t")
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Logic functions
