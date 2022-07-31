@@ -433,7 +433,7 @@ main = do
 
     --tstApply           stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToCnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
-    --tstDerivation      stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+    tstDerivation      stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
     --tstApply           stratToDnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToDnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
@@ -499,9 +499,9 @@ main = do
     --putStrLn $ show $ derivToStringList $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
     --putStrLn $ show $ derivToStrategy $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
 
-    putStrLn $ show $ getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)
-    putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!7)
-    putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!10)
+    --putStrLn $ show $ getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)
+    --putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!7)
+    --putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!10)
 
     --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!3)
     --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!4)

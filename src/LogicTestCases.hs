@@ -292,7 +292,7 @@ absorptionTestSet =
                   ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: r),             -- 24. Commutative Absorption 2, somewhere, repeat
                   ((p :||: q) :&&: p) :&&: ((p :&&: q) :||: q),             -- 25. Commutative Absorption 2, somewhere, repeat
                   (((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q,    -- 26. Commutative Absorption 4, Absorption, somewhere, repeat
-                  (p :&&: (p :||: q)) :||: ((p :&&: q) :||: p) :||: ((p :||: q) :&&: p) :||: (p :&&: (q :||: p)) :||: ((p :&&: q) :||: ((p :&&: q) :&&: q)) :||: ((q :||: p) :&&: p),
+                  (p :&&: (r :||: q)) :||: (p :&&: (p :||: r)) :||: (p :&&: (p :||: q)) :||: ((p :&&: q) :||: p) :||: ((p :||: q) :&&: p) :||: (p :&&: (q :||: p)) :||: ((p :&&: q) :||: ((p :&&: q) :&&: q)) :||: ((q :||: p) :&&: p),
                                                                             -- 26. Commutative All Absorption variants, somewhere, repeat
                   p :&&: (Not p :||: q),                                    -- 27. Absorption Derivative
                   p :||: (q :&&: Not p),                                    -- 28. Absorption Derivative

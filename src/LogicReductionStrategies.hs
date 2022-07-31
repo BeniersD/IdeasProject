@@ -1,5 +1,6 @@
 module LogicReductionStrategies where
 
+import Ideas.Common.Strategy hiding (not, layer)
 import Data.List
 import Data.Maybe
 import Domain.Logic.Formula 
@@ -272,7 +273,7 @@ stratSA                 = label "Strategy Simplification"                    $ s
         s = repeatS (somewhere (stratConjunctionsA .|. stratDisjunctionsA .|. stratAbsorbersA)) 
 stratSAO                = label "Strategy Simplification and Ordering"       $ s
     where
-        s = stratS .*. try stratAC
+        s = repeatS( repeat1 (somewhere (stratConjunctionsA .|. stratDisjunctionsA .|. stratAbsorbersA)) |> stratAC )
 
 stratToNnf              = label "Strategy to NNF (All variants)"             $ s
     where
@@ -298,12 +299,12 @@ stratToCnfS1            = label "Strategy to CNF (All variants)"             $ s
 stratToCnfS2            = label "Strategy to CNF (All variants)"             $ s
     where
         c = evalCondOnTerm isDistAnd  
-        s = stratToNnfA .*. stratSA .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity)  .*. stratSA
+        s = stratToNnfA .*. stratSA .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) .*. stratSA
+
 stratToCnfAC            = label "Strategy to CNF (AC - All variants)"        $ s
     where
         c = evalCondOnTerm isDistAnd  
-        s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity)  .*. stratSA
-
+        s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) 
 stratToDnf              = label "Strategy to DNF"                            $ s
     where
         c = evalCondOnTerm isDistOr  
@@ -323,11 +324,11 @@ stratToDnfS2            = label "Strategy to DNF (All variants)"             $ s
         c = evalCondOnTerm isDistOr  
         s = stratToNnfA .*. stratSA .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity)  .*. stratSA
 
+
 stratToDnfAC            = label "Strategy to DNF  (AC - All variants)"       $ s
     where
         c = evalCondOnTerm isDistOr  
-        s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) .*. stratSA
-
+        s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) 
 ruleAC                  = convertToRule "Associativity-Commutativity"        "combi.ac"                                  stratAC  
 ruleACI                 = convertToRule d                                    "combi.aci"                                 stratACI    
     where
