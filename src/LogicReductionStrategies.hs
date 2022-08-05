@@ -92,7 +92,7 @@ ruleFRuleConjunctionC, ruleTRuleConjunctionC, ruleFRuleComplementC, ruleTRuleCom
     ruleCommutativityOrd, ruleFRuleComplementA, ruleTRuleComplementA, ruleFRuleComplementN, ruleTRuleComplementN, ruleFRuleConjunctionA, 
     ruleFRuleConjunctionN, ruleTRuleConjunctionA, ruleFRuleDisjunctionA, ruleTRuleConjunctionN, ruleTRuleDisjunctionA, ruleFRuleDisjunctionN, 
     ruleTRuleDisjunctionN, ruleDeMorgan, ruleAbsorptionC, ruleAbsorptionA, ruleAbsorptionN, ruleAC, ruleACI, ruleDeMorganAndG, ruleDeMorganOrG, 
-    ruleDeMorganG, ruleDeMorganA, ruleDeMorganD, ruleDoubleNotC, ruleMultiDoubleNot, ruleLayerDoubleNot, ruleMultiTFRuleNotTF, 
+    ruleDeMorganG, ruleDeMorganA, ruleDeMorganD, ruleDoubleNotA, ruleMultiDoubleNot, ruleLayerDoubleNot, ruleMultiTFRuleNotTF, 
     ruleLayerTFRuleNotTF, ruleTFRuleNotTFA, ruleImplicationEliminationA, ruleImplicationEliminationN, ruleEquivalenceEliminationA, 
     ruleEquivalenceEliminationN, ruleIdempotencyN, ruleNegations :: Rule (Context SLogic)
 
@@ -247,11 +247,11 @@ stratAbsorbersA         = label d                                            $ s
         s = (stratAbsorptionA .|. stratIdempotencyA)
 stratGenerics           = label d                                            $ s
     where
-        d = "Elimination / Equivalence Elimination / DeMorgan"
+        d = "Strategy Implication Elimination / Equivalence Elimination / DeMorgan"
         s = (liftToContext ruleImplicationElimination .|. liftToContext ruleEquivalenceElimination .|. stratDeMorgan)
 stratGenericsA          = label d                                            $ s
     where
-        d = "Elimination / Equivalence Elimination / DeMorgan (All variants)"
+        d = "Strategy Implication Elimination / Equivalence Elimination / DeMorgan (All variants)"
         s = (stratImplicationEliminationA .|. stratEquivalenceEliminationA .|. stratDeMorganA)
 stratAll                = label d                                            $ s
     where
@@ -539,7 +539,7 @@ stratDoubleNot        = label "Strategy Layered Double Not"                  $ (
 
 ruleMultiDoubleNot    = convertToRule "Multi Double Not"                     "combi.doublenot"                          stratMultiDoubleNot
 ruleLayerDoubleNot    = convertToRule "Layered Double Not"                   "combi.doublenot"                          stratLayerDoubleNot
-ruleDoubleNotC        = convertToRule "Double Not (All Variants)"            "all.doublenot"                            stratDoubleNot
+ruleDoubleNotA        = convertToRule "Double Not (All Variants)"            "all.doublenot"                            stratDoubleNot
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- F-Rule Not T/T-Rule Not F strategies and rules

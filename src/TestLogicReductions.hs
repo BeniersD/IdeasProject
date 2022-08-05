@@ -433,7 +433,7 @@ main = do
 
     --tstApply           stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToCnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
-    tstDerivation      stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+    --tstDerivation      stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
     --tstApply           stratToDnf                   Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToDnf                   (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
