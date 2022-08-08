@@ -427,9 +427,9 @@ main = do
     --tstDerivation      stratToCnfS2                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
 
-    --tstApply           stratToNnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
-    --tstStrategyGeneric stratToNnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
-    --tstDerivation      stratToNnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
+    --tstApply           stratToNnf                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstStrategyGeneric stratToNnf                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
+    --tstDerivation      stratToNnf                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
 
     --tstApply           stratToCnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstStrategyGeneric stratToCnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
@@ -451,6 +451,14 @@ main = do
     --tstStrategyGeneric stratToDnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstDerivation      stratToDnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
     
+    --tstApply           stratACI                     SomeWhereRepeat1  commutativityTestSet 
+    --tstStrategyGeneric stratACI                     commutativityTestSet 
+    --tstDerivation      stratACI                     SomeWhere         commutativityTestSet 
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-- Derivations
+-------------------------------------------------------------------------------------------------------------------------------------------------
+   
     --putStrLn $ execStrategy stratAC ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)
     --putStrLn $ show $ length $ applyAll stratToDnfAC (newContext (termNavigator (((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q))))
     --putStrLn $ show $ length $ applyAll stratToDnfAC (newContext (termNavigator ((Not p :&&: r :&&: Not (Not (Not F))) :||: Not (Not (Not F)) :||: Not (Not (Not r)) :||: Not (Not (Not p)) :||: (Not p :&&: q) :||: (Not (Not p) :&&: q :&&: Not p) :||: q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T :||: Not (Not (Not T)) :||: (Not q :<->: Not p))))
@@ -505,3 +513,4 @@ main = do
 
     --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!3)
     --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!4)
+

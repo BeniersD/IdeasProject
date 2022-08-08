@@ -50,7 +50,10 @@ multiStrategy t xs = label d $ s
                 Choice -> choice xs
                 OrElse -> orelse xs
                 Sequence -> Combinators.sequence xs  
-                     
+ 
+evalStrategyG :: (IsId l, IsStrategy f) => l -> f a -> LabeledStrategy a
+evalStrategyG l s       = label l $ s
+
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Visits -- replica of Traversal.hs
 -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -215,7 +218,7 @@ stratACI                = label d                                            $  
 
         lar = liftToContext ruleassociativityR
         ri  = liftToContext ruleIdempotency |> (evalCondOnTerm f .*. lar)
-        s   = stratAC .*. repeatS (oncebu ri)
+        s   = repeatS(somewhere stratUnairiesA) .*. stratAC .*. repeatS (oncebu ri)
 
 stratUnairiesA          = label d                                            $ stratDoubleNot .|. stratTFRuleNotTFA
     where

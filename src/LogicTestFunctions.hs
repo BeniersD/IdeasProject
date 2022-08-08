@@ -56,9 +56,6 @@ instance LogicEvaluationStrategy (LabeledStrategy (Context SLogic)) where
     evalStrategy r SomeWhereRepeatS = evalStrategyG ("Evaluate repeat somewhere - " ++ showId r)    (repeatS   (somewhere r))
     evalStrategy r SomeWhereRepeat1 = evalStrategyG ("Evaluate repeat somewhere - " ++ showId r)    (repeat1   (somewhere r))
 
-evalStrategyG :: (IsId l, IsStrategy f) => l -> f a -> LabeledStrategy a
-evalStrategyG l s       = label l $ s
-
 minimalExercise :: LabeledStrategy (Context SLogic) -> Exercise SLogic
 minimalExercise x = emptyExercise
                      { 
