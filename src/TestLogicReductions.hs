@@ -492,7 +492,7 @@ main = do
     --tstStrategyGeneric stratToDnfAC                 thesisTestSet 
     --tstDerivation      stratToDnfAC                 Single ((drop 0 . take 1) thesisTestSet)
 
-    --putStrLn $ show $ derivStepsList (thesisTestSet!!11)
+    putStrLn $ show $ derivStepsList (thesisTestSet!!11)
     --putStrLn $ show $ derivStepsList (thesisTestSet!!12)
     --putStrLn $ show $ derivTermsList (thesisTestSet!!11)
     --putStrLn $ show $ derivTermsList (thesisTestSet!!12)     

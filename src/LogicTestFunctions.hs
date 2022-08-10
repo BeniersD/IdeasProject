@@ -13,6 +13,7 @@ import Domain.Logic.Formula  hiding (not)
 import Ideas.Common.Library
 import LogicReductionStrategies
 import LogicTestCases
+import LogicFunctions
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Generic functions for test purposes

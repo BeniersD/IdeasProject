@@ -35,7 +35,7 @@ stratRuleTopLayerMany f = label d $ s
 
 stratRuleC, stratNegate :: Rule (Context SLogic) -> LabeledStrategy (Context SLogic)
 -- Commutative version of a rule
-stratRuleC  r           = label ("Strategy Commutativy of a Rule "++showId r) $ (liftToContext ruleCommutativity .*. r)
+stratRuleC  r           = label ("Strategy Commutativy of a Rule " ++ showId r) $ (liftToContext ruleCommutativity .*. r)
 stratNegate r           = label ("Strategy Negate " ++ showId r)              $ s 
     where 
         c = evalCondOnTerm isNegation
@@ -97,7 +97,7 @@ ruleFRuleConjunctionC, ruleTRuleConjunctionC, ruleFRuleComplementC, ruleTRuleCom
     ruleTRuleDisjunctionN, ruleDeMorgan, ruleAbsorptionC, ruleAbsorptionA, ruleAbsorptionN, ruleAC, ruleACI, ruleDeMorganAndG, ruleDeMorganOrG, 
     ruleDeMorganG, ruleDeMorganA, ruleDeMorganD, ruleDoubleNotA, ruleMultiDoubleNot, ruleLayerDoubleNot, ruleMultiTFRuleNotTF, 
     ruleLayerTFRuleNotTF, ruleTFRuleNotTFA, ruleImplicationEliminationA, ruleImplicationEliminationN, ruleEquivalenceEliminationA, 
-    ruleEquivalenceEliminationN, ruleIdempotencyN, ruleNegations :: Rule (Context SLogic)
+    ruleEquivalenceEliminationN, ruleIdempotencyN, ruleNegations, ruleImplicationEliminationD :: Rule (Context SLogic)
 
 stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRuleComplementC, stratFRuleDisjunctionC, stratTRuleDisjunctionC, 
     stratCommutativityOrd, stratDeMorgan, stratFRuleComplementA, stratTRuleComplementA, stratFRuleComplementN, stratTRuleComplementN, 
@@ -123,7 +123,7 @@ stratAbsorptionC  = label "Strategy Commutativity-Absortion"                  $ 
         f2 ((p :||: q) :&&: r) | p == r = True
 
         f2 _                            = False
-        f3 (p :&&: (q :||: r)) | p == r = True--
+        f3 (p :&&: (q :||: r)) | p == r = True
         f3 _                            = False
 
         f4 (p :||: (q :&&: r)) | p == q = True 
@@ -605,7 +605,7 @@ stratImplicationEliminationD = label d                                       $ s
         c = evalCondOnTerm f
         s = c .*. liftToContext ruleImplicationElimination .*. 
             repeatS (somewhere stratUnairiesA) .*. 
-            repeatS (somewhere (liftToContext ruleIdempotency .|. stratDisjunctionsA))
+            repeatS (somewhere (stratDisjunctionsA .|. stratIdempotencyA))
 stratImplicationElimination = label d                                        $ s
     where
         d = "Strategy Implication Elimination Single + Derivative"
