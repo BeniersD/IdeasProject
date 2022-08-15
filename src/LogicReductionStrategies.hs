@@ -1,3 +1,6 @@
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module LogicReductionStrategies where
 
 import Ideas.Common.Strategy hiding (not, layer)
@@ -53,6 +56,27 @@ multiStrategy t xs = label d $ s
  
 evalStrategyG :: (IsId l, IsStrategy f) => l -> f a -> LabeledStrategy a
 evalStrategyG l s       = label l $ s
+
+getAllRules :: [Rule (Context SLogic)]
+getAllRules = removeDuplicates $ rulesInStrategy $ stratNegations .|. stratAll
+
+applicableRules :: SLogic -> [Rule (Context SLogic)]
+applicableRules l = f getAllRules l
+    where
+        f :: [Rule (Context SLogic)] -> SLogic -> [Rule (Context SLogic)]
+        f [] lf  = []
+        f (x:xs) lf | (hasRule x lf) = [x] ++ f xs lf
+                    | otherwise      = []  ++ f xs lf
+
+evalApplicableRules :: SLogic -> [Rule (Context SLogic)] -> [SLogic]
+evalApplicableRules l xs = [fromJust $ currentInContext (applyD (repeat1 $ somewhere x) (newContext $ termNavigator l)) | x <- xs]
+
+isMultiSingleRule :: SLogic -> SLogic -> Bool
+isMultiSingleRule l1 l2 =  matchingElement ys zs
+    where
+        xs = applicableRules l1
+        ys = evalApplicableRules l1 xs
+        zs = evalApplicableRules l2 xs
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Visits -- replica of Traversal.hs
@@ -218,7 +242,7 @@ stratACI                = label d                                            $  
 
         lar = liftToContext ruleassociativityR
         ri  = liftToContext ruleIdempotency |> (evalCondOnTerm f .*. lar)
-        s   = repeatS(somewhere stratUnairiesA) .*. stratAC .*. repeatS (oncebu ri)
+        s   = repeatS (somewhere stratUnairiesA) .*. stratAC .*. repeatS (oncebu ri)
 
 stratUnairiesA          = label d                                            $ stratDoubleNot .|. stratTFRuleNotTFA
     where
@@ -307,7 +331,7 @@ stratToCnfS2            = label "Strategy to CNF (All variants)"             $ s
 stratToCnfAC            = label "Strategy to CNF (AC - All variants)"        $ s
     where
         c = evalCondOnTerm isDistAnd  
-        s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) 
+        s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) .*. stratSAO  
 stratToDnf              = label "Strategy to DNF"                            $ s
     where
         c = evalCondOnTerm isDistOr  
@@ -331,7 +355,7 @@ stratToDnfS2            = label "Strategy to DNF (All variants)"             $ s
 stratToDnfAC            = label "Strategy to DNF  (AC - All variants)"       $ s
     where
         c = evalCondOnTerm isDistOr  
-        s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) 
+        s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) .*. stratSAO 
 ruleAC                  = convertToRule "Associativity-Commutativity"        "combi.ac"                                  stratAC  
 ruleACI                 = convertToRule d                                    "combi.aci"                                 stratACI    
     where
@@ -616,4 +640,4 @@ stratImplicationEliminationN = label d                                       $ s
 
 ruleImplicationEliminationA = convertToRule "Implication Elimination (All Variants)" "all.implicationelimination"              stratImplicationEliminationA
 ruleImplicationEliminationD = convertToRule "Implication Elimination Derivative"     "combi.implicationelimination.derivative" stratImplicationEliminationD
-ruleImplicationEliminationN = convertToRule "Implication Elimination Negate"         "combi.equivalenceelimination.negate"     stratImplicationEliminationN
+ruleImplicationEliminationN = convertToRule "Implication Elimination Negate"         "combi.implicationelimination.negate"     stratImplicationEliminationN

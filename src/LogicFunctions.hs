@@ -1,6 +1,9 @@
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module LogicFunctions ( o, p, q, r, s ,t, createRule, convertToRule, countNegations, compareLogic, hasRule, hasBool, hasNegation, isAndOrOr, 
    isAssoCommOrdered, isBool, isDistAnd, isDistOr, isMultiAnd, isDoubleNot, isMultiAndOr, isMultiDoubleNot, isMultiImplicationDefinition, 
-   isMultiOr, isNegation, isOrdered,  isUnary, skipNegation, skipNegations 
+   isMultiOr, isNegation, isOrdered,  isUnary, skipNegation, skipNegations, ruleToStrategy, removeDuplicates, hasElement, matchingElement
    ) where
 
 import Data.Maybe
@@ -24,6 +27,19 @@ t = Var (ShowString "t")
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Generic Logic functions
 -------------------------------------------------------------------------------------------------------------------------------------------------
+class LogicRuleConversion a where
+    type Out a     :: * 
+    ruleToStrategy :: a -> Out a
+
+instance LogicRuleConversion (Rule SLogic) where  
+    type Out (Rule SLogic) = (LabeledStrategy (Context SLogic))
+    ruleToStrategy x    = ruleToStrategy (liftToContext x)
+
+instance LogicRuleConversion (Rule (Context SLogic)) where 
+    type Out (Rule (Context SLogic)) = (LabeledStrategy (Context SLogic))
+    ruleToStrategy x    = label (showId x) $ x
+
+
 createRule     :: String -> String -> (SLogic -> Maybe (SLogic)) -> Rule SLogic
 createRule x y f                                                            = describe ( "Rewrite " ++ x ) $ makeRule y f
 
@@ -40,9 +56,22 @@ compareLogic p q | skipNegations p == skipNegations q                       = co
                  | skipNegations p == F && skipNegations q == T             = True
                  | otherwise                                                = skipNegations p  <= skipNegations q 
 
-hasRule :: Rule SLogic -> SLogic -> Bool
-hasRule x                                                                   = isJust . apply x
+hasElement :: Eq a => a -> [a] -> Bool
+hasElement e []                 = False
+hasElement e (x:xs) | e == x    = True
+                    | otherwise = hasElement e xs
 
+matchingElement :: Eq a => [a] -> [a] -> Bool
+matchingElement [] _          = False
+matchingElement _ []          = False
+matchingElement (x:xs) (y:ys) = x == y || matchingElement xs ys
+
+hasRule :: Rule (Context SLogic) -> SLogic -> Bool
+hasRule x y                                                                 =  applicable (somewhere x) (newContext $ termNavigator y)
+
+removeDuplicates :: Eq a => [a] -> [a]
+removeDuplicates [] = []
+removeDuplicates (x:xs) = x:removeDuplicates (filter (/=x) xs)
 
 hasBool, hasDoubleNot, hasNegation, isAndOrOr, isAssoCommOrdered, isDistAnd, isDistOr, isDoubleNot, isMultiImplicationDefinition, isMultiAnd, 
    isMultiAndOr, isMultiDoubleNot, isMultiOr, isNegation, isOrdered, isBool, isUnary :: SLogic -> Bool

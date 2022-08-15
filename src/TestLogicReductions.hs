@@ -475,6 +475,12 @@ main = do
     --putStrLn $ show $ eqExpr (p :->: (Not p :||: q)) ((Not p :||: q) :->: r)
     --putStrLn $ show $ eqExpr (p :&&: (Not p :->: q)) ((Not p :->: q) :&&: p)
     --putStrLn $ show $ eqExpr (p :&&: (Not p :->: q) :&&: (Not r :<->: q) :&&: r) ((Not r :<->: q) :&&: r :&&: (Not p :->: q) :&&: p)
+    
+    putStrLn $ show $ getAllRules
+    putStrLn $ show $ applicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r)
+    putStrLn $ show $ evalApplicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) (applicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r))
+    putStrLn $ show $ isMultiSingleRule ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) ((p :&&: Not (Not p :||: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r)
+    putStrLn $ show $ isMultiSingleRule ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) ((p :&&: Not (Not p :||: q)) :&&: (p :&&: Not (Not p :||: q)) :&&: (Not r :<->: q) :&&: r)
 
     --tstApply           stratToDnf                   Single thesisTestSet 
     --tstStrategyGeneric stratToDnf                   thesisTestSet 
@@ -492,25 +498,38 @@ main = do
     --tstStrategyGeneric stratToDnfAC                 thesisTestSet 
     --tstDerivation      stratToDnfAC                 Single ((drop 0 . take 1) thesisTestSet)
 
-    putStrLn $ show $ derivStepsList (thesisTestSet!!11)
-    --putStrLn $ show $ derivStepsList (thesisTestSet!!12)
-    --putStrLn $ show $ derivTermsList (thesisTestSet!!11)
-    --putStrLn $ show $ derivTermsList (thesisTestSet!!12)     
-    --putStrLn $ show $ derivDiff (thesisTestSet!!11) (thesisTestSet!!12)
-    --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!4)
-    --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!5)
-    --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!6)
-    --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!8)
-    --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!9)
-    --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
-    --putStrLn $ show $ derivDiff (thesisTestSet!!1) (thesisTestSet!!10)
-    --putStrLn $ show $ derivToStringList $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
-    --putStrLn $ show $ derivToStrategy $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
+     --tstApply     stratToDnfAC                 Single ((drop 3 . take 4) thesisTestSet)
+     --tstApply     stratToDnfAC                 Single ((drop 4 . take 5) thesisTestSet)
+     --tstApply     stratToDnfAC                 Single ((drop 5 . take 6) thesisTestSet)
+     --tstApply     stratToDnfAC                 Single ((drop 5 . take 6) thesisTestSet)
 
-    --putStrLn $ show $ getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)
-    --putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!7)
-    --putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!10)
+     --tstDerivation   stratToDnfAC                 Single ((drop 11 . take 12) thesisTestSet)
+     --tstDerivation   stratToDnfAC                 Single ((drop 12 . take 13) thesisTestSet)
+     --tstDerivation   stratToDnfAC                 Single ((drop 13 . take 14) thesisTestSet)
+     --tstDerivation   stratToDnfAC                 Single ((drop 14 . take 15) thesisTestSet)
+     --tstDerivation   stratToDnfAC                 Single ((drop 15 . take 16) thesisTestSet)
+     --tstDerivation   stratToDnfAC                 Single ((drop 16 . take 17) thesisTestSet)
+     --tstDerivation   stratToDnfAC                 Single ((drop 17 . take 18) thesisTestSet)
 
-    --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!3)
-    --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!4)
+     --putStrLn $ show $ derivStepsList (thesisTestSet!!11)
+     --putStrLn $ show $ derivStepsList (thesisTestSet!!12)
+     --putStrLn $ show $ derivTermsList (thesisTestSet!!11)
+     --putStrLn $ show $ derivTermsList (thesisTestSet!!12)     
+     --putStrLn $ show $ derivDiff (thesisTestSet!!11) (thesisTestSet!!12)(p :&&: q)
+     --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!4)
+     --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!5)
+     --putStrLn $ show $ derivDiff (thesisTestSet!!3) (thesisTestSet!!6)
+     --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!8)
+     --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!9)
+     --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
+     --putStrLn $ show $ derivDiff (thesisTestSet!!1) (thesisTestSet!!10)
+     --putStrLn $ show $ derivToStringList $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
+     --putStrLn $ show $ derivToStrategy $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10) 
 
+     --putStrLn $ show $ getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)
+     --putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!7)
+     --putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!10)
+
+     --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!3)
+     --putStrLn $ show $ treeDiff (thesisTestSet!!0) (thesisTestSet!!4)
+     --putStrLn $ show $ getRuleSet

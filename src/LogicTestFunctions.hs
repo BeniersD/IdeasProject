@@ -1,7 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module LogicTestFunctions 
     where
@@ -19,18 +17,6 @@ import LogicFunctions
 -- Generic functions for test purposes
 -------------------------------------------------------------------------------------------------------------------------------------------------
 data EvaluationType = Single | SomeWhere | SomeWhereRepeatS | SomeWhereRepeat1 | RepeatS | Repeat1 
-
-class LogicRuleConversion a where
-    type Out a     :: * 
-    ruleToStrategy :: a -> Out a
-
-instance LogicRuleConversion (Rule SLogic) where  
-    type Out (Rule SLogic) = (LabeledStrategy (Context SLogic))
-    ruleToStrategy x    = ruleToStrategy (liftToContext x)
-
-instance LogicRuleConversion (Rule (Context SLogic)) where 
-    type Out (Rule (Context SLogic)) = (LabeledStrategy (Context SLogic))
-    ruleToStrategy x    = label (showId x) $ x
 
 class LogicEvaluationStrategy a where
     type Out2 a  :: * 

@@ -8,6 +8,7 @@ import Ideas.Main.Default
 import LogicReductionStrategies
 import LogicTestCases
 import LogicReductionRules
+import LogicFunctions
 
 main :: IO ()
 main = defaultMain dr
@@ -59,10 +60,6 @@ derivToStrategy xs | otherwise       = label d $ s
           
 derivToStringList :: [Rule (Context SLogic)] -> [String]
 derivToStringList xs = map show xs
-
-removeDuplicates :: Eq a => [a] -> [a]
-removeDuplicates [] = []
-removeDuplicates (x:xs) = x:removeDuplicates (filter (/=x) xs)
 
 removeMatching :: [Rule (Context SLogic)] -> [Rule (Context SLogic)] -> [Rule (Context SLogic)]
 removeMatching (x:xs) (y:ys) | x == y    = removeMatching xs ys
