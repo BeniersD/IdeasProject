@@ -71,12 +71,20 @@ applicableRules l = f getAllRules l
 evalApplicableRules :: SLogic -> [Rule (Context SLogic)] -> [SLogic]
 evalApplicableRules l xs = [fromJust $ currentInContext (applyD (repeat1 $ somewhere x) (newContext $ termNavigator l)) | x <- xs]
 
-isMultiSingleRule :: SLogic -> SLogic -> Bool
-isMultiSingleRule l1 l2 =  matchingElement ys zs
+evalApplicableRulesAC :: SLogic -> [Rule (Context SLogic)] -> [SLogic]
+evalApplicableRulesAC l xs = [fromJust $ currentInContext (applyD stratAC (newContext $ termNavigator x)) | x <- (evalApplicableRules l xs)]
+
+data MultiSingleStrategy = AcEnabled | AcDisabled
+isMultiSingleRule :: SLogic -> SLogic -> MultiSingleStrategy -> Bool
+isMultiSingleRule l1 l2 b =  matchingElement ys zs
     where
         xs = applicableRules l1
-        ys = evalApplicableRules l1 xs
-        zs = evalApplicableRules l2 xs
+        f = case b of
+                AcEnabled  -> evalApplicableRulesAC
+                AcDisabled -> evalApplicableRules
+        ys = f l1 xs
+        zs = f l2 xs
+
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Visits -- replica of Traversal.hs
