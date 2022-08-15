@@ -567,12 +567,14 @@ thesisTestSet = [
                   Not (p :->: Not q) :->: (p :&&: q),
                   (p :&&: q) :->: (p :&&: q),
                   (Not p :||: Not q) :||: Not (Not p :||: Not q),
-                  Not (Not p :||: Not q) :->: Not (p :->: Not q),                  
-                  Not (p :->: Not q) :->: Not (Not p :||: Not q),
-                  (p :->: Not q) :||: Not (p :->: Not q),
+                                  
+                  
                   Not (p :->: Not q) :->: Not (p :->: Not q),
-                  Not (p :->: Not q) :->: (p :&&: q),                   
-                  (Not p :||: Not q) :||: (p :&&: q),
+                  (p :&&: q) :->: Not (p :->: Not q),                 
+                  Not (p :->: Not q) :->: (p :&&: q),
+                  (p :&&: q) :->: (p :&&: q),                   
+                  (p :->: Not q) :||: Not (p :->: Not q),               
+
 
                   Not (p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r),
                   (Not p :&&: q) :&&: Not (Not (p :||: Not q) :&&: r),

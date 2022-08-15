@@ -32,15 +32,15 @@ derivTermsList x =
         Nothing -> []
 
 derivDiff :: SLogic -> SLogic -> [Rule (Context SLogic)]
-derivDiff x y = xs 
+derivDiff x y = removeDuplicates $ xs
       where
           s1 = reverse $ derivStepsList x
-          t1 = reverse $ derivTermsList x
+          --t1 = reverse $ derivTermsList x
           s2 = reverse $ derivStepsList y
-          t2 = reverse $ derivTermsList y
-          xs = case head t1 == head t2 of
-                  True  -> removeDuplicates $ removeMatching s1 s2
-                  False -> []
+          --t2 = reverse $ derivTermsList y
+          xs = case head s1 == head s2 of
+                  True  -> removeMatching s1 s2
+                  False -> s1 ++ s2
 
 derivToStrategy :: [Rule (Context SLogic)] -> LabeledStrategy (Context SLogic)
 derivToStrategy [] = label "failure" $ failS
