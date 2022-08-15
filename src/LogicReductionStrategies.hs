@@ -61,12 +61,16 @@ getAllRules :: [Rule (Context SLogic)]
 getAllRules = removeDuplicates $ rulesInStrategy $ stratNegations .|. stratAll
 
 applicableRules :: SLogic -> [Rule (Context SLogic)]
-applicableRules l = f getAllRules l
+applicableRules l = zs
     where
         f :: [Rule (Context SLogic)] -> SLogic -> [Rule (Context SLogic)]
         f [] lf  = []
         f (x:xs) lf | (hasRule x lf) = [x] ++ f xs lf
                     | otherwise      = []  ++ f xs lf
+        ys = f getAllRules l
+        zs = case (elem (liftToContext ruleDeMorganOr) ys || elem (liftToContext ruleDeMorganAnd) ys) of
+                  True  -> [ruleDeMorgan] ++ filter (\x -> showId x /= "single.demorgan.or" && showId x /= "single.demorgan.and" ) ys
+                  False -> ys
 
 evalApplicableRules :: SLogic -> [Rule (Context SLogic)] -> [SLogic]
 evalApplicableRules l xs = [fromJust $ currentInContext (applyD (repeat1 $ somewhere x) (newContext $ termNavigator l)) | x <- xs]
@@ -500,18 +504,18 @@ stratDeMorganA        = label "Strategy DeMorgan All Variants)"              $ s
 stratDeMorganAndG     = label "Strategy DeMorgan And Generalisation"         $ s
     where
         c = evalCondOnTerm $ isMultiAnd . skipNegation
-        s = c .*. stratRuleTopLayerMany (liftToContext ruleDeMorganAnd) .*. fulltd (try stratDoubleNotUnary)
+        s = c .*. stratRuleTopLayerMany (liftToContext ruleDeMorganAnd) .*. fulltd (try stratDoubleNot)
 stratDeMorganD        = label "Strategy DeMorgan Derivative"                 $ s 
     where
         f :: SLogic -> Bool
         f (Not p) | hasNegation p = True
         f _                       = False
         c = evalCondOnTerm f
-        s = c .*. stratDeMorgan .*. stratDoubleNot
+        s = c .*. stratDeMorgan .*. fulltd (try stratDoubleNot)
 stratDeMorganOrG      = label "Strategy DeMorgan Or Generalisation"          $ s
     where
         c = evalCondOnTerm $ isMultiOr . skipNegation
-        s = c .*. stratRuleTopLayerMany (liftToContext ruleDeMorganOr) .*. fulltd (try stratDoubleNotUnary)
+        s = c .*. stratRuleTopLayerMany (liftToContext ruleDeMorganOr) .*. fulltd (try stratDoubleNot)
 stratDeMorganG        = label "Strategy DeMorgan Generalisation"             $ s
     where
         c = evalCondOnTerm $ isMultiAndOr . skipNegation

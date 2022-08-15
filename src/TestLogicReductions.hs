@@ -476,11 +476,19 @@ main = do
     --putStrLn $ show $ eqExpr (p :&&: (Not p :->: q)) ((Not p :->: q) :&&: p)
     --putStrLn $ show $ eqExpr (p :&&: (Not p :->: q) :&&: (Not r :<->: q) :&&: r) ((Not r :<->: q) :&&: r :&&: (Not p :->: q) :&&: p)
     
-    putStrLn $ show $ getAllRules
-    putStrLn $ show $ applicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r)
-    putStrLn $ show $ evalApplicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) (applicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r))
-    putStrLn $ show $ isMultiSingleRule ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) ((p :&&: Not (Not p :||: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) AcDisabled
-    putStrLn $ show $ isMultiSingleRule ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) ((p :&&: Not (q :||: Not p)) :&&: (p :&&: Not (Not p :||: q)) :&&: (Not r :<->: q) :&&: r) AcEnabled
+    --putStrLn $ show $ getAllRules
+    --putStrLn $ show $ applicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r)
+    putStrLn $ execStrategy stratDeMorganD  ((Not p :&&: Not (Not q)) :&&: (Not (Not (p :||: Not q)) :&&: Not r))
+    putStrLn $ show $ applicableRules (Not (p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r))
+    
+    putStrLn $ show $ evalApplicableRules (Not (p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r))               (applicableRules (Not (p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r)))
+    putStrLn $ show $ evalApplicableRules (((Not p :&&: q) :&&: Not (Not (p :||: Not q) :&&: r)))                 (applicableRules (Not (p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r)))
+    putStrLn $ show $ evalApplicableRules ((Not p :&&: Not (Not q)) :&&: Not ((Not p :&&: Not (Not q)) :&&: r)) (applicableRules (Not (p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r)))
+    putStrLn $ show $ evalApplicableRules ((Not p :&&: Not (Not q)) :&&: (Not (Not (p :||: Not q)) :||: Not r)) (applicableRules (Not (p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r)))
+    putStrLn $ show $ evalApplicableRules (Not (p :||: Not q) :&&: ((Not (Not p) :||: Not (Not (Not q))) :||: Not r)) (applicableRules (Not (p :||: Not q) :&&: Not (Not (p :||: Not q) :&&: r)))
+    --putStrLn $ show $ evalApplicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) (applicableRules ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r))
+    --putStrLn $ show $ isMultiSingleRule ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) ((p :&&: Not (Not p :||: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) AcDisabled
+    --putStrLn $ show $ isMultiSingleRule ((p :&&: Not (p :->: q)) :&&: (p :&&: Not (p :->: q)) :&&: (Not r :<->: q) :&&: r) ((p :&&: Not (q :||: Not p)) :&&: (p :&&: Not (Not p :||: q)) :&&: (Not r :<->: q) :&&: r) AcEnabled
 
     --tstApply           stratToDnf                   Single thesisTestSet 
     --tstStrategyGeneric stratToDnf                   thesisTestSet 
