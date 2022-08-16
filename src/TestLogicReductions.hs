@@ -535,9 +535,10 @@ main = do
     --putStrLn $ show $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
     --putStrLn $ show $ derivDiff (thesisTestSet!!1) (thesisTestSet!!10)
     --putStrLn $ show $ derivToStringList $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10)
-    putStrLn $ show $ derivToStrategy $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10) 
+    --putStrLn $ show $ derivToStrategy $ derivDiff (thesisTestSet!!7) (thesisTestSet!!10) 
 
     --putStrLn $ show $ getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)
+    putStrLn $ show $ ruleDynamic (thesisTestSet!!7) (thesisTestSet!!10)
     --putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!7)
     --putStrLn $ show $ execStrategy (getMatchingStrategy (thesisTestSet!!7) (thesisTestSet!!10)) (thesisTestSet!!10)
 

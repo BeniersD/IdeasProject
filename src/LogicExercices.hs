@@ -1,7 +1,7 @@
 module LogicExercices where
 
 import Data.Maybe
-import Data.List           (group, sort, sortBy, (\\))
+import Data.List           (group, sort, sortBy, intercalate , (\\))
 import Domain.Logic.Formula
 import Ideas.Common.Library
 import Ideas.Main.Default
@@ -19,17 +19,24 @@ main = defaultMain dr
 getMatchingStrategy :: SLogic -> SLogic -> LabeledStrategy (Context SLogic)
 getMatchingStrategy x y =  derivToStrategy $ derivDiff x y 
 
+ruleDynamic :: SLogic -> SLogic -> Rule (Context SLogic)
+ruleDynamic x y = convertToRule "Dynamic rule - matching strategy" d s
+      where
+          s  = getMatchingStrategy x y
+          rs = map showId $ rulesInStrategy $ s
+          d  = "combi." ++ (intercalate "." rs)
+
 derivStepsList :: SLogic -> [Rule (Context SLogic)]
 derivStepsList x = 
       case (defaultDerivation basicExercise x) of
-        Just d  -> [ x | (x,y) <- steps d]   
-        Nothing -> []
+          Just d  -> [ x | (x,y) <- steps d]   
+          Nothing -> []
 
 derivTermsList :: SLogic -> [Context SLogic]
 derivTermsList x = 
       case (defaultDerivation basicExercise x) of
-        Just d  -> terms d 
-        Nothing -> []
+          Just d  -> terms d 
+          Nothing -> []
 
 derivDiff :: SLogic -> SLogic -> [Rule (Context SLogic)]
 derivDiff x y = removeDuplicates $ xs
@@ -47,7 +54,7 @@ derivToStrategy [] = label "failure" $ failS
 derivToStrategy xs | length xs == 1 = label d $ s  
       where
           r = head xs
-          d = showId r
+          d = "combi." ++ showId r
           s = repeatS ( somewhere r)
 derivToStrategy xs | otherwise       = label d $ s
       where
