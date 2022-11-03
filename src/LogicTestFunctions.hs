@@ -146,8 +146,8 @@ tstDerivation r s xs = mapM_ (\(x, y) -> putStrLn $  show x ++ ". " ++ y) [(y, s
         t  = (drop 0 . take 1000) xs
         es = evalStrategy r s
         --ex = minimalExercise es
-        --ex = basicExercise es
-        ex = evalExercise es
+        ex = basicExercise es
+        --ex = evalExercise es
         f  = showDerivation ex
         --f  = showDerivations ex
 

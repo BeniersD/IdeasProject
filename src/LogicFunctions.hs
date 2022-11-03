@@ -116,10 +116,10 @@ isMultiOr _                                                                 = Fa
 isNegation (Not _)                                                          = True
 isNegation _                                                                = False
 
-isOrdered (p :||: q) | (isBool . skipNegations) p && (not . isLiteral) q      = True
-isOrdered (p :&&: q) | (isBool . skipNegations) p && (not . isLiteral) q      = True
-isOrdered (p :||: q) | (not . isLiteral) p && (isBool . skipNegations) q      = False
-isOrdered (p :&&: q) | (not . isLiteral) p && (isBool . skipNegations) q      = False
+isOrdered (p :||: q) | (isBool . skipNegations) p && (not . isLiteral) q    = True
+isOrdered (p :&&: q) | (isBool . skipNegations) p && (not . isLiteral) q    = True
+isOrdered (p :||: q) | (not . isLiteral) p && (isBool . skipNegations) q    = False
+isOrdered (p :&&: q) | (not . isLiteral) p && (isBool . skipNegations) q    = False
 isOrdered (p :||: q) | (isBool p && isBool q)                               = compareLogic p q 
 isOrdered (p :&&: q) | (isBool p && isBool q)                               = compareLogic p q 
 isOrdered (p :||: q) | p <= q                                               = True
