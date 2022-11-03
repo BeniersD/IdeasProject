@@ -27,7 +27,7 @@ main = do
 
     --tstApply           ruleToAC                     SomeWhereRepeat1  commutativityTestSet 
     --tstStrategyGeneric ruleToAC                     commutativityTestSet 
-    --tstDerivation      ruleToAC                     SomeWhereRepeat1    commutativityTestSet 
+    --tstDerivation      ruleToAC                     SomeWhereRepeat1  commutativityTestSet 
 
     --tstApply           stratToACI                   SomeWhereRepeat1  commutativityTestSet 
     --tstStrategyGeneric stratToACI                   commutativityTestSet 
