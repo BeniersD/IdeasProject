@@ -52,9 +52,9 @@ main = do
     --tstStrategyGeneric ruleLayerTFRuleNotTF         layerTestSet 
     --tstDerivation      ruleLayerTFRuleNotTF         SomeWhere         layerTestSet
 
-    --tstApply           ruleTFRuleNotTFA              SomeWhere         layerTestSet 
-    --tstStrategyGeneric ruleTFRuleNotTFA              layerTestSet 
-    --tstDerivation      ruleTFRuleNotTFA              SomeWhere         layerTestSet
+    --tstApply           ruleTFRuleNotTFA             SomeWhere         layerTestSet 
+    --tstStrategyGeneric ruleTFRuleNotTFA             layerTestSet 
+    --tstDerivation      ruleTFRuleNotTFA             SomeWhere         layerTestSet
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Absorption rule testing
