@@ -8,7 +8,7 @@ import Data.List
 import Data.Maybe
 import Domain.Logic.Formula 
 import qualified Ideas.Common.Strategy.Combinators as Combinators
-import Ideas.Common.Library hiding (layer, isUnary)
+import Ideas.Common.Library hiding (layer)
 import Ideas.Common.Traversal.Navigator
 import Ideas.Utils.Uniplate
 import LogicFunctions
@@ -27,7 +27,7 @@ execStrategy s x = show $ applyD s (newContext $ termNavigator x)
 
 -- Strategy checking syntactix similarity
 eqExpr :: SLogic -> SLogic -> Bool
-eqExpr x y = (execStrategy stratAC x) == (execStrategy stratAC y)
+eqExpr x y = (execStrategy stratToAC x) == (execStrategy stratToAC y)
 
 -- Apply layerMany multiple fimes
 stratRuleTopLayerMany :: (IsStrategy f, Navigator a, HasId (f a)) => f a -> LabeledStrategy a
@@ -42,7 +42,7 @@ stratRuleC  r           = label ("Strategy Commutativy of a Rule " ++ showId r) 
 stratNegate r           = label ("Strategy Negate " ++ showId r)              $ s 
     where 
         c = evalCondOnTerm isNegation
-        s = (c .*. layerFirst r .*. repeatS (somewhere stratUnairiesA))
+        s = (c .*. layerFirst r .*. repeatS (somewhere stratBoolsAndLiteralsA))
 
 data StrategyType = Choice | OrElse | Sequence 
 multiStrategy :: StrategyType -> [Rule (Context SLogic)] -> LabeledStrategy (Context SLogic)
@@ -50,8 +50,8 @@ multiStrategy t xs = label d $ s
     where
         d = "combi" ++ show [i | x <- xs, i <- "." ++ (drop 6 (showId x))]
         s = case t of
-                Choice -> choice xs
-                OrElse -> orelse xs
+                Choice   -> choice xs
+                OrElse   -> orelse xs
                 Sequence -> Combinators.sequence xs  
  
 evalStrategyG :: (IsId l, IsStrategy f) => l -> f a -> LabeledStrategy a
@@ -76,7 +76,7 @@ evalApplicableRules :: SLogic -> [Rule (Context SLogic)] -> [SLogic]
 evalApplicableRules l xs = [fromJust $ currentInContext (applyD (repeat1 $ somewhere x) (newContext $ termNavigator l)) | x <- xs]
 
 evalApplicableRulesAC :: SLogic -> [Rule (Context SLogic)] -> [SLogic]
-evalApplicableRulesAC l xs = [fromJust $ currentInContext (applyD stratAC (newContext $ termNavigator x)) | x <- (evalApplicableRules l xs)]
+evalApplicableRulesAC l xs = [fromJust $ currentInContext (applyD stratToAC (newContext $ termNavigator x)) | x <- (evalApplicableRules l xs)]
 
 data MultiSingleStrategy = AcEnabled | AcDisabled
 isMultiSingleRule :: SLogic -> SLogic -> MultiSingleStrategy -> Bool
@@ -130,7 +130,7 @@ layerMany s            = layer (visit  VisitMany      ruleRight s)
 ruleFRuleConjunctionC, ruleTRuleConjunctionC, ruleFRuleComplementC, ruleTRuleComplementC, ruleFRuleDisjunctionC, ruleTRuleDisjunctionC, 
     ruleCommutativityOrd, ruleFRuleComplementA, ruleTRuleComplementA, ruleFRuleComplementN, ruleTRuleComplementN, ruleFRuleConjunctionA, 
     ruleFRuleConjunctionN, ruleTRuleConjunctionA, ruleFRuleDisjunctionA, ruleTRuleConjunctionN, ruleTRuleDisjunctionA, ruleFRuleDisjunctionN, 
-    ruleTRuleDisjunctionN, ruleDeMorgan, ruleAbsorptionC, ruleAbsorptionA, ruleAbsorptionN, ruleAC, ruleACI, ruleDeMorganAndG, ruleDeMorganOrG, 
+    ruleTRuleDisjunctionN, ruleDeMorgan, ruleAbsorptionC, ruleAbsorptionA, ruleAbsorptionN, ruleToAC, ruleToACI, ruleDeMorganAndG, ruleDeMorganOrG, 
     ruleDeMorganG, ruleDeMorganA, ruleDeMorganD, ruleDoubleNotA, ruleMultiDoubleNot, ruleLayerDoubleNot, ruleMultiTFRuleNotTF, 
     ruleLayerTFRuleNotTF, ruleTFRuleNotTFA, ruleImplicationEliminationA, ruleImplicationEliminationN, ruleEquivalenceEliminationA, 
     ruleEquivalenceEliminationN, ruleIdempotencyN, ruleNegations, ruleImplicationEliminationD :: Rule (Context SLogic)
@@ -139,8 +139,8 @@ stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRul
     stratCommutativityOrd, stratDeMorgan, stratFRuleComplementA, stratTRuleComplementA, stratFRuleComplementN, stratTRuleComplementN, 
     stratFRuleConjunctionA, stratTRuleConjunctionA, stratFRuleConjunctionN, stratTRuleConjunctionN, stratFRuleDisjunctionA, 
     stratTRuleDisjunctionA, stratFRuleDisjunctionN, stratTRuleDisjunctionN, stratAbsorptionC, stratAbsorptionA, stratAbsorptionN, 
-    stratDeMorganAndG, stratDeMorganOrG, stratDeMorganG, stratDeMorganD, stratMultiDoubleNot, stratDoubleNotUnary, stratDoubleNot, 
-    stratLayerDoubleNot, stratLayerTFRuleNotTF, stratUnairiesA, stratConjunctionsA, stratMultiTFRuleNotTF, stratTFRuleNotTFUnary, 
+    stratDeMorganAndG, stratDeMorganOrG, stratDeMorganG, stratDeMorganD, stratMultiDoubleNot, stratDoubleNotLiteral, stratDoubleNot, 
+    stratLayerDoubleNot, stratLayerTFRuleNotTF, stratBoolsAndLiteralsA, stratConjunctionsA, stratMultiTFRuleNotTF, stratTFRuleNotTFBool, 
     stratTFRuleNotTFA, stratDisjunctionsA, stratAbsorbersA, stratImplicationEliminationD, stratImplicationEliminationA, 
     stratImplicationEliminationN, stratEquivalenceEliminationD, stratImplicationElimination, stratEquivalenceEliminationA, 
     stratEquivalenceElimination, stratEquivalenceEliminationN, stratIdempotencyN, stratNegations, stratSA, stratSAO, stratToNnf, stratToNnfA,
@@ -225,12 +225,12 @@ ruleassociativityR    = createRule "Associativity Reversed"                  "si
 -- Combinated strategies like
 -- - Combination of associativity/ commutativity
 -- - Combination of associativity/ commutativity and Idempotency  
--- - Combination of unaries
+-- - Combination of bools and literals
 -- - Combination of conjunctions
 -- - Combination of disjunctions
 -------------------------------------------------------------------------------------------------------------------------------------------------
-stratAC, stratACI :: LabeledStrategy (Context SLogic)
-stratAC                 = label "Strategy Associativity-Commutativity"       $  s
+stratToAC, stratToACI :: LabeledStrategy (Context SLogic)
+stratToAC               = label "Strategy Associativity-Commutativity"       $  s
     where
         f ::  SLogic -> Bool
         f (p :||: (q :||: r)) | (skipNegations p == skipNegations q) && (not . isOrdered) (p :||: q)                             = True
@@ -244,7 +244,7 @@ stratAC                 = label "Strategy Associativity-Commutativity"       $  
         ra = liftToContext ruleAssociativity |> liftToContext rc |> 
              (evalCondOnTerm f .*. lar .*. layerLeftMost (liftToContext ruleCommutativity) .*. la)
         s = repeat1 (somewhere ra)
-stratACI                = label d                                            $  s
+stratToACI              = label d                                            $  s
     where
         d = "Strategy Associativity-Commutativity Idempotency"
         f ::  SLogic -> Bool
@@ -254,9 +254,9 @@ stratACI                = label d                                            $  
 
         lar = liftToContext ruleassociativityR
         ri  = liftToContext ruleIdempotency |> (evalCondOnTerm f .*. lar)
-        s   = repeatS (somewhere stratUnairiesA) .*. stratAC .*. repeatS (oncebu ri)
+        s   = repeatS (somewhere stratBoolsAndLiteralsA) .*. stratToAC .*. repeatS (oncebu ri)
 
-stratUnairiesA          = label d                                            $ stratDoubleNot .|. stratTFRuleNotTFA
+stratBoolsAndLiteralsA  = label d                                            $ stratDoubleNot .|. stratTFRuleNotTFA
     where
         d = "Strategy Double Not / F-Rule Not T / T-Rule Not F (All variants)"
 stratConjunctions       = label d                                            $ s
@@ -296,7 +296,7 @@ stratAll                = label d                                            $ s
     where
         d = "Strategy all rules"
         r = (stratNegations |> stratAbsorbersA |> stratConjunctionsA |> stratDisjunctionsA |> stratGenericsA)
-        s = repeatS (somewhere stratUnairiesA) .*. try r
+        s = repeatS (somewhere stratBoolsAndLiteralsA) .*. try r
 stratNegations          = label "Strategy Negate" $ s 
     where 
         c = evalCondOnTerm isNegation
@@ -312,7 +312,7 @@ stratSA                 = label "Strategy Simplification"                    $ s
         s = repeatS (somewhere (stratConjunctionsA .|. stratDisjunctionsA .|. stratAbsorbersA)) 
 stratSAO                = label "Strategy Simplification and Ordering"       $ s
     where
-        s = repeatS( repeat1 (somewhere (stratConjunctionsA .|. stratDisjunctionsA .|. stratAbsorbersA)) |> stratAC )
+        s = repeatS( repeat1 (somewhere (stratConjunctionsA .|. stratDisjunctionsA .|. stratAbsorbersA)) |> stratToAC )
 
 stratToNnf              = label "Strategy to NNF (All variants)"             $ s
     where
@@ -321,7 +321,7 @@ stratToNnf              = label "Strategy to NNF (All variants)"             $ s
 stratToNnfA             = label "Strategy to NNF (AC - All variants)"        $ s
     where
         s = repeatS ( somewhere ( stratImplicationEliminationA .|. stratEquivalenceEliminationA .|. stratNegations .|. 
-            stratDeMorganA)) .*. repeatS (somewhere stratUnairiesA)
+            stratDeMorganA)) .*. repeatS (somewhere stratBoolsAndLiteralsA)
 stratToCnf              = label "Strategy to CNF"                            $ s
     where
         c = evalCondOnTerm isDistAnd  
@@ -368,8 +368,8 @@ stratToDnfAC            = label "Strategy to DNF  (AC - All variants)"       $ s
     where
         c = evalCondOnTerm isDistOr  
         s = stratToNnfA .*. stratSAO .*. repeatS (somewhere $ c .*. liftToContext ruleDistributivity) .*. stratSAO 
-ruleAC                  = convertToRule "Associativity-Commutativity"        "combi.ac"                                  stratAC  
-ruleACI                 = convertToRule d                                    "combi.aci"                                 stratACI    
+ruleToAC                = convertToRule "Associativity-Commutativity"        "combi.ac"                                  stratToAC  
+ruleToACI               = convertToRule d                                    "combi.aci"                                 stratToACI    
     where
         d = "Associativity-Commutativity-Idempotency"
 ruleNegations           = convertToRule "Negate"                             "combi.negate"                              stratNegations
@@ -519,7 +519,7 @@ stratDeMorganOrG      = label "Strategy DeMorgan Or Generalisation"          $ s
 stratDeMorganG        = label "Strategy DeMorgan Generalisation"             $ s
     where
         c = evalCondOnTerm $ isMultiAndOr . skipNegation
-        s = c .*. stratRuleTopLayerMany ruleDeMorgan .*. fulltd (try stratDoubleNotUnary)
+        s = c .*. stratRuleTopLayerMany ruleDeMorgan .*. fulltd (try stratDoubleNotLiteral)
 
 ruleDeMorgan         = convertToRule "De Morgan (And / Or)"                  "single.demorgan"                           stratDeMorgan
 ruleDeMorganA        = convertToRule "DeMorgan (All variants)"               "all.demorgan"                              stratDeMorganA
@@ -541,7 +541,7 @@ stratEquivalenceEliminationD = label d                                       $ s
         f _                                                                           = False 
         d = "Strategy Equivalence Elimination Derivative"
         c = evalCondOnTerm f
-        s = (c .*. liftToContext ruleEquivalenceElimination .*. layerAll (repeatS (somewhere (stratUnairiesA)) .*. 
+        s = (c .*. liftToContext ruleEquivalenceElimination .*. layerAll (repeatS (somewhere (stratBoolsAndLiteralsA)) .*. 
             repeatS (somewhere $ liftToContext ruleIdempotency .|. stratConjunctionsA)) .*. 
             repeatS (somewhere $ liftToContext ruleIdempotency .|. stratDisjunctionsA))
 stratEquivalenceElimination  = label d                                       $ s
@@ -567,14 +567,14 @@ ruleEquivalenceEliminationN  = convertToRule "Equivalence Elimination Negate" "c
 stratMultiDoubleNot   = label d                                              $ s
     where
         d = "Rewrite Strategy Multi Double Not"
-        c = evalCondOnTerm isMultiDoubleNot .*. evalCondOnTerm isUnary
+        c = evalCondOnTerm isMultiDoubleNot .*. evalCondOnTerm isLiteral
         s = c .*. repeat1 (liftToContext ruleDoubleNot)
-stratDoubleNotUnary   = label "Strategy Unary Double Not"                    $ (ruleMultiDoubleNot .|. liftToContext ruleDoubleNot)
+stratDoubleNotLiteral = label "Strategy Literal Double Not"                    $ (ruleMultiDoubleNot .|. liftToContext ruleDoubleNot)
 stratLayerDoubleNot   = label "Strategy Layered Double Not"                  $ s
     where
-        c = evalCondOnTerm $ not . isUnary
-        s = c .*. repeat1 (layerFirst stratDoubleNotUnary)
-stratDoubleNot        = label "Strategy Layered Double Not"                  $ (stratDoubleNotUnary |> stratLayerDoubleNot)
+        c = evalCondOnTerm $ not . isLiteral
+        s = c .*. repeat1 (layerFirst stratDoubleNotLiteral)
+stratDoubleNot        = label "Strategy Layered Double Not"                  $ (stratDoubleNotLiteral |> stratLayerDoubleNot)
 
 ruleMultiDoubleNot    = convertToRule "Multi Double Not"                     "combi.doublenot"                          stratMultiDoubleNot
 ruleLayerDoubleNot    = convertToRule "Layered Double Not"                   "combi.doublenot"                          stratLayerDoubleNot
@@ -587,16 +587,16 @@ stratMultiTFRuleNotTF = label d                                              $ s
     where
         d = "Strategy Multi Double Not"
         r = liftToContext ruleTRuleNotF |> liftToContext ruleFRuleNotT
-        s = evalCondOnTerm isDoubleNot .*. evalCondOnTerm isUnary .*. repeat1 (oncebu r)
-stratTFRuleNotTFUnary = label d                                              $ s
+        s = evalCondOnTerm isDoubleNot .*. evalCondOnTerm isLiteral .*. repeat1 (oncebu r)
+stratTFRuleNotTFBool = label d                                              $ s
     where
-        d = "Strategy Unary TFRuleNotTFUnary"
+        d = "Strategy T-Rule Not F / F-Rule Not T"
         s = ruleMultiTFRuleNotTF |> liftToContext ruleTRuleNotF |> liftToContext ruleFRuleNotT 
-stratLayerTFRuleNotTF = label "Strategy Layered T-Rule Not F or F-RuleNot-T" $ s
+stratLayerTFRuleNotTF = label "Strategy Layered T-Rule Not F / F-Rule Not T" $ s
     where
-        c = evalCondOnTerm $ not . isUnary 
-        s = c .*. repeat1 (layerFirst stratTFRuleNotTFUnary) 
-stratTFRuleNotTFA     = label "Strategy Layered Double Not"                  $ (stratTFRuleNotTFUnary |> stratLayerTFRuleNotTF) 
+        c = evalCondOnTerm $ not . isLiteral 
+        s = c .*. repeat1 (layerFirst stratTFRuleNotTFBool) 
+stratTFRuleNotTFA     = label "Strategy Layered Double Not"                  $ (stratTFRuleNotTFBool |> stratLayerTFRuleNotTF) 
 
 ruleMultiTFRuleNotTF  = convertToRule "Multi TRuleNotF / FRuleNotT"          "combi.TRuleNotF.FRuleNotT"                stratMultiTFRuleNotTF
 ruleLayerTFRuleNotTF  = convertToRule "Layered TRuleNotF / FRuleNotT"        "combi.layer.TRuleNotF.FRuleNotT"          stratLayerTFRuleNotTF
@@ -640,7 +640,7 @@ stratImplicationEliminationD = label d                                       $ s
         d = "Strategy Implication Elimination Derivative"
         c = evalCondOnTerm f
         s = c .*. liftToContext ruleImplicationElimination .*. 
-            repeatS (somewhere stratUnairiesA) .*. 
+            repeatS (somewhere stratBoolsAndLiteralsA) .*. 
             repeatS (somewhere (stratDisjunctionsA .|. stratIdempotencyA))
 stratImplicationElimination = label d                                        $ s
     where

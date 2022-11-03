@@ -55,15 +55,15 @@ derivToStrategy xs | length xs == 1 = label d $ s
       where
           r = head xs
           d = "combi." ++ showId r
-          s = repeatS ( somewhere r)
+          s = repeatS (somewhere r)
 derivToStrategy xs | otherwise       = label d $ s
       where
           ys = case (elem (liftToContext ruleDeMorganOr) xs || elem (liftToContext ruleDeMorganAnd) xs) of
                   True  -> [ruleDeMorgan] ++ filter (\x -> showId x /= "single.demorgan.or" && showId x /= "single.demorgan.and" ) xs
                   False -> xs
           ms = multiStrategy Choice ys
-          s = repeatS ( somewhere ms)
-          d = showId ms
+          s  = repeatS ( somewhere ms)
+          d  = showId ms
           
 derivToStringList :: [Rule (Context SLogic)] -> [String]
 derivToStringList xs = map show xs

@@ -21,21 +21,21 @@ main = do
 -- Combinated strategies
 -------------------------------------------------------------------------------------------------------------------------------------------------
     --printDerivations   (evalExercise (evalStrategy ruleAC Single)) (commutativityTestSet!!45)
-    --tstApply           stratAC                      SomeWhereRepeat1  commutativityTestSet 
-    --tstStrategyGeneric stratAC                      commutativityTestSet 
-    --tstDerivation      stratAC                      SomeWhereRepeat1  commutativityTestSet 
+    --tstApply           stratToAC                    SomeWhereRepeat1  commutativityTestSet 
+    --tstStrategyGeneric stratToAC                    commutativityTestSet 
+    --tstDerivation      stratToAC                    SomeWhereRepeat1  commutativityTestSet 
 
-    --tstApply           ruleAC                       SomeWhereRepeat1  commutativityTestSet 
-    --tstStrategyGeneric ruleAC                       commutativityTestSet 
-    --tstDerivation      ruleAC                       SomeWhereRepeat1    commutativityTestSet 
+    --tstApply           ruleToAC                     SomeWhereRepeat1  commutativityTestSet 
+    --tstStrategyGeneric ruleToAC                     commutativityTestSet 
+    --tstDerivation      ruleToAC                     SomeWhereRepeat1    commutativityTestSet 
 
-    --tstApply           stratACI                     SomeWhereRepeat1  commutativityTestSet 
-    --tstStrategyGeneric stratACI                     commutativityTestSet 
-    --tstDerivation      stratACI                     SomeWhere         commutativityTestSet 
+    --tstApply           stratToACI                   SomeWhereRepeat1  commutativityTestSet 
+    --tstStrategyGeneric stratToACI                   commutativityTestSet 
+    --tstDerivation      stratToACI                   SomeWhere         commutativityTestSet 
 
-    --tstApply           stratUnairies                SomeWhereRepeat1  layerTestSet 
-    --tstStrategyGeneric stratUnairies                layerTestSet 
-    --tstDerivation      stratUnairies                SomeWhereRepeat1  layerTestSet 
+    --tstApply           stratBoolsAndLiteralsA       SomeWhereRepeat1  layerTestSet 
+    --tstStrategyGeneric stratBoolsAndLiteralsA       layerTestSet 
+    --tstDerivation      stratBoolsAndLiteralsA       SomeWhereRepeat1  layerTestSet 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- F-Rule Not T/T-Rule Not F variants
@@ -44,9 +44,9 @@ main = do
     --tstStrategyGeneric ruleMultiTFRuleNotTF         layerTestSet 
     --tstDerivation      ruleMultiTFRuleNotTF         SomeWhere         layerTestSet
 
-    --tstApply           stratTFRuleNotTFUnary        SomeWhere         layerTestSet 
-    --tstStrategyGeneric stratTFRuleNotTFUnary        layerTestSet 
-    --tstDerivation      stratTFRuleNotTFUnary        SomeWhere         layerTestSet
+    --tstApply           stratTFRuleNotTFBool         SomeWhere         layerTestSet 
+    --tstStrategyGeneric stratTFRuleNotTFBool         layerTestSet 
+    --tstDerivation      stratTFRuleNotTFBool         SomeWhere         layerTestSet
  
     --tstApply           ruleLayerTFRuleNotTF         SomeWhere         layerTestSet 
     --tstStrategyGeneric ruleLayerTFRuleNotTF         layerTestSet 
@@ -451,20 +451,20 @@ main = do
     --tstStrategyGeneric stratToDnfAC                 (negationsTestSet ++ layerTestSet ++ commutativityTestSet) 
     --tstDerivation      stratToDnfAC                 Single (negationsTestSet ++ layerTestSet ++ commutativityTestSet)
     
-    --tstApply           stratACI                     SomeWhereRepeat1  commutativityTestSet 
-    --tstStrategyGeneric stratACI                     commutativityTestSet 
-    --tstDerivation      stratACI                     SomeWhere         commutativityTestSet 
+    --tstApply           stratToACI                   SomeWhereRepeat1  commutativityTestSet 
+    --tstStrategyGeneric stratToACI                   commutativityTestSet 
+    --tstDerivation      stratToACI                   SomeWhere         commutativityTestSet 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Derivations
 -------------------------------------------------------------------------------------------------------------------------------------------------
    
-    --putStrLn $ execStrategy stratAC ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)
+    --putStrLn $ execStrategy stratToAC ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)
     --putStrLn $ show $ length $ applyAll stratToDnfAC (newContext (termNavigator (((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q))))
     --putStrLn $ show $ length $ applyAll stratToDnfAC (newContext (termNavigator ((Not p :&&: r :&&: Not (Not (Not F))) :||: Not (Not (Not F)) :||: Not (Not (Not r)) :||: Not (Not (Not p)) :||: (Not p :&&: q) :||: (Not (Not p) :&&: q :&&: Not p) :||: q :||: p :||: q :||: p :||: Not q :||: Not p :||: F :||: T :||: Not (Not (Not T)) :||: (Not q :<->: Not p))))
 
 
-    --putStrLn $ show $ applyD stratAC (newContext (termNavigator ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)))
+    --putStrLn $ show $ applyD stratToAC (newContext (termNavigator ((((p :||: q) :&&: q) :&&: ((p :&&: q) :||: q)) :||: q)))
     --putStrLn $ show $ eqExpr (p :&&: (Not p :||: q)) ((Not p :||: q) :&&: p)
     --putStrLn $ show $ eqExpr (p :&&: (Not p :||: q)) ((Not p :||: q) :&&: r)
     --putStrLn $ show $ eqExpr ((p :&&: q :&&: r) :&&: (p :&&: q :&&: r)) ((p :&&: r :&&: q) :&&: (q :&&: r :&&: p)) 

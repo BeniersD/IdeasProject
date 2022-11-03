@@ -3,12 +3,12 @@
 
 module LogicFunctions ( o, p, q, r, s ,t, createRule, convertToRule, countNegations, compareLogic, hasRule, hasBool, hasNegation, isAndOrOr, 
    isAssoCommOrdered, isBool, isDistAnd, isDistOr, isMultiAnd, isDoubleNot, isMultiAndOr, isMultiDoubleNot, isMultiImplicationDefinition, 
-   isMultiOr, isNegation, isOrdered,  isUnary, skipNegation, skipNegations, ruleToStrategy, removeDuplicates, hasElement, matchingElement
+   isMultiOr, isNegation, isOrdered, isLiteral, skipNegation, skipNegations, ruleToStrategy, removeDuplicates, hasElement, matchingElement
    ) where
 
 import Data.Maybe
 import Domain.Logic.Formula
-import Ideas.Common.Library hiding (isUnary)
+import Ideas.Common.Library
 import Ideas.Utils.Prelude
 import Ideas.Utils.Uniplate
 
@@ -73,7 +73,7 @@ removeDuplicates [] = []
 removeDuplicates (x:xs) = x:removeDuplicates (filter (/=x) xs)
 
 hasBool, hasDoubleNot, hasNegation, isAndOrOr, isAssoCommOrdered, isDistAnd, isDistOr, isDoubleNot, isMultiImplicationDefinition, isMultiAnd, 
-   isMultiAndOr, isMultiDoubleNot, isMultiOr, isNegation, isOrdered, isBool, isUnary :: SLogic -> Bool
+   isMultiAndOr, isMultiDoubleNot, isMultiOr, isNegation, isOrdered, isBool, isLiteral :: SLogic -> Bool
 hasBool p                                                                   = isBool p || any isBool (children p)
 
 hasDoubleNot p                                                              = any isDoubleNot (children p)
@@ -116,10 +116,10 @@ isMultiOr _                                                                 = Fa
 isNegation (Not _)                                                          = True
 isNegation _                                                                = False
 
-isOrdered (p :||: q) | (isBool . skipNegations) p && (not . isUnary) q      = True
-isOrdered (p :&&: q) | (isBool . skipNegations) p && (not . isUnary) q      = True
-isOrdered (p :||: q) | (not . isUnary) p && (isBool . skipNegations) q      = False
-isOrdered (p :&&: q) | (not . isUnary) p && (isBool . skipNegations) q      = False
+isOrdered (p :||: q) | (isBool . skipNegations) p && (not . isLiteral) q      = True
+isOrdered (p :&&: q) | (isBool . skipNegations) p && (not . isLiteral) q      = True
+isOrdered (p :||: q) | (not . isLiteral) p && (isBool . skipNegations) q      = False
+isOrdered (p :&&: q) | (not . isLiteral) p && (isBool . skipNegations) q      = False
 isOrdered (p :||: q) | (isBool p && isBool q)                               = compareLogic p q 
 isOrdered (p :&&: q) | (isBool p && isBool q)                               = compareLogic p q 
 isOrdered (p :||: q) | p <= q                                               = True
@@ -128,8 +128,8 @@ isOrdered _                                                                 = Fa
 
 isBool p                                                                    = (isTrue . skipNegations) p || (isFalse . skipNegations) p
 
-isUnary (Not p)                                                             = isUnary p
-isUnary p                                                                   = isAtomic p
+isLiteral (Not p)                                                             = isLiteral p
+isLiteral p                                                                   = isAtomic p
 
 skipNegation, skipNegations :: SLogic -> SLogic
 skipNegation  x                                                             = fromMaybe x (isComplement x) 
