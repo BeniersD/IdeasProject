@@ -139,7 +139,7 @@ stratFRuleComplementC, stratFRuleConjunctionC, stratTRuleConjunctionC, stratTRul
     stratCommutativityOrd, stratDeMorgan, stratFRuleComplementA, stratTRuleComplementA, stratFRuleComplementN, stratTRuleComplementN, 
     stratFRuleConjunctionA, stratTRuleConjunctionA, stratFRuleConjunctionN, stratTRuleConjunctionN, stratFRuleDisjunctionA, 
     stratTRuleDisjunctionA, stratFRuleDisjunctionN, stratTRuleDisjunctionN, stratAbsorptionC, stratAbsorptionA, stratAbsorptionN, 
-    stratDeMorganAndG, stratDeMorganOrG, stratDeMorganG, stratDeMorganD, stratMultiDoubleNot, stratDoubleNotLiteral, stratDoubleNot, 
+    stratDeMorganAndG, stratDeMorganOrG, stratDeMorganG, stratDeMorganD, stratMultiDoubleNot, stratDoubleNotLiteral, stratDoubleNotA, 
     stratLayerDoubleNot, stratLayerTFRuleNotTF, stratBoolsAndLiteralsA, stratConjunctionsA, stratMultiTFRuleNotTF, stratTFRuleNotTFBool, 
     stratTFRuleNotTFA, stratDisjunctionsA, stratAbsorbersA, stratImplicationEliminationD, stratImplicationEliminationA, 
     stratImplicationEliminationN, stratEquivalenceEliminationD, stratImplicationElimination, stratEquivalenceEliminationA, 
@@ -214,8 +214,8 @@ ruleAbsorptionN  = convertToRule "Commutative Absorption Derivative"         "co
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Associativity rules 
 -------------------------------------------------------------------------------------------------------------------------------------------------
-ruleassociativityR :: Rule SLogic
-ruleassociativityR    = createRule "Associativity Reversed"                  "single.associativity.reversed"          f
+ruleAssociativityR :: Rule SLogic
+ruleAssociativityR    = createRule "Associativity Reversed"                  "single.associativity.reversed"          f
     where
         f ::  SLogic -> Maybe (SLogic)
         f (p :||: (q:||: r))  = Just ((p :||: q) :||: r) 
@@ -239,7 +239,7 @@ stratToAC               = label "Strategy Associativity-Commutativity" s
         f (p :&&: (q :&&: r)) | (skipNegations p == skipNegations q) && (not . isOrdered) (p :&&: q)                             = True                            
         f (p :&&: (q :&&: r)) | (skipNegations p /= skipNegations q) && (not . isOrdered) (skipNegations p :&&: skipNegations q) = True 
         f _                                                                                                                      = False
-        lar = liftToContext ruleassociativityR
+        lar = liftToContext ruleAssociativityR
         la  = liftToContext ruleAssociativity
         rc = (check (not . isAssoCommOrdered) .*. ruleCommutativity) 
         ra = liftToContext ruleAssociativity |> liftToContext rc |> 
@@ -252,11 +252,11 @@ stratToACI              = label "Strategy Associativity-Commutativity Idempotenc
         f (p :&&: (q :&&: r)) = p == q 
         f _                   = False
 
-        lar = liftToContext ruleassociativityR
+        lar = liftToContext ruleAssociativityR
         ri  = liftToContext ruleIdempotency |> (evalCondOnTerm f .*. lar)
         s   = repeatS (somewhere stratBoolsAndLiteralsA) .*. stratToAC .*. repeatS (oncebu ri)
 
-stratBoolsAndLiteralsA  = label "Strategy Double Not / F-Rule Not T / T-Rule Not F (All variants)" $ stratDoubleNot .|. stratTFRuleNotTFA
+stratBoolsAndLiteralsA  = label "Strategy Double Not / F-Rule Not T / T-Rule Not F (All variants)" $ stratDoubleNotA .|. stratTFRuleNotTFA
 stratConjunctions       = label "Strategy F-Rule Complement / F-Rule Conjunction / T-Rule Conjunction (All variants)"  s
     where
         s = (liftToContext ruleFRuleComplement .|. liftToContext ruleFRuleConjunction .|. liftToContext ruleTRuleConjunction) 
@@ -418,7 +418,7 @@ stratFRuleComplementD  = label "Strategy F-Rule Derivate"                    s
         f2 (p :&&: (q :&&: Not r)) = p == r
         f2 _                       = False  
 
-        s1 = evalCondOnTerm f1 .*. liftToContext ruleassociativityR .*. layerLeftMost (stratFRuleComplement) 
+        s1 = evalCondOnTerm f1 .*. liftToContext ruleAssociativityR .*. layerLeftMost (stratFRuleComplement) 
         s2 = evalCondOnTerm f2 .*. layerRightMost (liftToContext ruleCommutativity) .*. s1
         s  = s1 .|. s2
 stratFRuleComplementN  = label "Strategy F-Rule Complement Negate"           $ stratNegate ruleFRuleComplementA
@@ -440,7 +440,7 @@ stratTRuleComplementD  = label "Strategy Commutative-and-T-Rule Complement"  s
         f2 (p :||: (q :||: Not r)) = p == r 
         f2 _                       = False  
 
-        s1 = evalCondOnTerm f1 .*. liftToContext ruleassociativityR .*. layerLeftMost (stratTRuleComplement) 
+        s1 = evalCondOnTerm f1 .*. liftToContext ruleAssociativityR .*. layerLeftMost (stratTRuleComplement) 
         s2 = evalCondOnTerm f2 .*. layerRightMost (liftToContext ruleCommutativity) .*. s1
         s  = s1 .|. s2 
 stratTRuleComplementN  = label "Strategy T-Rule Complement Negate"           $ stratNegate ruleTRuleComplementA
@@ -489,18 +489,18 @@ stratDeMorganA        = label "Strategy DeMorgan All Variants)"              s
 stratDeMorganAndG     = label "Strategy DeMorgan And Generalisation"         s
     where
         c = evalCondOnTerm $ isMultiAnd . skipNegation
-        s = c .*. stratRuleTopLayerMany (liftToContext ruleDeMorganAnd) .*. fulltd (try stratDoubleNot)
+        s = c .*. stratRuleTopLayerMany (liftToContext ruleDeMorganAnd) .*. fulltd (try stratDoubleNotA)
 stratDeMorganD        = label "Strategy DeMorgan Derivative"                 s 
     where
         f :: SLogic -> Bool
         f (Not p) | hasNegation p = True
         f _                       = False
         c = evalCondOnTerm f
-        s = c .*. stratDeMorgan .*. fulltd (try stratDoubleNot)
+        s = c .*. stratDeMorgan .*. fulltd (try stratDoubleNotA)
 stratDeMorganOrG      = label "Strategy DeMorgan Or Generalisation"          s
     where
         c = evalCondOnTerm $ isMultiOr . skipNegation
-        s = c .*. stratRuleTopLayerMany (liftToContext ruleDeMorganOr) .*. fulltd (try stratDoubleNot)
+        s = c .*. stratRuleTopLayerMany (liftToContext ruleDeMorganOr) .*. fulltd (try stratDoubleNotA)
 stratDeMorganG        = label "Strategy DeMorgan Generalisation"             s
     where
         c = evalCondOnTerm $ isMultiAndOr . skipNegation
@@ -548,11 +548,11 @@ stratLayerDoubleNot   = label "Strategy Layered Double Not"       s
     where
         c = evalCondOnTerm $ not . isLiteral
         s = c .*. repeat1 (layerFirst stratDoubleNotLiteral)
-stratDoubleNot        = label "Strategy Layered Double Not"       $ stratDoubleNotLiteral |> stratLayerDoubleNot
+stratDoubleNotA        = label "Strategy Layered Double Not"       $ stratDoubleNotLiteral |> stratLayerDoubleNot
 
 ruleMultiDoubleNot    = convertToRule "Multi Double Not"          "combi.doublenot" stratMultiDoubleNot
 ruleLayerDoubleNot    = convertToRule "Layered Double Not"        "combi.doublenot" stratLayerDoubleNot
-ruleDoubleNotA        = convertToRule "Double Not (All Variants)" "all.doublenot"   stratDoubleNot
+ruleDoubleNotA        = convertToRule "Double Not (All Variants)" "all.doublenot"   stratDoubleNotA
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 -- F-Rule Not T/T-Rule Not F strategies and rules
@@ -591,7 +591,7 @@ stratIdempotencyD     = label "Strategy Idempotency Negate"                  s
         f2 (p :||: (q :||: r)) = p == r
         f2 _                   = False
 
-        s1 = evalCondOnTerm f1 .*. liftToContext ruleassociativityR .*. layerLeftMost (liftToContext ruleIdempotency) 
+        s1 = evalCondOnTerm f1 .*. liftToContext ruleAssociativityR .*. layerLeftMost (liftToContext ruleIdempotency) 
         s2 = evalCondOnTerm f2 .*. layerRightMost (liftToContext ruleCommutativity) .*. s1
         s  = s1 .|. s2
 stratIdempotencyN     = label "Strategy Idempotency Negate"                  $ stratNegate ruleIdempotencyA

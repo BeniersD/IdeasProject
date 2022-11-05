@@ -128,8 +128,8 @@ isOrdered _                                                                 = Fa
 
 isBool p                                                                    = (isTrue . skipNegations) p || (isFalse . skipNegations) p
 
-isLiteral (Not p)                                                             = isLiteral p
-isLiteral p                                                                   = isAtomic p
+isLiteral (Not p)                                                           = isLiteral p
+isLiteral p                                                                 = isAtomic p
 
 skipNegation, skipNegations :: SLogic -> SLogic
 skipNegation  x                                                             = fromMaybe x (isComplement x) 
